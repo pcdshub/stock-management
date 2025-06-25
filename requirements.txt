@@ -1,1 +1,2 @@
 pydm
+PyQt6

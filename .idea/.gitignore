@@ -1,0 +1,8 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Template ignored files
+__pycache__
+*.swp
+~*
