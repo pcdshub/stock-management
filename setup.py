@@ -20,7 +20,7 @@ setup(
     install_requires=install_requires,
     entry_points={
         'gui_scripts': [
-            'appname=appname.__main__:main'
+            'appname=stock_manager.__main__:main'
         ]
     },
 )
