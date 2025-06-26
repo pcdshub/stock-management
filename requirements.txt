@@ -1,2 +1,4 @@
 pydm
 PyQt6
+PySide6
+qtpy
