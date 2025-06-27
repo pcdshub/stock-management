@@ -6,6 +6,6 @@ source /cds/group/pcds/pyps/conda/pcds_conda
 
 launcher="$(realpath $0)"
 launcher_dir="$(dirname ${launcher})"
-app="${launcher_dir}/stock_manager/stock_manager.py"
+app="${launcher_dir}/stock_manager/__main__.py"
 
 pydm ${app} $@ # Can add pydm args here
