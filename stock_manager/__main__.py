@@ -1,48 +1,48 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton
 from PyQt6.uic import loadUi
+
+from utils.logger import Logger
 
 
 class App(QMainWindow):
 	def __init__(self):
 		super(App, self).__init__()
+		self._log = Logger()
+		self._log.info_log("App Started")
 		loadUi("ui/stock_manager.ui", self)
-		# self._handle_side_ui()
-		
-		self.view_btn.clicked.connect(lambda: self._change_screens(self.view_btn))
-		self.add_btn.clicked.connect(lambda: self._change_screens(self.add_btn))
-		self.edit_btn.clicked.connect(lambda: self._change_screens(self.edit_btn))
-		self.remove_btn.clicked.connect(lambda: self._change_screens(self.remove_btn))
-		self.exit_btn.clicked.connect(lambda: sys.exit())
+		self._handle_side_ui()
+		self._change_screens(self.view_btn)
 	
 	def _handle_side_ui(self):
-		pass
+		self.view_btn.clicked.connect(lambda: self._change_screens(self.view_btn))
+		self.qr_btn.clicked.connect(lambda: self._change_screens(self.qr_btn))
+		self.edit_btn.clicked.connect(lambda: self._change_screens(self.edit_btn))
+		self.remove_btn.clicked.connect(lambda: self._change_screens(self.remove_btn))
+		self.exit_btn.clicked.connect(QCoreApplication.quit)
 	
-	def _change_screens(self, src):
-		print(src)
-		print(src in [self.view_btn, self.add_btn, self.edit_btn, self.remove_btn])
-		return
-		
+	def _change_screens(self, src: QPushButton):
 		title = ' | SLAC Inventory Management Application'
-		match src:
-			case self.view_btn:
-				self.screens.setCurrentIndex(0)
-				self.MainWindow.setWindowTitle('View' + title)
-			case self.add_btn:
-				self.screens.setCurrentIndex(1)
-				self.MainWindow.setWindowTitle('Add' + title)
-			case self.edit_btn:
-				self.screens.setCurrentIndex(2)
-				self.MainWindow.setWindowTitle('Edit' + title)
-			case self.remove_btn:
-				self.screens.setCurrentIndex(3)
-				self.MainWindow.setWindowTitle('Remove' + title)
-			case _:
-				print(src)
-			# case self.exit_btn:
-			# 	sys.exit()
-			
+		buttons: list[QPushButton] = [self.view_btn, self.qr_btn, self.edit_btn, self.remove_btn]
+		
+		for i, btn in enumerate(buttons):
+			if src == btn:
+				self.screens.setCurrentIndex(i)
+				self.setWindowTitle(btn.text() + title)
+				font = src.font()
+				font.setBold(True)
+				src.setFont(font)
+			else:
+				font = btn.font()
+				font.setBold(False)
+				btn.setFont(font)
+	
+	def closeEvent(self, event):
+		self._log.info_log("App Exited")
+		super().closeEvent(event)
+
 
 def main():
 	app = QApplication([])
