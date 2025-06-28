@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>centralwidget</class>
+ <widget class="QWidget" name="centralwidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1263</width>
+    <height>813</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMaximumSize</enum>
+   </property>
+   <item>
+    <widget class="QWidget" name="sideUI" native="true">
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#sideUI {
+       background-color: rgb(170, 0, 0);
+       }</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="view_btn">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+          border-radius: 15;
+          }
+          QPushButton:hover {
+          color: grey;
+          }</string>
+        </property>
+        <property name="text">
+         <string>View</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="qr_btn">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+	border-radius: 15;
+}
+QPushButton:hover {
+	color: grey;
+}
+#qr_btn {
+	font-weight: bold;
+}</string>
+        </property>
+        <property name="text">
+         <string>QR Scan</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="edit_btn">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+          border-radius: 15;
+          }
+          QPushButton:hover {
+          color: grey;
+          }</string>
+        </property>
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="remove_btn">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+          border-radius: 15;
+          }
+          QPushButton:hover {
+          color: grey;
+          }</string>
+        </property>
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="exit_btn">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+          border-radius: 15;
+          }
+          QPushButton:hover {
+          color: grey;
+          }</string>
+        </property>
+        <property name="text">
+         <string>Exit</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="qr_vertical_layout" stretch="1,7">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Scan QR Code:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="video_lbl">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
