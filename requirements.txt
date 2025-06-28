@@ -2,3 +2,5 @@ PyQt6
 PySide6
 qtpy
 cv2
+gspread
+oauth2client
