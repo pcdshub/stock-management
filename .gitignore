@@ -1,0 +1,12 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Template ignored files
+__pycache__
+*.swp
+~*
+
+# Custom ignored files
+stock_manager/assets/gs_credentials.json
+.idea
