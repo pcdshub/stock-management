@@ -1,8 +1,19 @@
+"""
+Logger utility for Stock Management Application.
+
+Provides static methods for logging messages to a file with different severity levels.
+"""
 import logging as log
 
 
 class Logger:
+	"""
+	Logger utility for writing informational, warning, and error logs to a file.
+	"""
 	def __init__(self):
+		"""
+		Configures the logging module to write logs to 'app.log' with timestamps and severity levels.
+		"""
 		log.basicConfig(
 				filename='app.log',
 				level=log.INFO,
@@ -11,28 +22,28 @@ class Logger:
 		)
 	
 	@staticmethod
-	def info_log(msg: str):
+	def info_log(msg: str) -> None:
 		"""
-		Logs a specified message in ../app.log.
-		Prepends message with timestamp and [INFO]
-		:param msg: message to be logged
+		Logs an informational message to the app log.
+		
+		:param msg: Message to be logged.
 		"""
 		log.info(msg)
 	
 	@staticmethod
-	def warning_log(msg: str):
+	def warning_log(msg: str) -> None:
 		"""
-		Logs a specified message in ../app.log.
-		Prepends message with timestamp and [WARNING]
-		:param msg: message to be logged
+		Logs a warning message to the app log.
+		
+		:param msg: Message to be logged.
 		"""
 		log.warning(msg)
 	
 	@staticmethod
-	def error_log(msg: str):
+	def error_log(msg: str) -> None:
 		"""
-		Logs a specified message in ../app.log.
-		Prepends message with timestamp and [ERROR]
-		:param msg: message to be logged
+		Logs an error message to the app log.
+		
+		:param msg: Message to be logged.
 		"""
 		log.error(msg)
