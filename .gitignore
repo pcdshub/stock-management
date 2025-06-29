@@ -3,10 +3,11 @@
 /workspace.xml
 
 # Template ignored files
-__pycache__
+__pycache__/
 *.swp
 ~*
 
 # Custom ignored files
-stock_manager/assets/gs_credentials.json
+*credentials.json
 .idea
+*.pyc
