@@ -1,6 +1,6 @@
 PyQt6
-PySide6
-qtpy
 cv2
+numpy
 gspread
 oauth2client
+pathlib

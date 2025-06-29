@@ -5,7 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 def main():
 	scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 	
-	credentials = ServiceAccountCredentials.from_json_keyfile_name('../assets/gs_credentials.json')
+	credentials = ServiceAccountCredentials.from_json_keyfile_name('../../assets/gs_credentials.json')
 	client = gspread.authorize(credentials)
 	# create_sheet(client)
 	# update_sheet(client)
