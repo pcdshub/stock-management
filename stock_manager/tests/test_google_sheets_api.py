@@ -17,15 +17,14 @@ def update_sheet(client):
 	
 	sheet.update_cell(1, 1, 'Another Updated Value')
 
-
-# sheet.update(range_name='B1:C2', values=[['New Value 1', 'New Value 2'], ['New Value 3', 'New Value 4']])
-# sheet.batch_update([{
-# 	'range': 'D1',
-# 	'values': [['Batch Updated Value']]
-# }, {
-# 	'range': 'E1:F2',
-# 	'values': [['Batch', 'Update'], ['Example', 'Data']]
-# }])
+	# sheet.update(range_name='B1:C2', values=[['New Value 1', 'New Value 2'], ['New Value 3', 'New Value 4']])
+	# sheet.batch_update([{
+	# 	'range': 'D1',
+	# 	'values': [['Batch Updated Value']]
+	# }, {
+	# 	'range': 'E1:F2',
+	# 	'values': [['Batch', 'Update'], ['Example', 'Data']]
+	# }])
 
 
 def read_sheet(client):

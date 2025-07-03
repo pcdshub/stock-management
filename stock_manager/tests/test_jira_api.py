@@ -44,3 +44,7 @@ def update_issue(issue, update_dict):
 
 if __name__ == '__main__':
 	main()
+
+# TODO: add more methods
+# TODO: test more features
+# TODO: potentially integrate into application

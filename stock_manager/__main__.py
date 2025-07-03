@@ -13,18 +13,18 @@ from stock_manager.app import App
 
 def main():
 	"""Start the Qt application and show the main window."""
-	try:
-		app = QApplication([])
-		# app = QApplication(sys.argv)
-		window = App()
-		window.run()
-		window.show()
-		sys.exit(app.exec())
-	except Exception as e:
-		from stock_manager.utils.logger import Logger
-		Logger().error_log(f"Fatal error in main(): {e}")
-		print(f"Fatal error in main(): {e}")
-		sys.exit(1)
+	# try:
+	app = QApplication([])  # todo: if command line arguments are used, swap [] for sys.argv
+	window = App()
+	window.run()
+	window.show()
+	sys.exit(app.exec())
+	# except Exception as e:
+	# 	from stock_manager.utils.logger import Logger
+	# 	Logger().error_log(f"Fatal error in main(): {e}")
+	# 	print(f"Fatal error in main(): {e}")
+	# 	sys.exit(1)
+	# todo: uncomment try except later
 
 
 if __name__ == '__main__':

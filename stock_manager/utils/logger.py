@@ -3,6 +3,7 @@ Logger utility for Stock Management Application.
 
 Provides static methods for logging messages to a file with different severity levels.
 """
+
 import logging as log
 
 

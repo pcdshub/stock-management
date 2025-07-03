@@ -3,6 +3,7 @@
 Provides static methods to handle common UI control logic shared
 across controllers, such as navigation sidebar button behavior.
 """
+
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtWidgets import QPushButton, QStackedWidget
 
@@ -28,7 +29,7 @@ class AbstractController:
 		:param screens: Stacked widget managing different application screens.
 		"""
 		view_btn.clicked.connect(lambda: screens.setCurrentIndex(0))
-		qr_btn.clicked.connect(lambda: screens.setCurrentIndex(1))
+		qr_btn.clicked.connect(lambda: screens.setCurrentIndex(2))
 		# edit_btn.clicked.connect(lambda: screens.setCurrentIndex(2))
 		# remove_btn.clicked.connect(lambda: screens.setCurrentIndex(3))
 		exit_btn.clicked.connect(QCoreApplication.quit)
