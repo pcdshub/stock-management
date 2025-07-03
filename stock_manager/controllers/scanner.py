@@ -5,6 +5,7 @@ Handles video capture, QR code scanning, and updates the UI with camera frames.
 """
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import cv2
 from PyQt6.QtCore import QTimer
@@ -16,11 +17,14 @@ from numpy import ndarray
 
 from .abstract_controller import AbstractController
 
+if TYPE_CHECKING:
+	from stock_manager.app import App
+
 
 class Scanner(QWidget, AbstractController):
 	"""QR Scanner UI controller for capturing video and decoding QR codes."""
 	
-	def __init__(self, app):
+	def __init__(self, app: 'App'):
 		"""
 		Initializes the scanner UI and starts video capture.
 		
@@ -50,6 +54,7 @@ class Scanner(QWidget, AbstractController):
 	
 	def start_video(self) -> None:
 		"""Starts video capture from the default camera."""
+		
 		self._cap = cv2.VideoCapture(0)
 		if not self._cap.isOpened():
 			self._logger.error_log('Could not access camera')
@@ -60,15 +65,13 @@ class Scanner(QWidget, AbstractController):
 	
 	def stop_video(self) -> None:
 		"""Stops video capture and disconnects the timer."""
+		
 		self._cap.release()
 		self._timer.stop()
 	
 	def _update_frame(self) -> None:
-		"""
-		Reads the next frame from the camera, updates the UI, and checks for QR codes.
+		"""Reads the next frame from the camera, updates the UI, and checks for QR codes."""
 		
-		Logs and skips on frame read failures.
-		"""
 		worked, frame = self._cap.read()
 		if not worked:
 			self._logger.error_log('Failed to read frame from camera')
@@ -117,13 +120,17 @@ class Scanner(QWidget, AbstractController):
 			self._logger.info_log(f'QR Code Not Recognized: {data}')
 			print(f'QR Code Not Recognized: {data}')
 	
-	def _clear_form(self):
+	def _clear_form(self) -> None:
+		"""Clears all fields in the scanner UI form and resets the scanned item list."""
+		
 		self._logger.info_log('Items List Cleared')
 		self._items = []
 		self._user = ''
 		self.items_list.clear()
 	
-	def _finish_form(self):
+	def _finish_form(self) -> None:
+		"""Handles the completion of a scanning session and navigates to the finish screen."""
+		
 		if not self._user:
 			print("user required")
 			return
@@ -145,7 +152,9 @@ class Scanner(QWidget, AbstractController):
 		finally:
 			self._app.screens.setCurrentIndex(3)  # finished (success) screen
 	
-	def _handle_remove_items(self):
+	def _handle_remove_items(self) -> None:
+		"""Handles the removal of selected items from the internal item list and updates the UI accordingly."""
+		
 		for item_name in self._items:
 			for item in self._app.all_items:
 				if item.part_num == item_name:

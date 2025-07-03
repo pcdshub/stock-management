@@ -8,9 +8,9 @@ from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.uic import loadUi
 
-from stock_manager.controllers import Export
+from stock_manager.controllers import Export, View, Scanner, Finish
 from stock_manager.model.item import Item
-from stock_manager.utils.database import DBUtils
+from stock_manager.utils import Logger, DBUtils
 
 
 class App(QMainWindow):
@@ -22,8 +22,7 @@ class App(QMainWindow):
 	
 	def __init__(self):
 		"""Initialize the main application window and setup screens."""
-		from stock_manager.controllers import View, Scanner, Finish
-		from stock_manager.utils import Logger
+		
 		super(App, self).__init__()
 		self.log = Logger()
 		self.db = DBUtils()
@@ -60,6 +59,7 @@ class App(QMainWindow):
 	
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
+		
 		title = {0: "View", 1: 'Export', 2: "QR Scanner", 3: 'Finished'}.get(self.screens.currentIndex(), "ERROR")
 		base = " | SLAC Inventory Management Application"
 		self.setWindowTitle(title + base)
@@ -75,30 +75,30 @@ class App(QMainWindow):
 			except Exception as e:
 				self.log.error_log(f"Failed to stop QR scanner: {e}")
 	
-	def _create_all_items(self, items: list[dict[str, int | float | str]]):
+	def _create_all_items(self, items: list[dict[str, int | float | str]]) -> None:
+		"""
+		Creates and populates the internal list of all inventory items from the data source.
+		
+		This method parses raw data and instantiates Item objects accordingly.
+		"""
+		
 		for item in items:
 			vals = list(item.values())
 			for i, val in enumerate(vals):
 				if val == '':
 					vals[i] = None
 			
-			self.all_items.append(Item(
-					part_num=vals[0],
-					manufacturer=vals[1],
-					description=vals[2],
-					total=vals[3],
-					stock_b750=vals[4],
-					stock_b757=vals[5],
-					minimum=vals[6],
-					excess=vals[7],
-					minimum_sallie=vals[8]
-			))
+			self.all_items.append(Item(*vals))
 	
 	def closeEvent(self, event: QCloseEvent) -> None:
 		"""Handle the application close event and log exit."""
 		self.log.info_log("App Exited\n")
 		super().closeEvent(event)
 	
-	def update_tables(self):
-		self._view.update_table(self.all_items)
-		# TODO: add more tables
+	def update_tables(self) -> None:
+		"""
+		Refreshes or updates the displayed tables in the UI to reflect the latest inventory data.
+		
+		This method should be called after making changes to the inventory or data source.
+		"""
+		self._view.update_table(self.all_items)  # TODO: add more tables
