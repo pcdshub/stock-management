@@ -3,6 +3,7 @@ Database utilities for Stock Management Application.
 
 Provides DBUtils for connecting to and retrieving data from Google Sheets.
 """
+
 import os.path
 from pathlib import Path
 
@@ -52,3 +53,9 @@ class DBUtils:
 		except Exception as e:
 			self._log.error_log(f"Error in get_all_data: Failed to fetch data from {self._file_name}. Exception: {e}")
 			raise RuntimeError
+	
+	def get_all_users(self) -> list[str]:  # todo: possibly make user objects out of data
+		return ['QR_USERNAME']  # todo: handle getting usernames from database
+	
+	def update_database(self):
+		pass  # todo: handle update database

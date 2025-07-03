@@ -3,6 +3,7 @@ QR Scanner controller for the Stock Management Application.
 
 Handles video capture, QR code scanning, and updates the UI with camera frames.
 """
+
 from pathlib import Path
 
 import cv2
@@ -13,24 +14,28 @@ from PyQt6.uic import loadUi
 from cv2 import VideoCapture
 from numpy import ndarray
 
-from stock_manager import App
 from .abstract_controller import AbstractController
 
 
 class Scanner(QWidget, AbstractController):
 	"""QR Scanner UI controller for capturing video and decoding QR codes."""
 	
-	_cap: VideoCapture
-	
-	def __init__(self, app: App):
+	def __init__(self, app):
 		"""
 		Initializes the scanner UI and starts video capture.
 		
 		:param app: Reference to the main application instance.
 		"""
 		super(Scanner, self).__init__()
-		self._timer = QTimer()
+		self._app = app
 		self._logger = app.log
+		self._db = app.db
+		self._timer = QTimer()
+		self._cap: VideoCapture
+		self._user = ''
+		self._users_list = app.db.get_all_users()  # get user list from JIRA or database
+		self._items: list[str] = []
+		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / 'scanner.ui'
 			loadUi(str(ui_path), self)
@@ -39,6 +44,8 @@ class Scanner(QWidget, AbstractController):
 			raise
 		
 		self.handle_side_ui(self.view_btn, self.qr_btn, self.edit_btn, self.remove_btn, self.exit_btn, app.screens)
+		self.clear_btn.clicked.connect(self._clear_form)
+		self.done_btn.clicked.connect(self._finish_form)
 		self.start_video()
 	
 	def start_video(self) -> None:
@@ -89,7 +96,72 @@ class Scanner(QWidget, AbstractController):
 		
 		:param frame: Current video frame as a numpy ndarray.
 		"""
-		detector = cv2.QRCodeDetector()
-		data, bbox, code = detector.detectAndDecode(frame)
+		data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
 		if data:
+			if data in self._items or data == self._user:
+				return
+			elif data in self._users_list:
+				self.desc_lbl.setText(data + ' is checking out items:')
+				self._user = data
+				return
+			
 			self._logger.info_log(f"QR Code Scanned: {data}")
+			print(f"QR Code Scanned: {data}")
+			
+			for item in self._app.all_items:
+				if data == item.part_num:
+					self._items.append(item.part_num)
+					self.items_list.append(f'<ul><li>{data}</li></ul>')
+					return
+			
+			self._logger.info_log(f'QR Code Not Recognized: {data}')
+			print(f'QR Code Not Recognized: {data}')
+	
+	def _clear_form(self):
+		self._logger.info_log('Items List Cleared')
+		self._items = []
+		self._user = ''
+		self.items_list.clear()
+	
+	def _finish_form(self):
+		if not self._user:
+			print("user required")
+			return
+		elif not self._items:
+			print("at least one item required")
+			return
+		
+		try:
+			self._handle_remove_items()
+		except Exception as e:
+			self._app.success.set_text('An Error Occurred, Items Could Not Be Subtracted From Database')
+			self._logger.error_log(f'Item(s) could not be subtracted from database: {e}')
+		else:
+			length = len(self._items)
+			self._app.success.set_text(f"{length} {'item has' if length == 1 else 'items have'} successfully been subtracted from database.")
+			self._logger.info_log(f'{self._user} has checked out items: {self._items}')
+			self._clear_form()
+			self.desc_lbl.setText('Please Scan User QR Code')
+		finally:
+			self._app.screens.setCurrentIndex(3)  # finished (success) screen
+	
+	def _handle_remove_items(self):
+		for item_name in self._items:
+			for item in self._app.all_items:
+				if item.part_num == item_name:
+					if self.b750_btn.isChecked():
+						item.stock_b750 -= 1
+					elif self.b757_btn.isChecked():
+						item.stock_b757 -= 1
+					else:
+						self._logger.error_log("Neither Radio Button Is Selected")
+						raise ValueError("Neither Radio Button Is Selected")
+					
+					item.update_stats()
+					if item.excess <= 0:
+						pass  # TODO: handle alert send for specified item
+					
+					break
+					
+		self._app.update_tables()
+		self._db.update_database()

@@ -11,3 +11,6 @@ __pycache__/
 *credentials.json
 .idea
 *.pyc
+ui_*.py
+TODO.txt
+# TODO: remove this later
