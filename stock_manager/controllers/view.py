@@ -5,6 +5,7 @@ Handles the main table display and integrates with the database utility.
 """
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from PyQt6.QtWidgets import QWidget, QTableWidgetItem, QTableWidget
 from PyQt6.uic import loadUi
@@ -13,18 +14,22 @@ from stock_manager.model.item import Item
 from stock_manager.utils import DBUtils
 from .abstract_controller import AbstractController
 
+if TYPE_CHECKING:
+	from stock_manager.app import App
+
 
 class View(QWidget, AbstractController):
 	"""
 	View controller for displaying and managing inventory data.
 	"""
 	
-	def __init__(self, app):
+	def __init__(self, app: 'App'):
 		"""
 		Initializes the View controller, loads the UI, and sets up the table.
 		
 		:param app: Reference to the main application instance.
 		"""
+		
 		super(View, self).__init__()
 		self._database = DBUtils()
 		self._logger = app.log
@@ -46,6 +51,7 @@ class View(QWidget, AbstractController):
 		"""
 		Initializes the table widget with all inventory data from the database.
 		"""
+		
 		self.table.setRowCount(len(all_data))
 		
 		row_num: int
@@ -55,6 +61,12 @@ class View(QWidget, AbstractController):
 				self.table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))
 
 	def _filter_table(self, text: str) -> None:
+		"""
+		Filters the displayed table rows based on the provided search query.
+		
+		:param text: The text to filter table entries by.
+		"""
+		
 		table: QTableWidget = self.table
 		
 		if text == '':

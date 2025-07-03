@@ -55,7 +55,9 @@ class DBUtils:
 			raise RuntimeError
 	
 	def get_all_users(self) -> list[str]:  # todo: possibly make user objects out of data
+		"""Retrieve a list of all users from the database."""
 		return ['QR_USERNAME']  # todo: handle getting usernames from database
 	
-	def update_database(self):
+	def update_database(self) -> None:
+		"""Update the database with the latest changes or synchronize its contents."""
 		pass  # todo: handle update database
