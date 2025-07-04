@@ -11,6 +11,7 @@ class Logger:
 	"""
 	Logger utility for writing informational, warning, and error logs to a file.
 	"""
+	
 	def __init__(self):
 		"""
 		Configures the logging module to write logs to 'app.log' with timestamps and severity levels.

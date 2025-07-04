@@ -1,6 +1,5 @@
 # Default ignored files
 /shelf/
-/workspace.xml
 
 # Template ignored files
 __pycache__/
@@ -12,5 +11,6 @@ __pycache__/
 .idea
 *.pyc
 ui_*.py
+*.log
 TODO.txt
 # TODO: remove this later
