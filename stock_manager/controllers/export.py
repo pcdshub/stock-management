@@ -1,13 +1,10 @@
 """Controls exporting inventory data to various file formats for the SLAC Inventory Management application."""
 
-from __future__ import annotations
-
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PyQt6.QtWidgets import QWidget, QFileDialog
-from PyQt6.uic import loadUi
+from PyQt6.QtWidgets import QFileDialog
 
 from .abstract_controller import AbstractController
 
@@ -15,7 +12,7 @@ if TYPE_CHECKING:
 	from stock_manager.app import App
 
 
-class Export(QWidget, AbstractController):
+class Export(AbstractController):
 	"""UI controller for data export functionality."""
 	
 	def __init__(self, app: 'App'):
@@ -24,19 +21,9 @@ class Export(QWidget, AbstractController):
 		
 		:param app: Reference to the main application instance.
 		"""
-		super(Export, self).__init__()
+		super().__init__('export', app)
 		
 		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
-		self._app = app
-		
-		try:
-			ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / 'export.ui'
-			loadUi(str(ui_path), self)
-		except Exception as e:
-			app.log.error_log(f"Failed to load scanner UI file: {e}")
-			raise
-		
-		self.handle_side_ui(self.view_btn, self.qr_btn, self.edit_btn, self.remove_btn, self.exit_btn, app.screens)
 		
 		self.back_btn.clicked.connect(lambda: app.screens.setCurrentIndex(0))
 		self.location_btn.clicked.connect(self._get_directory)
@@ -59,8 +46,10 @@ class Export(QWidget, AbstractController):
 	def _get_directory(self) -> None:
 		"""Open a dialog to select the export directory and update the UI."""
 		
-		response = QFileDialog.getExistingDirectory(self, 'Select A Folder',
-				str(Path(__file__).resolve().parent.parent.parent / 'exports'))
+		response = QFileDialog.getExistingDirectory(
+				self, 'Select A Folder',
+				str(Path(__file__).resolve().parent.parent.parent / 'exports')
+		)
 		response = str(response)
 		self.location_btn.setText(f'...{response[-6:]}' if len(response) > 6 else response)
 		self._path = response
@@ -78,13 +67,13 @@ class Export(QWidget, AbstractController):
 		"""
 		
 		delimiter = {
-			'CSV': ',',
-			'TSV': '\t',
-			'PSV': ' | '
+			'csv': ',',
+			'tsv': '\t',
+			'psv': ' | '
 		}.get(ext)
 		
 		with open(self._get_valid_path(ext), 'x') as f:
-			for item in self._app.all_items:
+			for item in self.app.all_items:
 				line = ''
 				for var in item:
 					line += (str(var) if var else '') + delimiter

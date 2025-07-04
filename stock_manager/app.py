@@ -8,9 +8,10 @@ from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.uic import loadUi
 
-from stock_manager.controllers import Export, View, Scanner, Finish
+import stock_manager.controllers
+from stock_manager.controllers import Edit, Export, Finish, Scanner, View
 from stock_manager.model.item import Item
-from stock_manager.utils import Logger, DBUtils
+from stock_manager.utils import DBUtils, Logger
 
 
 class App(QMainWindow):
@@ -26,7 +27,6 @@ class App(QMainWindow):
 		super(App, self).__init__()
 		self.log = Logger()
 		self.db = DBUtils()
-		self.all_items: list[Item] = []
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
@@ -37,7 +37,7 @@ class App(QMainWindow):
 		
 		try:
 			gs_data: list[dict[str, int | float | str]] = self.db.get_all_data()
-			self._create_all_items(gs_data)
+			self.all_items = self._create_all_items(gs_data)
 		except Exception as e:
 			self.log.error_log(f"Could not load data from database: {e}")
 		
@@ -45,14 +45,17 @@ class App(QMainWindow):
 		self._qr: Scanner = Scanner(self)
 		self._export = Export(self)
 		self.success = Finish(self)
+		self._edit = Edit(self)
 		self.screens.addWidget(self._view)
 		self.screens.addWidget(self._export)
 		self.screens.addWidget(self._qr)
 		self.screens.addWidget(self.success)
+		self.screens.addWidget(self._edit)
 		self.screens.currentChanged.connect(self._on_page_changed)
 	
 	def run(self) -> None:
 		"""Start the application, show the initial screen, log app startup."""
+		
 		self.log.info_log("App Started")
 		self.screens.setCurrentIndex(0)
 		self._on_page_changed()
@@ -60,9 +63,14 @@ class App(QMainWindow):
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
 		
-		title = {0: "View", 1: 'Export', 2: "QR Scanner", 3: 'Finished'}.get(self.screens.currentIndex(), "ERROR")
-		base = " | SLAC Inventory Management Application"
-		self.setWindowTitle(title + base)
+		title = {
+			0: "View",
+			1: 'Export',
+			2: "QR Scanner",
+			3: 'Finished',
+			4: 'Edit'
+		}.get(self.screens.currentIndex(), "ERROR")
+		self.setWindowTitle(title + " | SLAC Inventory Management Application")
 		
 		if self.screens.currentIndex() == 2:
 			try:
@@ -75,23 +83,23 @@ class App(QMainWindow):
 			except Exception as e:
 				self.log.error_log(f"Failed to stop QR scanner: {e}")
 	
-	def _create_all_items(self, items: list[dict[str, int | float | str]]) -> None:
+	@staticmethod
+	def _create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
 		"""
 		Creates and populates the internal list of all inventory items from the data source.
 		
 		This method parses raw data and instantiates Item objects accordingly.
 		"""
 		
-		for item in items:
-			vals = list(item.values())
-			for i, val in enumerate(vals):
-				if val == '':
-					vals[i] = None
-			
-			self.all_items.append(Item(*vals))
+		obj_items: list[Item] = []
+		for item in gs_items:
+			vals: list[int | float | str | None] = [None if val == '' else val for val in list(item.values())]
+			obj_items.append(Item(*vals))
+		return obj_items
 	
 	def closeEvent(self, event: QCloseEvent) -> None:
 		"""Handle the application close event and log exit."""
+		
 		self.log.info_log("App Exited\n")
 		super().closeEvent(event)
 	
@@ -101,4 +109,7 @@ class App(QMainWindow):
 		
 		This method should be called after making changes to the inventory or data source.
 		"""
-		self._view.update_table(self.all_items)  # TODO: add more tables
+		
+		controller: stock_manager.controllers.AbstractController
+		for controller in [self._view, self._edit]:
+			controller.update_table(self.all_items, controller.table)

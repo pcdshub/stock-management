@@ -14,7 +14,7 @@ from stock_manager.app import App
 def main():
 	"""Start the Qt application and show the main window."""
 	# try:
-	app = QApplication([])  # todo: if command line arguments are used, swap [] for sys.argv
+	app = QApplication([])  # TODO: if command line arguments are used, swap [] for sys.argv
 	window = App()
 	window.run()
 	window.show()
@@ -24,7 +24,7 @@ def main():
 	# 	Logger().error_log(f"Fatal error in main(): {e}")
 	# 	print(f"Fatal error in main(): {e}")
 	# 	sys.exit(1)
-	# todo: uncomment try except later
+# TODO: uncomment try except later
 
 
 if __name__ == '__main__':

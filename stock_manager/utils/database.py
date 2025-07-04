@@ -54,10 +54,10 @@ class DBUtils:
 			self._log.error_log(f"Error in get_all_data: Failed to fetch data from {self._file_name}. Exception: {e}")
 			raise RuntimeError
 	
-	def get_all_users(self) -> list[str]:  # todo: possibly make user objects out of data
+	def get_all_users(self) -> list[str]:  # TODO: possibly make user objects out of data
 		"""Retrieve a list of all users from the database."""
-		return ['QR_USERNAME']  # todo: handle getting usernames from database
+		return ['QR_USERNAME']  # TODO: handle getting usernames from database
 	
 	def update_database(self) -> None:
-		"""Update the database with the latest changes or synchronize its contents."""
-		pass  # todo: handle update database
+		"""Update the database with the latest changes and synchronize its contents."""
+		pass  # TODO: handle update database

@@ -7,6 +7,8 @@ Defines the Item dataclass, which tracks part numbers, quantities, and stock sta
 from dataclasses import dataclass
 from typing import Generator
 
+from stock_manager.utils import EXCESS_EQUATION, TOTAL_EQUATION
+
 
 @dataclass
 class Item:
@@ -24,18 +26,18 @@ class Item:
 	:var minimum_sallie: Minimum required stock for B757.
 	"""
 	
-	part_num: str
-	manufacturer: str
-	description: str
-	total: int
-	stock_b750: int
-	stock_b757: int
-	minimum: int
-	excess: int
-	minimum_sallie: int
+	part_num: str | None
+	manufacturer: str | None
+	description: str | None
+	total: int | None
+	stock_b750: int | None
+	stock_b757: int | None
+	minimum: int | None
+	excess: int | None
+	minimum_sallie: int | None
 	
 	def __len__(self) -> int:
-		"""Allows calling the length to the item's total number of field values."""
+		"""Allows counting the length of the item's total number of field values."""
 		return len(self.__dict__)
 	
 	def __getitem__(self, idx: int) -> str | int | None:
@@ -49,8 +51,8 @@ class Item:
 	def update_stats(self) -> None:
 		"""Updates the 'total' and 'excess' fields based on current stock and minimums."""
 		
-		total = self.stock_b750 + self.stock_b757
+		total = TOTAL_EQUATION(self.stock_b750, self.stock_b757)
 		self.total = 0 if total <= 0 else total
-			
-		excess = total - (self.minimum + self.minimum_sallie)
+		
+		excess = EXCESS_EQUATION(total, self.minimum, self.minimum_sallie)
 		self.excess = 0 if excess <= 0 else excess
