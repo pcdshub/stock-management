@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from .abstract_controller import AbstractController
 
 if TYPE_CHECKING:
-	from stock_manager.app import App
+	from stock_manager import App
 
 
 class Finish(AbstractController):

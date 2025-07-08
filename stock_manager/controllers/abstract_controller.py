@@ -1,4 +1,5 @@
-"""Abstract base controller for Stock Management Application.
+"""
+Abstract base controller for Stock Management Application.
 
 Provides static methods to handle common UI control logic shared
 across controllers, such as navigation sidebar button behavior,
@@ -9,17 +10,21 @@ from abc import ABC, ABCMeta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PyQt6.QtCore import QCoreApplication
-from PyQt6.QtWidgets import QPushButton, QStackedWidget, QTableWidget, QTableWidgetItem, QWidget
+from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem, QWidget
 from PyQt6.uic import loadUi
 
-from stock_manager.model import Item
-
 if TYPE_CHECKING:
-	from stock_manager.app import App
+	from stock_manager import App
+	from stock_manager import Item
 
 
 class CombinedMeta(type(QWidget), ABCMeta):
+	"""
+	A metaclass combining PyQts QWidget metaclass and Python's ABCMeta.
+	
+	This enables the AbstractController to inherit from both PyQt widgets and Python abstract base classes,
+	resolving metaclass conflicts that would otherwise occur with multiple inheritance.
+	"""
 	pass
 
 
@@ -27,6 +32,13 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 	"""Abstract controller with common UI behavior for the application."""
 	
 	def __init__(self, file_name: str, app: 'App'):
+		"""
+		Initialize the abstract controller, load its UI, and set up sidebar navigation handlers.
+		
+		:param file_name: The name of the .ui file (without extension) to load for this controller.
+		:param app: Reference to the main application instance
+		"""
+		
 		super(AbstractController, self).__init__()
 		
 		self.app = app
@@ -39,36 +51,14 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 			app.log.error_log(f"Failed to load view UI file: {e}")
 			raise
 		
-		self._handle_side_ui(self.view_btn, self.qr_btn, self.edit_btn, self.remove_btn, self.exit_btn, app.screens)
-	
-	@staticmethod
-	def _handle_side_ui(
-			view_btn: QPushButton,
-			qr_btn: QPushButton,
-			edit_btn: QPushButton,
-			remove_btn: QPushButton,
-			exit_btn: QPushButton,
-			screens: QStackedWidget
-	) -> None:
-		"""
-		Connects sidebar buttons to the appropriate screen navigation actions.
-		
-		:param view_btn: Button to switch to the View screen.
-		:param qr_btn: Button to switch to the QR Scanner screen.
-		:param edit_btn:
-		:param remove_btn:
-		:param exit_btn: Button to quit the application.
-		:param screens: Stacked widget managing different application screens.
-		"""
-		view_btn.clicked.connect(lambda: screens.setCurrentIndex(0))
-		qr_btn.clicked.connect(lambda: screens.setCurrentIndex(2))
-		edit_btn.clicked.connect(lambda: screens.setCurrentIndex(4))
-		# remove_btn.clicked.connect(lambda: screens.setCurrentIndex(3))
-		exit_btn.clicked.connect(QCoreApplication.quit)
-	
 	@staticmethod
 	def filter_table(text: str, table: QTableWidget) -> None:
-		# TODO: add docstring
+		"""
+		Filter the rows of a QTableWidget to show only those matching the search text.
+		
+		:param text: Search string to filter rows by. Only rows that contain this text will be shown.
+		:param table: The table widget to filter.
+		"""
 		
 		if text == '':
 			for row in range(table.rowCount()):
@@ -85,16 +75,16 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 			
 			table.setRowHidden(row, not match)
 	
-	@staticmethod
-	def update_table(all_data: list[Item], table: QTableWidget) -> None:
+	def update_table(self, table: QTableWidget) -> None:
 		"""
 		Initializes the table widget with all inventory data from the database.
 		"""
 		
+		all_data = self.app.all_items
 		table.setRowCount(len(all_data))
 		
 		row_num: int
-		item: Item
+		item: 'Item'
 		for row_num, item in enumerate(all_data):
 			for col_num in range(len(item)):
 				table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))

@@ -7,8 +7,6 @@ Defines the Item dataclass, which tracks part numbers, quantities, and stock sta
 from dataclasses import dataclass
 from typing import Generator
 
-from stock_manager.utils import EXCESS_EQUATION, TOTAL_EQUATION
-
 
 @dataclass
 class Item:
@@ -50,6 +48,8 @@ class Item:
 	
 	def update_stats(self) -> None:
 		"""Updates the 'total' and 'excess' fields based on current stock and minimums."""
+		
+		from stock_manager import EXCESS_EQUATION, TOTAL_EQUATION
 		
 		total = TOTAL_EQUATION(self.stock_b750, self.stock_b757)
 		self.total = 0 if total <= 0 else total

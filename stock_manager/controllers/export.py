@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import QFileDialog
 from .abstract_controller import AbstractController
 
 if TYPE_CHECKING:
-	from stock_manager.app import App
+	from stock_manager import App
 
 
 class Export(AbstractController):
@@ -33,26 +33,36 @@ class Export(AbstractController):
 	def _export_data(self) -> None:
 		"""Export data based on the selected file type in the UI."""
 		
-		match self.export_combo.currentText():
-			case 'PDF':
-				self._pdf_export()
-			case 'CSV':
-				self._sv_export('csv')
-			case 'TSV':
-				self._sv_export('tsv')
-			case 'PSV':
-				self._sv_export('psv')
+		try:
+			match self.export_combo.currentText():
+				case 'PDF':
+					self._pdf_export()
+				case 'CSV':
+					self._sv_export('csv')
+				case 'TSV':
+					self._sv_export('tsv')
+				case 'PSV':
+					self._sv_export('psv')
+				case _:
+					print("unknown export type")
+		except Exception as e:
+			print(f'Export Failed: {e}')
+			self.app.log.error_log(f'Export Failed: {e}')
 	
 	def _get_directory(self) -> None:
 		"""Open a dialog to select the export directory and update the UI."""
 		
-		response = QFileDialog.getExistingDirectory(
-				self, 'Select A Folder',
-				str(Path(__file__).resolve().parent.parent.parent / 'exports')
-		)
-		response = str(response)
-		self.location_btn.setText(f'...{response[-6:]}' if len(response) > 6 else response)
-		self._path = response
+		try:
+			response = QFileDialog.getExistingDirectory(
+					self, 'Select A Folder',
+					str(Path(__file__).resolve().parent.parent.parent / 'exports')
+			)
+			response = str(response)
+			self.location_btn.setText(f'...{response[-6:]}' if len(response) > 6 else response)
+			self._path = response
+		except Exception as e:
+			print(f"Directory selection failed: {e}")
+			self.app.log.error_log(f"Directory selection failed: {e}")
 	
 	def _pdf_export(self) -> None:
 		"""Export current data to PDF format."""
@@ -72,12 +82,18 @@ class Export(AbstractController):
 			'psv': ' | '
 		}.get(ext)
 		
-		with open(self._get_valid_path(ext), 'x') as f:
-			for item in self.app.all_items:
-				line = ''
-				for var in item:
-					line += (str(var) if var else '') + delimiter
-				f.write(line[:-1] + '\n')
+		try:
+			with open(self._get_valid_path(ext), 'x') as f:
+				for item in self.app.all_items:
+					line = ''
+					for var in item:
+						line += (str(var) if var else '') + delimiter
+					f.write(line[:-1] + '\n')
+		except FileExistsError:
+			print("file already exists")
+		except Exception as e:
+			print(f'Failed To Export Data To {ext.upper()}: {e}')
+			self.app.log.error_log(f'Failed To Export Data To {ext.upper()}: {e}')
 	
 	def _get_valid_path(self, ext: str) -> str:
 		"""
@@ -86,6 +102,7 @@ class Export(AbstractController):
 		:param ext: The desired file extension.
 		:return: A unique file path as a string.
 		"""
+		
 		name = f'{ext}_export'
 		path = f'{self._path}/{name}.{ext}'
 		

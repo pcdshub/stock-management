@@ -15,7 +15,7 @@ from PyQt6.QtGui import QImage, QPixmap
 from .abstract_controller import AbstractController
 
 if TYPE_CHECKING:
-	from stock_manager.app import App
+	from stock_manager import App
 
 
 class Scanner(AbstractController):
@@ -72,10 +72,9 @@ class Scanner(AbstractController):
 		except Exception as e:
 			self.logger.error_log(f"Failed to convert frame color: {e}")
 		
-		h, w, ch = frame.shape
-		bytes_per_line = ch * w
-		
 		try:
+			h, w, ch = frame.shape
+			bytes_per_line = ch * w
 			q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
 			self.video_lbl.setPixmap(QPixmap.fromImage(q_img))
 		except Exception as e:
@@ -140,7 +139,7 @@ class Scanner(AbstractController):
 			self._clear_form()
 			self.desc_lbl.setText('Please Scan User QR Code')
 		finally:
-			self.app.screens.setCurrentIndex(3)  # finished (success) screen
+			self.app.screens.setCurrentIndex(6)  # finished (success) screen
 	
 	def _handle_remove_items(self) -> None:
 		"""Handles the removal of selected items from the internal item list and updates the UI accordingly."""
