@@ -8,7 +8,7 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from stock_manager.app import App
+from stock_manager import App
 
 
 def main():
@@ -21,6 +21,7 @@ def main():
 	sys.exit(app.exec())
 	# except Exception as e:
 	# 	from stock_manager.utils.logger import Logger
+#
 	# 	Logger().error_log(f"Fatal error in main(): {e}")
 	# 	print(f"Fatal error in main(): {e}")
 	# 	sys.exit(1)

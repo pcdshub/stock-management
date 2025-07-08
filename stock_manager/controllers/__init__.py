@@ -1,12 +1,15 @@
-"""Controllers package for the Stock Management Application.
+"""
+Controllers package for the Stock Management Application.
 
 Exposes the main View and Scanner controllers for the application's UI logic.
 """
 
 from .abstract_controller import AbstractController
+from .add import Add
 from .edit import Edit
 from .export import Export
 from .finish import Finish
+from .remove import Remove
 from .scanner import Scanner
 from .view import View
 
@@ -16,5 +19,7 @@ __all__ = [
 	'Scanner',
 	'Finish',
 	'Export',
-	'Edit'
+	'Add',
+	'Edit',
+	'Remove',
 ]

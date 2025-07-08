@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from .abstract_controller import AbstractController
 
 if TYPE_CHECKING:
-	from stock_manager.app import App
+	from stock_manager import App
 
 
 class View(AbstractController):
@@ -26,6 +26,6 @@ class View(AbstractController):
 		
 		super().__init__('view', app)
 		
-		self.update_table(app.all_items, self.table)
+		self.update_table(self.table)
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
-		self.export_btn.clicked.connect(lambda: app.screens.setCurrentIndex(1))
+		self.export_btn.clicked.connect(lambda: app.screens.setCurrentIndex(5))  # export screen
