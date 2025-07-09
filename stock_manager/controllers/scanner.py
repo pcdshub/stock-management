@@ -4,73 +4,63 @@ QR Scanner controller for the Stock Management Application.
 Handles video capture, QR code scanning, and updates the UI with camera frames.
 """
 
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 import cv2
-from cv2 import VideoCapture
 from numpy import ndarray
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import pyqtSignal, QThread
 from PyQt6.QtGui import QImage, QPixmap
+from qasync import asyncSlot
 
 from .abstract_controller import AbstractController
 
 if TYPE_CHECKING:
 	from stock_manager import App
+	from stock_manager import Logger
 
 
 class Scanner(AbstractController):
 	"""QR Scanner UI controller for capturing video and decoding QR codes."""
 	
+	@override
 	def __init__(self, app: 'App'):
 		"""
-		Initializes the scanner UI and starts video capture.
+		Initializes the scanner UI.
 		
 		:param app: Reference to the main application instance.
 		"""
+		
 		super().__init__('scanner', app)
 		
 		self._db = app.db
-		self._timer = QTimer()
-		self._cap: VideoCapture
+		self._camera_thread = CameraThread(self.logger)
 		self._user = ''
 		self._users_list = app.db.get_all_users()  # get user list from JIRA or database
 		self._items: list[str] = []
 		
 		self.clear_btn.clicked.connect(self._clear_form)
 		self.done_btn.clicked.connect(self._finish_form)
-		self.start_video()
 	
 	def start_video(self) -> None:
-		"""Starts video capture from the default camera."""
-		
-		self._cap = cv2.VideoCapture(0)
-		if not self._cap.isOpened():
-			self.logger.error_log('Could not access camera')
-			return
-		
-		self._timer.timeout.connect(self._update_frame)
-		self._timer.start(100)
+		try:
+			self._camera_thread.frame_ready.connect(self._process_frame)
+			self._camera_thread.start()
+		except Exception as e:
+			self.logger.error_log(f'Error Starting Camera Thread: {e}')
+			print(f'error in start video: {e}')
 	
 	def stop_video(self) -> None:
-		"""Stops video capture and disconnects the timer."""
-		
-		self._cap.release()
-		self._timer.stop()
+		self._camera_thread.stop()
+		self._camera_thread.wait()
 	
-	def _update_frame(self) -> None:
-		"""Reads the next frame from the camera, updates the UI, and checks for QR codes."""
-		
-		worked, frame = self._cap.read()
-		if not worked:
-			self.logger.error_log('Failed to read frame from camera')
-			return
-		
+	def _process_frame(self, frame: ndarray) -> None:
 		self._check_for_qr(frame)
 		
 		try:
 			cv2.cvtColor(frame, cv2.COLOR_BGR2RGB, frame)
 		except Exception as e:
 			self.logger.error_log(f"Failed to convert frame color: {e}")
+			print(f'failed to convert frame color: {e}')
 		
 		try:
 			h, w, ch = frame.shape
@@ -79,13 +69,16 @@ class Scanner(AbstractController):
 			self.video_lbl.setPixmap(QPixmap.fromImage(q_img))
 		except Exception as e:
 			self.logger.error_log(f"Failed to update video label: {e}")
+			print(f'Failed to update video label: {e}')
 	
-	def _check_for_qr(self, frame: ndarray) -> None:
+	@asyncSlot()
+	async def _check_for_qr(self, frame: ndarray) -> None:
 		"""
 		Scans the current frame for a QR code and logs if found.
 		
 		:param frame: Current video frame as a numpy ndarray.
 		"""
+		
 		data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
 		if data:
 			if data in self._items or data == self._user:
@@ -133,7 +126,9 @@ class Scanner(AbstractController):
 		else:
 			length = len(self._items)
 			self.app.success.set_text(
-					f"{length} {'item has' if length == 1 else 'items have'} successfully been subtracted from database."
+					f"{length} "
+					f"{'item has' if length == 1 else 'items have'} "
+					f"successfully been subtracted from database."
 			)
 			self.logger.info_log(f'{self._user} has checked out items: {self._items}')
 			self._clear_form()
@@ -163,3 +158,33 @@ class Scanner(AbstractController):
 		
 		self.app.update_tables()
 		self._db.update_database()
+
+
+class CameraThread(QThread):
+	frame_ready = pyqtSignal(object)
+	
+	def __init__(self, logger: 'Logger', parent=None):
+		super().__init__(parent)
+		self._running = False
+		self._logger = logger
+	
+	@override
+	def run(self) -> None:
+		self._running = True
+		cap = cv2.VideoCapture(0)
+		if not cap.isOpened():
+			self._logger.error_log('Could not access camera')
+			print('could not access camera')
+			return
+		
+		while self._running:
+			worked, frame = cap.read()
+			if worked:
+				self.frame_ready.emit(frame)
+			else:
+				self._logger.error_log('Failed to read frame from camera')
+				print('Failed to read frame from camera')
+		cap.release()
+	
+	def stop(self) -> None:
+		self._running = False

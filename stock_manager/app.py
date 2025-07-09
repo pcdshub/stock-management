@@ -2,7 +2,9 @@
 Instantiate and run the App class to start the SLAC Inventory Management application.
 """
 
+import asyncio
 from pathlib import Path
+from typing import override
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QCloseEvent, QFont
@@ -28,6 +30,7 @@ class App(QMainWindow):
 		super(App, self).__init__()
 		self.log = Logger()
 		self.db = DBUtils()
+		self.all_items: list[Item] = []
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
@@ -36,21 +39,25 @@ class App(QMainWindow):
 			self.log.error_log(f"Failed to load main UI file: {e}")
 			raise SystemExit
 		
-		try:
-			gs_data: list[dict[str, int | float | str]] = self.db.get_all_data()
-			self.all_items = self._create_all_items(gs_data)
-		except Exception as e:
-			self.log.error_log(f"Could not load data from database: {e}")
-		
 		self._handle_screens()
 		self._handle_side_ui()
 	
-	def run(self) -> None:
+	async def run(self) -> None:
 		"""Start the application, show the initial screen, log app startup."""
 		
 		self.log.info_log("App Started")
 		self.screens.setCurrentIndex(0)
 		self._on_page_changed()
+		asyncio.create_task(self._async_load())
+	
+	async def _async_load(self) -> None:
+		try:
+			gs_data: list[dict[str, int | float | str]] = await self.db.get_all_data()
+			self.all_items = await self._create_all_items(gs_data)
+			await self.update_tables()
+		except Exception as e:
+			self.log.error_log(f"Could not load data from database: {e}")
+			print(f'error with async: {e}')
 	
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
@@ -88,12 +95,16 @@ class App(QMainWindow):
 	def _handle_screens(self) -> None:
 		from stock_manager import Edit, Export, Finish, Remove, Scanner, View, Add
 		
-		self.screens.addWidget(View(self))
+		self._view = View(self)
 		self._qr = Scanner(self)
+		self._edit = Edit(self)
+		self._remove = Remove(self)
+		
+		self.screens.addWidget(self._view)
 		self.screens.addWidget(self._qr)
 		self.screens.addWidget(Add(self))
-		self.screens.addWidget(Edit(self))
-		self.screens.addWidget(Remove(self))
+		self.screens.addWidget(self._edit)
+		self.screens.addWidget(self._remove)
 		self.screens.addWidget(Export(self))
 		self.screens.addWidget(Finish(self))
 		
@@ -110,7 +121,7 @@ class App(QMainWindow):
 		self.exit_btn.clicked.connect(QCoreApplication.quit)
 	
 	@staticmethod
-	def _create_all_items(gs_items: list[dict[str, int | float | str]]) -> list['Item']:
+	async def _create_all_items(gs_items: list[dict[str, int | float | str]]) -> list['Item']:
 		"""
 		Creates and populates the internal list of all inventory items from the data source.
 		
@@ -127,13 +138,14 @@ class App(QMainWindow):
 			obj_items.append(Item(*vals))
 		return obj_items
 	
+	@override
 	def closeEvent(self, event: QCloseEvent) -> None:
 		"""Handle the application close event and log exit."""
 		
 		self.log.info_log("App Exited\n")
 		super().closeEvent(event)
 	
-	def update_tables(self) -> None:
+	async def update_tables(self) -> None:
 		"""
 		Refreshes or updates the displayed tables in the UI to reflect the latest inventory data.
 		

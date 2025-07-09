@@ -4,21 +4,29 @@ Main entry point for the SLAC Inventory Management Application.
 Initializes the Qt Application and launches the main application window.
 """
 
-import sys
+import asyncio
 
+from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QApplication
+from qasync import QEventLoop
 
 from stock_manager import App
 
 
 def main():
 	"""Start the Qt application and show the main window."""
+	
 	# try:
 	app = QApplication([])  # TODO: if command line arguments are used, swap [] for sys.argv
+	loop = QEventLoop(app)
+	asyncio.set_event_loop(loop)
 	window = App()
-	window.run()
 	window.show()
-	sys.exit(app.exec())
+	
+	QTimer.singleShot(0, lambda: asyncio.create_task(window.run()))
+	
+	with loop:
+		loop.run_forever()
 	# except Exception as e:
 	# 	from stock_manager.utils.logger import Logger
 #

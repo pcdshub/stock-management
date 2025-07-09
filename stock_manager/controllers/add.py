@@ -1,5 +1,5 @@
 # TODO at home: add docstrings and type annotation
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QLineEdit, QSpinBox, QTextEdit
 
@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 
 class Add(AbstractController):
+	@override
 	def __init__(self, app: 'App'):
 		super().__init__('add', app)
 		

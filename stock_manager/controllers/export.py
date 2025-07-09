@@ -2,9 +2,10 @@
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QFileDialog
+from qasync import asyncSlot
 
 from .abstract_controller import AbstractController
 
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
 class Export(AbstractController):
 	"""UI controller for data export functionality."""
 	
+	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initialize the Export controller.
@@ -28,9 +30,9 @@ class Export(AbstractController):
 		self.back_btn.clicked.connect(lambda: app.screens.setCurrentIndex(0))
 		self.location_btn.clicked.connect(self._get_directory)
 		self.location_btn.setText(f'...{self._path[-6:]}')
-		self.export_btn.clicked.connect(self._export_data)
+		self.export_btn.clicked.connect(self._async_export_data)
 	
-	def _export_data(self) -> None:
+	def _async_export_data(self) -> None:
 		"""Export data based on the selected file type in the UI."""
 		
 		try:
@@ -64,12 +66,14 @@ class Export(AbstractController):
 			print(f"Directory selection failed: {e}")
 			self.app.log.error_log(f"Directory selection failed: {e}")
 	
-	def _pdf_export(self) -> None:
+	@asyncSlot()
+	async def _pdf_export(self) -> None:
 		"""Export current data to PDF format."""
 		
 		pass  # TODO: add pdf generation
 	
-	def _sv_export(self, ext: str) -> None:
+	@asyncSlot()
+	async def _sv_export(self, ext: str) -> None:
 		"""
 		Export current data to a delimited text file (CSV, TSV, PSV).
 		
@@ -84,11 +88,12 @@ class Export(AbstractController):
 		
 		try:
 			with open(self._get_valid_path(ext), 'x') as f:
-				for item in self.app.all_items:
+				for i, item in enumerate(self.app.all_items):
 					line = ''
 					for var in item:
 						line += (str(var) if var else '') + delimiter
 					f.write(line[:-1] + '\n')
+					self.progressBar.setValue(i)
 		except FileExistsError:
 			print("file already exists")
 		except Exception as e:

@@ -1,5 +1,5 @@
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 from .abstract_controller import AbstractController
 
@@ -8,10 +8,10 @@ if TYPE_CHECKING:
 
 
 class Remove(AbstractController):
+	@override
 	def __init__(self, app: 'App'):
 		super().__init__('remove', app)
 		
-		self.update_table(self.table)
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
 		self.table.cellClicked.connect(self._on_cell_clicked)
 	
