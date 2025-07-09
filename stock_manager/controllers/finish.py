@@ -4,7 +4,7 @@ Controller for the 'Finish' screen
 Manages the UI and logic for displaying the completion screen and returning the user to the main menu.
 """
 
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 from .abstract_controller import AbstractController
 
@@ -19,6 +19,7 @@ class Finish(AbstractController):
 	This UI component displays a completion screen and provides navigation back to the main menu.
 	"""
 	
+	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initialize the Finish screen controller.

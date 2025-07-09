@@ -5,9 +5,8 @@ This module provides the Edit class, which handles the UI and logic for editing 
 including updating item details, validating user input, and saving changes to the database.
 """
 
-# from __future__ import annotations
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QLineEdit, QSpinBox, QTextEdit
 
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
 class Edit(AbstractController):
 	"""Controller for editing inventory items in the Stock Management Application."""
 	
+	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initialize the Edit controller, load the UI, set up the table, and connect signals for user interactions.
@@ -40,7 +40,6 @@ class Edit(AbstractController):
 		]
 		self._text_fields: list[QLineEdit | QTextEdit] = [self.manufacturer, self.desc]
 		
-		self.update_table(self.table)
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
 		self.table.cellClicked.connect(self._on_cell_clicked)
 		self.clear_btn.clicked.connect(self._clear_form)

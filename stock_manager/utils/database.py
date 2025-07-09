@@ -44,7 +44,7 @@ class DBUtils:
 			Logger().error_log(f"Database connection failed: {e}")
 			raise RuntimeError("Failed to initialize database connection.")
 	
-	def get_all_data(self) -> list[dict[str, int | float | str]]:
+	async def get_all_data(self) -> list[dict[str, int | float | str]]:
 		"""
 		Retrieves all records from the first worksheet of the 'Stock Management Sheet'.
 		
