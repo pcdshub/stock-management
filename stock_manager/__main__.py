@@ -6,7 +6,6 @@ Initializes the Qt Application and launches the main application window.
 
 import asyncio
 
-from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QApplication
 from qasync import QEventLoop
 
@@ -21,18 +20,23 @@ def main():
 	loop = QEventLoop(app)
 	asyncio.set_event_loop(loop)
 	window = App()
+	window.run()
 	window.show()
-	
-	QTimer.singleShot(0, lambda: asyncio.create_task(window.run()))
 	
 	with loop:
 		loop.run_forever()
 	# except Exception as e:
 	# 	from stock_manager.utils.logger import Logger
-#
-	# 	Logger().error_log(f"Fatal error in main(): {e}")
-	# 	print(f"Fatal error in main(): {e}")
-	# 	sys.exit(1)
+
+# 	print(f"Fatal Error In Main(): {e}")
+# 	Logger().error_log(f"Fatal Error In Main(): {e}")
+# 	QMessageBox.critical(
+# 			None,
+# 			'Fatal Error',
+# 			'Fatal Error Starting The Application',
+# 			QMessageBox.StandardButton.Ok
+# 	)
+# 	raise SystemExit(1)
 # TODO: uncomment try except later
 
 

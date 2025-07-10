@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QFileDialog, QMessageBox
 from qasync import asyncSlot
 
 from .abstract_controller import AbstractController
@@ -30,9 +30,9 @@ class Export(AbstractController):
 		self.back_btn.clicked.connect(lambda: app.screens.setCurrentIndex(0))
 		self.location_btn.clicked.connect(self._get_directory)
 		self.location_btn.setText(f'...{self._path[-6:]}')
-		self.export_btn.clicked.connect(self._async_export_data)
+		self.export_btn.clicked.connect(self._export_data)
 	
-	def _async_export_data(self) -> None:
+	def _export_data(self) -> None:
 		"""Export data based on the selected file type in the UI."""
 		
 		try:
@@ -45,11 +45,34 @@ class Export(AbstractController):
 					self._sv_export('tsv')
 				case 'PSV':
 					self._sv_export('psv')
-				case _:
-					print("unknown export type")
+				case 'Select':
+					QMessageBox.information(
+							self,
+							'Please Choose File Type',
+							'Please Select A File Type Before Exporting',
+							QMessageBox.StandardButton.Ok
+					)
+				case _ as unknown:
+					print(f'Unknown Export Type: "{unknown}"')
+					QMessageBox.warning(
+							self,
+							'Selection Error',
+							'Please Select A Valid File Type To Export',
+							QMessageBox.StandardButton.Ok
+					)
 		except Exception as e:
 			print(f'Export Failed: {e}')
 			self.app.log.error_log(f'Export Failed: {e}')
+			response = QMessageBox.critical(
+					self,
+					'Export Failure',
+					'Failed To Export Data To File',
+					QMessageBox.StandardButton.Ok,
+					QMessageBox.StandardButton.Retry
+			)
+			
+			if response == QMessageBox.StandardButton.Retry:
+				self._export_data()
 	
 	def _get_directory(self) -> None:
 		"""Open a dialog to select the export directory and update the UI."""
@@ -63,8 +86,18 @@ class Export(AbstractController):
 			self.location_btn.setText(f'...{response[-6:]}' if len(response) > 6 else response)
 			self._path = response
 		except Exception as e:
-			print(f"Directory selection failed: {e}")
-			self.app.log.error_log(f"Directory selection failed: {e}")
+			print(f"Directory Selection Failure: {e}")
+			self.app.log.error_log(f"Directory Selection Failure: {e}")
+			response = QMessageBox.critical(
+					self,
+					'Directory Selection Failure',
+					'Failed To Select Directory',
+					QMessageBox.StandardButton.Ok,
+					QMessageBox.StandardButton.Retry
+			)
+			
+			if response == QMessageBox.StandardButton.Retry:
+				self._get_directory()
 	
 	@asyncSlot()
 	async def _pdf_export(self) -> None:
@@ -94,11 +127,24 @@ class Export(AbstractController):
 						line += (str(var) if var else '') + delimiter
 					f.write(line[:-1] + '\n')
 					self.progressBar.setValue(i)
-		except FileExistsError:
-			print("file already exists")
+		except FileExistsError as e:
+			print("That File Already Exists")
+			self.app.log.error_log(f'File Already Exists Error: {e}')
+			QMessageBox.critical(
+					self,
+					'File Exists Error',
+					'That File Already Exists, Try Changing File Types',
+					QMessageBox.StandardButton.Ok
+			)
 		except Exception as e:
 			print(f'Failed To Export Data To {ext.upper()}: {e}')
 			self.app.log.error_log(f'Failed To Export Data To {ext.upper()}: {e}')
+			QMessageBox.critical(
+					self,
+					f'{ext.upper()} Export Error',
+					f'Failed To Export Data To {ext.upper()}, Try Changing File Types',
+					QMessageBox.StandardButton.Ok
+			)
 	
 	def _get_valid_path(self, ext: str) -> str:
 		"""

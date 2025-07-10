@@ -8,10 +8,10 @@ from typing import override
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QCloseEvent, QFont
-from PyQt6.QtWidgets import QMainWindow, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QPushButton
 from PyQt6.uic import loadUi
+from qasync import asyncSlot
 
-import stock_manager
 from stock_manager.model import Item
 
 
@@ -36,28 +36,44 @@ class App(QMainWindow):
 			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
 			loadUi(str(ui_path), self)
 		except Exception as e:
-			self.log.error_log(f"Failed to load main UI file: {e}")
-			raise SystemExit
+			print(f"Failed To Load Main UI File: {e}")
+			self.log.error_log(f"Failed To Load Main UI File: {e}")
+			QMessageBox.critical(
+					None,
+					'UI Failure',
+					'Failed To Load Main UI File',
+					QMessageBox.StandardButton.Ok
+			)
+			raise SystemExit(1)
 		
 		self._handle_screens()
 		self._handle_side_ui()
 	
-	async def run(self) -> None:
-		"""Start the application, show the initial screen, log app startup."""
-		
+	def run(self) -> None:
 		self.log.info_log("App Started")
 		self.screens.setCurrentIndex(0)
 		self._on_page_changed()
-		asyncio.create_task(self._async_load())
+		self._async_load()
 	
+	@asyncSlot()
 	async def _async_load(self) -> None:
 		try:
 			gs_data: list[dict[str, int | float | str]] = await self.db.get_all_data()
 			self.all_items = await self._create_all_items(gs_data)
 			await self.update_tables()
 		except Exception as e:
+			print(f'Error Loading Data Asynchronously: {e}')
 			self.log.error_log(f"Could not load data from database: {e}")
-			print(f'error with async: {e}')
+			response = QMessageBox.critical(
+					self,
+					'Data Load Failure',
+					'Failed To Load Data From Database',
+					QMessageBox.StandardButton.Ok,
+					QMessageBox.StandardButton.Close
+			)
+			
+			if response == QMessageBox.StandardButton.Close:
+				raise SystemExit(1)
 	
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
@@ -99,6 +115,7 @@ class App(QMainWindow):
 		self._qr = Scanner(self)
 		self._edit = Edit(self)
 		self._remove = Remove(self)
+		self.finish = Finish(self)
 		
 		self.screens.addWidget(self._view)
 		self.screens.addWidget(self._qr)
@@ -106,7 +123,7 @@ class App(QMainWindow):
 		self.screens.addWidget(self._edit)
 		self.screens.addWidget(self._remove)
 		self.screens.addWidget(Export(self))
-		self.screens.addWidget(Finish(self))
+		self.screens.addWidget(self.finish)
 		
 		self.screens.currentChanged.connect(self._on_page_changed)
 	
@@ -121,7 +138,7 @@ class App(QMainWindow):
 		self.exit_btn.clicked.connect(QCoreApplication.quit)
 	
 	@staticmethod
-	async def _create_all_items(gs_items: list[dict[str, int | float | str]]) -> list['Item']:
+	async def _create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
 		"""
 		Creates and populates the internal list of all inventory items from the data source.
 		
@@ -145,6 +162,7 @@ class App(QMainWindow):
 		self.log.info_log("App Exited\n")
 		super().closeEvent(event)
 	
+	@asyncSlot()
 	async def update_tables(self) -> None:
 		"""
 		Refreshes or updates the displayed tables in the UI to reflect the latest inventory data.
@@ -152,6 +170,9 @@ class App(QMainWindow):
 		This method should be called after making changes to the inventory or data source.
 		"""
 		
-		controller: stock_manager.AbstractController
-		for controller in [self._view, self._edit, self._remove]:
+		await asyncio.gather(
+				*(
 			controller.update_table(controller.table)
+					for controller in [self._view, self._edit, self._remove]
+				)
+		)

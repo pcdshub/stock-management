@@ -5,7 +5,7 @@ Defines the Item dataclass, which tracks part numbers, quantities, and stock sta
 """
 
 from dataclasses import dataclass
-from typing import Generator
+from typing import Generator, override
 
 
 @dataclass
@@ -33,6 +33,16 @@ class Item:
 	minimum: int | None
 	excess: int | None
 	minimum_sallie: int | None
+	
+	@override
+	def __hash__(self) -> int:
+		return hash((value for value in self))
+	
+	@override
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Item):
+			return False
+		return all(s == o for s, o, in zip(self, other))
 	
 	def __len__(self) -> int:
 		"""Allows counting the length of the item's total number of field values."""

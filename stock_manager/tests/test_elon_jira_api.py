@@ -1,5 +1,3 @@
-# TODO at home: figure out what this script does, how it works, how it compares to mine
-
 import asyncio
 import json
 import logging
