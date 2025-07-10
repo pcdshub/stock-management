@@ -1,8 +1,8 @@
-# TODO at home: add docstrings and type annotation
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QLineEdit, QSpinBox, QTextEdit
+from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
+import stock_manager
 from .abstract_controller import AbstractController
 
 if TYPE_CHECKING:
@@ -36,16 +36,27 @@ class Add(AbstractController):
 	def _on_spinner_change(self, _) -> None:
 		try:
 			from stock_manager import EXCESS_EQUATION, TOTAL_EQUATION
-			self._total = TOTAL_EQUATION(self.b750_spinner.value(), self.b757_spinner.value())
+			self._total = TOTAL_EQUATION(
+					self.b750_spinner.value(),
+					self.b757_spinner.value()
+			)
 			self._excess = EXCESS_EQUATION(
-					self._total, self.min_750_spinner.value(), self.min_757_spinner.value()
+					self._total,
+					self.min_750_spinner.value(),
+					self.min_757_spinner.value()
 			)
 			
 			self.total_lbl.setText("Total: " + str(self._total))
 			self.excess_lbl.setText("Excess: " + str(self._excess))
 		except Exception as e:
-			print(f"Spinner change error: {e}")
-			self.app.log.error_log(f"Spinner change error: {e}")
+			print(f"Spinner Change Error: {e}")
+			self.app.log.error_log(f"Spinner Change Error: {e}")
+			QMessageBox.critical(
+					self,
+					'Spinner Change Error',
+					'Failed To Compute Spinner Data',
+					QMessageBox.StandardButton.Ok
+			)
 	
 	def _clear_form(self) -> None:
 		text_field: QLineEdit | QTextEdit
@@ -54,11 +65,9 @@ class Add(AbstractController):
 		for spinner in self._spinners:
 			spinner.setValue(0)
 	
-	def _submit_form(self) -> None:  # TODO: test this
-		from stock_manager import Item
-		
+	def _submit_form(self) -> None:
 		self.app.all_items.append(
-				Item(
+				stock_manager.Item(
 						self.part_num.text(),
 						self.manufacturer.text(),
 						self.desc.toPlainText(),
@@ -70,4 +79,7 @@ class Add(AbstractController):
 						self.min_757_spinner.value()
 				)
 		)
-		print(self.app.all_items[-1])
+		
+		self.app.update_tables()
+		self.app.db.update_database()
+		self._clear_form()

@@ -50,7 +50,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		except Exception as e:
 			app.log.error_log(f"Failed to load view UI file: {e}")
 			raise
-		
+	
 	@staticmethod
 	def filter_table(text: str, table: QTableWidget) -> None:
 		"""
@@ -75,7 +75,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 			
 			table.setRowHidden(row, not match)
 	
-	def update_table(self, table: QTableWidget) -> None:
+	async def update_table(self, table: QTableWidget) -> None:
 		"""
 		Initializes the table widget with all inventory data from the database.
 		"""

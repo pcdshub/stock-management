@@ -8,7 +8,7 @@ including updating item details, validating user input, and saving changes to th
 from functools import partial
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QLineEdit, QSpinBox, QTextEdit
+from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 from stock_manager.model.item import Item
 from .abstract_controller import AbstractController
@@ -63,7 +63,7 @@ class Edit(AbstractController):
 			return int(text)
 		return text
 	
-	def _get_selected_item(self, row: int) -> Item:  # TODO: delete this method if not needed
+	def _get_selected_item(self, row: int) -> Item | None:  # TODO: delete this method if not needed
 		"""
 		Construct and return an Item instance from the data in the specified table row.
 		
@@ -71,20 +71,25 @@ class Edit(AbstractController):
 		:return: The Item instance constructed from the row's values.
 		"""
 		
-		info: list[int | str | None] = []
-		
 		try:
-			info = [
+			info: list[int | str | None] = [
 				self._parse_field(self.table.item(row, i).text())
 				for i in range(len(Item))
 			]
 		except Exception as e:
-			print(f"Item parsing error: {e}")
+			print(f"Item Parsing Error: {e}")
 			self.app.log.error_log(f"Item parsing error: {e}")
-		
-		temp_item = Item(*info)
-		self._selected_item = temp_item
-		return temp_item
+			QMessageBox.critical(
+					self,
+					'Item Parsing Error',
+					'Failed To Parse Selected Item',
+					QMessageBox.StandardButton.Ok
+			)
+			return None
+		else:
+			temp_item = Item(*info)
+			self._selected_item = temp_item
+			return temp_item
 	
 	def _on_cell_clicked(self, row: int, _) -> None:
 		"""
@@ -97,6 +102,8 @@ class Edit(AbstractController):
 		try:
 			self._selected_item = item = self.app.all_items[row]
 			# item = self._get_selected_item(row)
+			# if not item:
+			# 	raise
 			self._total = item.total
 			self._excess = item.excess
 			
@@ -110,8 +117,14 @@ class Edit(AbstractController):
 			self.min_750_spinner.setValue(item.minimum if item.minimum is not None else 0)
 			self.min_757_spinner.setValue(item.minimum_sallie if item.minimum_sallie is not None else 0)
 		except Exception as e:
-			print(f"Failed to populate fields: {e}")
+			print(f"Failed To Populate Fields: {e}")
 			self.app.log.error_log(f"Failed to populate fields: {e}")
+			QMessageBox.critical(
+					self,
+					'Field Population Error',
+					'Failed To Populate Fields',
+					QMessageBox.StandardButton.Ok
+			)
 	
 	def _on_spinner_change(self, _) -> None:
 		"""
@@ -122,16 +135,27 @@ class Edit(AbstractController):
 		
 		try:
 			from stock_manager import EXCESS_EQUATION, TOTAL_EQUATION
-			self._total = TOTAL_EQUATION(self.b750_spinner.value(), self.b757_spinner.value())
+			self._total = TOTAL_EQUATION(
+					self.b750_spinner.value(),
+					self.b757_spinner.value()
+			)
 			self._excess = EXCESS_EQUATION(
-					self._total, self.min_750_spinner.value(), self.min_757_spinner.value()
+					self._total,
+					self.min_750_spinner.value(),
+					self.min_757_spinner.value()
 			)
 			
 			self.total_lbl.setText("Total: " + str(self._total))
 			self.excess_lbl.setText("Excess: " + str(self._excess))
 		except Exception as e:
-			print(f"Spinner change error: {e}")
-			self.app.log.error_log(f"Spinner change error: {e}")
+			print(f"Spinner Change Error: {e}")
+			self.app.log.error_log(f"Spinner Change Error: {e}")
+			QMessageBox.critical(
+					self,
+					'Spinner Change Error',
+					'Failed To Compute Spinner Data',
+					QMessageBox.StandardButton.Ok
+			)
 	
 	def _clear_form(self) -> None:
 		"""Clear all fields in the edit form and reset spinners and labels."""
@@ -157,7 +181,12 @@ class Edit(AbstractController):
 		"""
 		
 		if not self._selected_item:
-			print('please select an item')
+			QMessageBox.information(
+					self,
+					'No Item Selected',
+					'Please Select An Item Before Submitting The Form',
+					QMessageBox.StandardButton.Ok
+			)
 			return
 		
 		field_vals: list[str | int | None] = [
@@ -178,21 +207,33 @@ class Edit(AbstractController):
 			if isinstance(field_val, str):
 				field_vals[i] = self._parse_field(field_val)
 		
-		if (new_item := Item(*field_vals)) != self._selected_item:
-			try:
-				idx = next(
-						i for i, old_item in enumerate(self.app.all_items) if old_item.part_num == new_item.part_num
-				)
-				self.app.all_items[idx] = new_item
-			except StopIteration:
-				print("Item with this part number does not exist.")
-				return
-			
-			# confirmation popup
-			
-			# if yes
-			self.app.update_tables()
-			self.app.db.update_database()
-			self._clear_form()
-		else:
-			print("Items are identical")
+		new_item = Item(*field_vals)
+		
+		if new_item == self._selected_item:
+			QMessageBox.information(
+					self,
+					'Identical Items',
+					'Item Is Unchanged, Please Change A Field Before Submitting Form',
+					QMessageBox.StandardButton.Ok
+			)
+			return
+		
+		response = QMessageBox.critical(
+				self,
+				'Item Change Confirmation',
+				f'Are You Sure You Want To Update Item {new_item.part_num}?',
+				QMessageBox.StandardButton.Yes,
+				QMessageBox.StandardButton.No
+		)
+		
+		if response == QMessageBox.StandardButton.No:
+			return
+		
+		for i, old_item in enumerate(self.app.all_items):
+			if old_item.part_num == new_item.part_num:
+				self.app.all_items[i] = new_item
+				break
+		
+		self.app.update_tables()
+		self.app.db.update_database()
+		self._clear_form()
