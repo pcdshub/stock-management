@@ -30,6 +30,7 @@ class App(QMainWindow):
 		super(App, self).__init__()
 		self.log = Logger()
 		self.db = DBUtils()
+		self.user: str | None = None
 		self.all_items: list[Item] = []
 		
 		try:
@@ -51,7 +52,7 @@ class App(QMainWindow):
 	
 	def run(self) -> None:
 		self.log.info_log("App Started")
-		self.screens.setCurrentIndex(0)
+		self._login.to_page()
 		self._on_page_changed()
 		self._async_load()
 	
@@ -81,19 +82,26 @@ class App(QMainWindow):
 		from stock_manager import SIDEBAR_BUTTON_SIZE, PAGE_NAMES
 		
 		idx = self.screens.currentIndex()
+		username = f' - {self.user}' if self.user else ''
 		
-		self.setWindowTitle(PAGE_NAMES[idx] + " | SLAC Inventory Management Application")
+		try:
+			self.setWindowTitle(PAGE_NAMES[idx] + " | SLAC Inventory Management Application" + username)
+		except IndexError as e:
+			print(f'Page Index Not In constants.PAGE_NAMES: {e}')
+			self.setWindowTitle("SLAC Inventory Management Application" + username)
 		
-		if idx == 1:
-			try:
-				self._qr.start_video()
-			except Exception as e:
-				self.log.error_log(f"Failed to start QR scanner: {e}")
-		else:
+		if idx != 1:
 			try:
 				self._qr.stop_video()
 			except Exception as e:
-				self.log.error_log(f"Failed to stop QR scanner: {e}")
+				print(f'Failed To Stop QR Scanner: {e}')
+				self.log.error_log(f"Failed To Stop QR Scanner: {e}")
+				QMessageBox.critical(
+						self,
+						'QR Scanner Error',
+						'Failed To Stop QR Scanner',
+						QMessageBox.StandardButton.Ok
+				)
 		
 		buttons: list[QPushButton] = self.sideUI.children()[1:]  # exclude QVBox
 		
@@ -105,24 +113,29 @@ class App(QMainWindow):
 		
 		i: int
 		button: QPushButton
-		for i, button in enumerate(buttons):
+		for i, button in enumerate(buttons, start=1):
 			button.setFont(active if i == idx else inactive)
 	
 	def _handle_screens(self) -> None:
-		from stock_manager import Edit, Export, Finish, Remove, Scanner, View, Add
+		from stock_manager import Edit, Export, Finish, Remove, Scanner, View, Add, Login
 		
-		self._view = View(self)
+		self.export = Export(self)
+		self.finish = Finish(self)
+		self.view = View(self)
+		
+		self._login = Login(self)
 		self._qr = Scanner(self)
+		self._add = Add(self)
 		self._edit = Edit(self)
 		self._remove = Remove(self)
-		self.finish = Finish(self)
 		
-		self.screens.addWidget(self._view)
+		self.screens.addWidget(self._login)
+		self.screens.addWidget(self.view)
 		self.screens.addWidget(self._qr)
-		self.screens.addWidget(Add(self))
+		self.screens.addWidget(self._add)
 		self.screens.addWidget(self._edit)
 		self.screens.addWidget(self._remove)
-		self.screens.addWidget(Export(self))
+		self.screens.addWidget(self.export)
 		self.screens.addWidget(self.finish)
 		
 		self.screens.currentChanged.connect(self._on_page_changed)
@@ -130,11 +143,11 @@ class App(QMainWindow):
 	def _handle_side_ui(self) -> None:
 		"""Connects sidebar buttons to the appropriate screen navigation actions."""
 		
-		self.view_btn.clicked.connect(lambda: self.screens.setCurrentIndex(0))
-		self.qr_btn.clicked.connect(lambda: self.screens.setCurrentIndex(1))
-		self.add_btn.clicked.connect(lambda: self.screens.setCurrentIndex(2))
-		self.edit_btn.clicked.connect(lambda: self.screens.setCurrentIndex(3))
-		self.remove_btn.clicked.connect(lambda: self.screens.setCurrentIndex(4))
+		self.view_btn.clicked.connect(self.view.to_page)
+		self.qr_btn.clicked.connect(self._qr.to_page)
+		self.add_btn.clicked.connect(self._add.to_page)
+		self.edit_btn.clicked.connect(self._edit.to_page)
+		self.remove_btn.clicked.connect(self._remove.to_page)
 		self.exit_btn.clicked.connect(QCoreApplication.quit)
 	
 	@staticmethod
@@ -171,8 +184,5 @@ class App(QMainWindow):
 		"""
 		
 		await asyncio.gather(
-				*(
-			controller.update_table(controller.table)
-					for controller in [self._view, self._edit, self._remove]
-				)
+				*(controller.update_table(controller.table) for controller in [self.view, self._edit, self._remove])
 		)

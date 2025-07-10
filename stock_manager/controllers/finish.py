@@ -33,7 +33,9 @@ class Finish(AbstractController):
 		
 		super().__init__('finish', app)
 		
-		self.pushButton.clicked.connect(lambda: app.screens.setCurrentIndex(0))
+		self.PAGE_INDEX = 7
+		
+		self.pushButton.clicked.connect(lambda: app.screens.setCurrentIndex(1))
 	
 	def set_text(self, title_txt: str) -> None:
 		"""

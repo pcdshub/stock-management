@@ -57,7 +57,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Please Scan User QR Code</string>
+          <string>Please Scan Item QR Code</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

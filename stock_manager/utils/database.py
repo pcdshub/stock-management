@@ -10,6 +10,7 @@ from pathlib import Path
 import gspread
 from gspread import Client
 from oauth2client.service_account import ServiceAccountCredentials
+from PyQt6.QtWidgets import QMessageBox
 
 
 class DBUtils:
@@ -41,8 +42,15 @@ class DBUtils:
 			self._file_name = 'Stock Management Sheet'
 			self._sheet = self._client.open(self._file_name).sheet1
 		except Exception as e:
-			Logger().error_log(f"Database connection failed: {e}")
-			raise RuntimeError("Failed to initialize database connection.")
+			print(f'Failed To Connect To Database: {e}')
+			Logger().error_log(f'Failed To Connect To Database: {e}')
+			QMessageBox.critical(
+					None,
+					'Database Connection Failure',
+					'Failed To Connect To Database, Try Restarting The Application',
+					QMessageBox.StandardButton.Ok
+			)
+			raise SystemExit(1)
 	
 	async def get_all_data(self) -> list[dict[str, int | float | str]]:
 		"""
@@ -56,8 +64,19 @@ class DBUtils:
 		try:
 			return self._sheet.get_all_records()
 		except Exception as e:
-			self._log.error_log(f"Error in get_all_data: Failed to fetch data from {self._file_name}. Exception: {e}")
-			raise RuntimeError('Failed To Initialize Database Connection')
+			print(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
+			self._log.error_log(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
+			response = QMessageBox.critical(
+					None,
+					'Data Fetching Error',
+					f'Failed To Fetch All Data From {self._file_name}.\n\n'
+					'Continue To Application?',
+					QMessageBox.StandardButton.Yes,
+					QMessageBox.StandardButton.Close
+			)
+			
+			if response == QMessageBox.StandardButton.Close:
+				raise SystemExit(1)
 	
 	def get_all_users(self) -> list[str]:  # TODO: possibly make user objects out of data
 		"""Retrieve a list of all users from the database."""
@@ -65,10 +84,15 @@ class DBUtils:
 		try:
 			return ['QR_USERNAME']  # TODO: handle getting usernames from database
 		except Exception as e:
-			self._log.error_log(
-					f'Failed in get_all_users: Failed to fetch users from {self._file_name}. Exception: {e}'
+			print(f'Failed To Get All Users From {self._file_name}: {e}')
+			self._log.error_log(f'Failed To Get All Users From {self._file_name}: {e}')
+			QMessageBox.critical(
+					None,
+					'User Fetch Error',
+					'Failed To Fetch Users From Database',
+					QMessageBox.StandardButton.Close
 			)
-			raise RuntimeError("Failed To Fetch Data From Database")
+			raise SystemExit(1)
 	
 	def update_database(self) -> None:
 		"""Update the database with the latest changes and synchronize its contents."""

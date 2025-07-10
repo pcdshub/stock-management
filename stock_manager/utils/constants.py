@@ -11,6 +11,7 @@ EXCESS_EQUATION: Callable[[int, int, int], int] = \
 SIDEBAR_BUTTON_SIZE = 14
 
 PAGE_NAMES = [
+	'Login',
 	'View',
 	'QR Scanner',
 	'Add',

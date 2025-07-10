@@ -1,9 +1,4 @@
-"""
-QR Scanner controller for the Stock Management Application.
-
-Handles video capture, QR code scanning, and updates the UI with camera frames.
-"""
-
+from abc import abstractmethod
 from typing import override, TYPE_CHECKING
 
 import cv2
@@ -20,32 +15,34 @@ if TYPE_CHECKING:
 	from stock_manager import Logger
 
 
-class Scanner(AbstractController):
-	"""QR Scanner UI controller for capturing video and decoding QR codes."""
+class AbstractScanner(AbstractController):
+	def __init__(self, file_name: str, app: 'App'):
+		super().__init__(file_name, app)
+		self.camera_thread = CameraThread(self.logger)
 	
 	@override
-	def __init__(self, app: 'App'):
-		"""
-		Initializes the scanner UI.
+	def to_page(self) -> None:
+		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
 		
-		:param app: Reference to the main application instance.
-		"""
-		
-		super().__init__('scanner', app)
-		
-		self._db = app.db
-		self._camera_thread = CameraThread(self.logger)
-		self._user = ''
-		self._users_list = app.db.get_all_users()  # get user list from JIRA or database
-		self._items: set[Item] = set()
-		
-		self.clear_btn.clicked.connect(self._clear_form)
-		self.done_btn.clicked.connect(self._finish_form)
+		try:
+			self.start_video()
+		except Exception as e:
+			print(f'Failed To Start QR Scanner: {e}')
+			self.log.error_log(f"Failed To Start QR Scanner: {e}")
+			QMessageBox.critical(
+					self,
+					'QR Scanner Error',
+					'Failed To Start QR Scanner',
+					QMessageBox.StandardButton.Ok
+			)
 	
 	def start_video(self) -> None:
+		if self.camera_thread.running:
+			return
+		
 		try:
-			self._camera_thread.frame_ready.connect(self._process_frame)
-			self._camera_thread.start()
+			self.camera_thread.frame_ready.connect(self.process_frame)
+			self.camera_thread.start()
 		except Exception as e:
 			print(f'Error Starting Camera Thread: {e}')
 			self.logger.error_log(f'Error Starting Camera Thread: {e}')
@@ -55,13 +52,14 @@ class Scanner(AbstractController):
 					'Failed To Start Camera',
 					QMessageBox.StandardButton.Ok
 			)
-
-	def stop_video(self) -> None:
-		self._camera_thread.stop()
-		self._camera_thread.wait()
 	
-	def _process_frame(self, frame: ndarray) -> None:
-		self._check_for_qr(frame)
+	def stop_video(self) -> None:
+		if self.camera_thread.running:
+			self.camera_thread.stop()
+			self.camera_thread.wait()
+	
+	def process_frame(self, frame: ndarray) -> None:
+		self.check_for_qr(frame)
 		
 		try:
 			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -90,8 +88,32 @@ class Scanner(AbstractController):
 					QMessageBox.StandardButton.Ok
 			)
 	
+	@abstractmethod
+	async def check_for_qr(self, frame: ndarray) -> None: pass
+
+
+class Scanner(AbstractScanner):
+	"""QR Scanner UI controller for capturing video and decoding QR codes."""
+	
+	@override
+	def __init__(self, app: 'App'):
+		"""
+		Initializes the scanner UI.
+		
+		:param app: Reference to the main application instance.
+		"""
+		
+		super().__init__('scanner', app)
+		
+		self._items: set[Item] = set()
+		self.PAGE_INDEX = 2
+		
+		self.clear_btn.clicked.connect(self._clear_form)
+		self.done_btn.clicked.connect(self._finish_form)
+	
+	@override
 	@asyncSlot()
-	async def _check_for_qr(self, frame: ndarray) -> None:
+	async def check_for_qr(self, frame: ndarray) -> None:
 		"""
 		Scans the current frame for a QR code and logs if found.
 		
@@ -99,53 +121,38 @@ class Scanner(AbstractController):
 		"""
 		
 		data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
-		if data:
-			if data == self._user \
-					or data in [item.part_num for item in self._items]:
+		if not data or data in [item.part_num for item in self._items]:
+			return
+		
+		self.logger.info_log(f"QR Code Scanned: {data}")
+		
+		for item in self.app.all_items:
+			if data == item.part_num:
+				self._items.add(item)
+				self.logger.info_log(f'{data} Added To Items List')
+				self.items_list.append(f'<ul><li>{data}</li></ul>')
 				return
-			elif data in self._users_list:
-				self.desc_lbl.setText(data + ' is checking out items:')
-				self._user = data
-				return
-			
-			self.logger.info_log(f"QR Code Scanned: {data}")
-			
-			for item in self.app.all_items:
-				if data == item.part_num:
-					self._items.add(item)
-					self.logger.info_log(f'{data} Added To Items List')
-					self.items_list.append(f'<ul><li>{data}</li></ul>')
-					return
-			
-			print(f'QR Code Not Recognized: "{data}"')
-			self.logger.info_log(f'QR Code Not Recognized: "{data}"')
-			QMessageBox.information(
-					self,
-					'Unknown QR Code',
-					'QR Code Not Recognized In Database',
-					QMessageBox.StandardButton.Ok
-			)
+		
+		print(f'QR Code Not Recognized: "{data}"')
+		self.logger.info_log(f'QR Code Not Recognized: "{data}"')
+		QMessageBox.information(
+				self,
+				'Unknown QR Code',
+				'QR Code Not Recognized In Database',
+				QMessageBox.StandardButton.Ok
+		)
 	
 	def _clear_form(self) -> None:
 		"""Clears all fields in the scanner UI form and resets the scanned item list."""
 		
 		self.logger.info_log('Items List Cleared')
 		self._items.clear()
-		self._user = ''
 		self.items_list.clear()
 	
 	def _finish_form(self) -> None:
 		"""Handles the completion of a scanning session and navigates to the finish screen."""
 		
-		if not self._user:
-			QMessageBox.critical(
-					self,
-					'User Required',
-					'A User Code Is Required To Complete Form',
-					QMessageBox.StandardButton.Ok
-			)
-			return
-		elif not self._items:
+		if not self._items:
 			QMessageBox.critical(
 					self,
 					'Item Required',
@@ -154,23 +161,35 @@ class Scanner(AbstractController):
 			)
 			return
 		
+		string_items = ''.join(f'{item.part_num}\n' for item in self._items)
+		
+		response = QMessageBox.question(
+				self,
+				'Item Checkout Confirmation',
+				'Are You Sure You Want To Checkout Items:\n' + string_items,
+				QMessageBox.StandardButton.Yes,
+				QMessageBox.StandardButton.No
+		)
+		
+		if response == QMessageBox.StandardButton.No:
+			return
+		
 		try:
 			self._handle_remove_items()
 		except Exception as e:
-			self.app.finish.set_text('An Error Occurred, Item(s) Could Not Be Subtracted From Database.')
 			print(f'Item(s) Could Not Be Subtracted From Database: {e}')
 			self.logger.error_log(f'Item(s) Could Not Be Subtracted From Database: {e}')
+			self.app.finish.set_text('An Error Occurred, Item(s) Could Not Be Subtracted From Database.')
 		else:
 			length = len(self._items)
 			self.app.finish.set_text(
 					f"{'1 item has' if length == 1 else f'{length} items have'} "
 					f"successfully been subtracted from database."
 			)
-			self.logger.info_log(f'{self._user} has checked out items: {self._items}')
+			self.logger.info_log(f'{self.app.user} has checked out items:\n{string_items}')
 			self._clear_form()
-			self.desc_lbl.setText('Please Scan User QR Code')
 		finally:
-			self.app.screens.setCurrentIndex(6)  # success (finish) screen
+			self.app.finish.to_page()
 	
 	def _handle_remove_items(self) -> None:
 		"""Handles the removal of selected items from the internal item list and updates the UI accordingly."""
@@ -195,7 +214,42 @@ class Scanner(AbstractController):
 				break
 		
 		self.app.update_tables()
-		self._db.update_database()
+		self.database.update_database()
+
+
+class Login(AbstractScanner):
+	@override
+	def __init__(self, app: 'App'):
+		super().__init__('login', app)
+		
+		self._users_list = self.database.get_all_users()  # get user list from JIRA or database
+		self.PAGE_INDEX = 0
+	
+	@override
+	@asyncSlot()
+	async def check_for_qr(self, frame: ndarray) -> None:
+		data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
+		if not data or self.app.user:
+			return
+		
+		self.logger.info_log(f"QR Code Scanned: {data}")
+		
+		if data not in self._users_list:
+			print(f'QR Code Not Recognized: "{data}"')
+			self.logger.info_log(f'QR Code Not Recognized: "{data}"')
+			QMessageBox.information(
+					self,
+					'Unknown QR Code',
+					'QR Code Not Recognized In Database',
+					QMessageBox.StandardButton.Ok
+			)
+			return
+		
+		self.app.user = data
+		print(f'User Logged In As: {data}')
+		self.logger.info_log(f'User Logged In As: {data}')
+		self.app.view.to_page()
+		self.stop_video()
 
 
 class CameraThread(QThread):
@@ -203,12 +257,12 @@ class CameraThread(QThread):
 	
 	def __init__(self, logger: 'Logger', parent=None):
 		super().__init__(parent)
-		self._running = False
+		self.running = False
 		self._logger = logger
 	
 	@override
 	def run(self) -> None:
-		self._running = True
+		self.running = True
 		cap = cv2.VideoCapture(0)
 		if not cap.isOpened():
 			self._logger.error_log('Could Not Access Camera')
@@ -226,7 +280,7 @@ class CameraThread(QThread):
 			
 			return
 		
-		while self._running:
+		while self.running:
 			worked, frame = cap.read()
 			if worked:
 				self.frame_ready.emit(frame)
@@ -242,4 +296,4 @@ class CameraThread(QThread):
 		cap.release()
 	
 	def stop(self) -> None:
-		self._running = False
+		self.running = False

@@ -26,6 +26,7 @@ class Add(AbstractController):
 			self.manufacturer,
 			self.desc
 		]
+		self.PAGE_INDEX = 3
 		
 		self.clear_btn.clicked.connect(self._clear_form)
 		self.submit_btn.clicked.connect(self._submit_form)
@@ -66,20 +67,54 @@ class Add(AbstractController):
 			spinner.setValue(0)
 	
 	def _submit_form(self) -> None:
-		self.app.all_items.append(
-				stock_manager.Item(
-						self.part_num.text(),
-						self.manufacturer.text(),
-						self.desc.toPlainText(),
-						self._total,
-						self.b750_spinner.value(),
-						self.b757_spinner.value(),
-						self.min_750_spinner.value(),
-						self._excess,
-						self.min_757_spinner.value()
-				)
+		empty_line_edits = {
+			field.objectName() for field in self._text_fields
+			if isinstance(field, QLineEdit)
+			   and not field.text().strip()
+		}
+		empty_text_edits = {
+			field.objectName() for field in self._text_fields
+			if isinstance(field, QTextEdit)
+			   and not field.toPlainText().strip()
+		}
+		valued_spinners = {
+			spinner.objectName() for spinner in self._spinners
+			if spinner.value()
+		}
+		
+		if any([empty_line_edits, empty_text_edits]) or not any(valued_spinners):
+			QMessageBox.information(
+					self,
+					'Empty Fields',
+					'Please Fill Out All Text Fields And At Least One Spinner Before Submitting Form',
+					QMessageBox.StandardButton.Ok
+			)
+			return
+		
+		new_item = stock_manager.Item(
+				self.part_num.text(),
+				self.manufacturer.text(),
+				self.desc.toPlainText(),
+				self._total,
+				self.b750_spinner.value(),
+				self.b757_spinner.value(),
+				self.min_750_spinner.value(),
+				self._excess,
+				self.min_757_spinner.value()
 		)
 		
-		self.app.update_tables()
-		self.app.db.update_database()
-		self._clear_form()
+		response = QMessageBox.information(
+				self,
+				'Item Creation Confirmation',
+				f'Are You Sure You Want To Add {new_item.part_num}'
+				'To The Database?\n\nThis Item Can Be Removed Later.',
+				QMessageBox.StandardButton.Yes,
+				QMessageBox.StandardButton.No
+		)
+		
+		if response == QMessageBox.StandardButton.Yes:
+			self.app.all_items.append(new_item)
+			self.logger.info_log(f"Item Added To Database: {new_item.part_num}")
+			self.app.update_tables()
+			self.database.update_database()
+			self._clear_form()
