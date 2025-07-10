@@ -10,7 +10,7 @@ from abc import ABC, ABCMeta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem, QWidget
+from PyQt6.QtWidgets import QMessageBox, QTableWidget, QTableWidgetItem, QWidget
 from PyQt6.uic import loadUi
 
 if TYPE_CHECKING:
@@ -43,13 +43,21 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		
 		self.app = app
 		self.logger = app.log
+		self.database = app.db
+		self.PAGE_INDEX = -1
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / f'{file_name}.ui'
 			loadUi(str(ui_path), self)
 		except Exception as e:
-			app.log.error_log(f"Failed to load view UI file: {e}")
-			raise
+			print(f'Failed To Load {file_name}.ui File: {e}')
+			app.log.error_log(f"Failed To Load {file_name}.ui File: {e}")
+			QMessageBox.critical(
+					self,
+					f'{file_name}.ui Failure',
+					f'Failed To Load {file_name}.ui File',
+					QMessageBox.StandardButton.Ok
+			)
 	
 	@staticmethod
 	def filter_table(text: str, table: QTableWidget) -> None:
@@ -88,3 +96,6 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		for row_num, item in enumerate(all_data):
 			for col_num in range(len(item)):
 				table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))
+	
+	def to_page(self) -> None:
+		self.app.screens.setCurrentIndex(self.PAGE_INDEX)

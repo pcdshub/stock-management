@@ -1,4 +1,7 @@
-"""Controls exporting inventory data to various file formats for the SLAC Inventory Management application."""
+"""
+Controls exporting inventory data to various file formats
+for the SLAC Inventory Management application.
+"""
 
 import os
 from pathlib import Path
@@ -25,9 +28,11 @@ class Export(AbstractController):
 		"""
 		super().__init__('export', app)
 		
+		self.PAGE_INDEX = 6
+		
 		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
 		
-		self.back_btn.clicked.connect(lambda: app.screens.setCurrentIndex(0))
+		self.back_btn.clicked.connect(lambda: app.screens.setCurrentIndex(1))
 		self.location_btn.clicked.connect(self._get_directory)
 		self.location_btn.setText(f'...{self._path[-6:]}')
 		self.export_btn.clicked.connect(self._export_data)
@@ -128,7 +133,7 @@ class Export(AbstractController):
 					f.write(line[:-1] + '\n')
 					self.progressBar.setValue(i)
 		except FileExistsError as e:
-			print("That File Already Exists")
+			print(f"That File Already Exists: {e}")
 			self.app.log.error_log(f'File Already Exists Error: {e}')
 			QMessageBox.critical(
 					self,

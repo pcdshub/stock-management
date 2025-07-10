@@ -10,11 +10,12 @@ from .edit import Edit
 from .export import Export
 from .finish import Finish
 from .remove import Remove
-from .scanner import Scanner
+from .scanner import Login, Scanner
 from .view import View
 
 __all__ = [
 	'AbstractController',
+	'Login',
 	'View',
 	'Scanner',
 	'Finish',

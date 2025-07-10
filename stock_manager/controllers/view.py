@@ -3,6 +3,7 @@ View controller for displaying inventory data in the Stock Management Applicatio
 
 Handles the main table display and integrates with the database utility.
 """
+
 from functools import partial
 from typing import override, TYPE_CHECKING
 
@@ -27,5 +28,7 @@ class View(AbstractController):
 		
 		super().__init__('view', app)
 		
+		self.PAGE_INDEX = 1
+		
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
-		self.export_btn.clicked.connect(lambda: app.screens.setCurrentIndex(5))  # export screen
+		self.export_btn.clicked.connect(app.export.to_page)

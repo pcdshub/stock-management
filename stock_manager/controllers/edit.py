@@ -39,6 +39,7 @@ class Edit(AbstractController):
 			self.min_757_spinner
 		]
 		self._text_fields: list[QLineEdit | QTextEdit] = [self.manufacturer, self.desc]
+		self.PAGE_INDEX = 4
 		
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
 		self.table.cellClicked.connect(self._on_cell_clicked)
@@ -218,7 +219,7 @@ class Edit(AbstractController):
 			)
 			return
 		
-		response = QMessageBox.critical(
+		response = QMessageBox.warning(
 				self,
 				'Item Change Confirmation',
 				f'Are You Sure You Want To Update Item {new_item.part_num}?',
@@ -234,6 +235,7 @@ class Edit(AbstractController):
 				self.app.all_items[i] = new_item
 				break
 		
+		self.logger.info_log(f'Database Item Edited: {new_item.part_num}')
 		self.app.update_tables()
-		self.app.db.update_database()
+		self.database.update_database()
 		self._clear_form()
