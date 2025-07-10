@@ -18,7 +18,6 @@ class View(AbstractController):
 	View controller for displaying and managing inventory data.
 	"""
 	
-	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initializes the View controller, loads the UI, and sets up the table.
@@ -30,5 +29,9 @@ class View(AbstractController):
 		
 		self.PAGE_INDEX = 1
 		
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
-		self.export_btn.clicked.connect(app.export.to_page)
+		self.export_btn.clicked.connect(self.app.export.to_page)

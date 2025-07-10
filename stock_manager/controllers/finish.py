@@ -19,7 +19,6 @@ class Finish(AbstractController):
 	This UI component displays a completion screen and provides navigation back to the main menu.
 	"""
 	
-	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initialize the Finish screen controller.
@@ -35,7 +34,11 @@ class Finish(AbstractController):
 		
 		self.PAGE_INDEX = 7
 		
-		self.pushButton.clicked.connect(lambda: app.screens.setCurrentIndex(1))
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
+		self.pushButton.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
 	
 	def set_text(self, title_txt: str) -> None:
 		"""

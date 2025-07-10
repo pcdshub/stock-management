@@ -8,10 +8,11 @@ from typing import override
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QCloseEvent, QFont
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QPushButton, QStackedWidget
 from PyQt6.uic import loadUi
 from qasync import asyncSlot
 
+import stock_manager
 from stock_manager.model import Item
 
 
@@ -25,13 +26,24 @@ class App(QMainWindow):
 	def __init__(self):
 		"""Initialize the main application window and setup screens."""
 		
-		from stock_manager import DBUtils, Logger
+		from stock_manager import DBUtils, Logger, Edit, Export, Finish, Remove, Scanner, View, Add, Login
 		
 		super(App, self).__init__()
+		
 		self.log = Logger()
 		self.db = DBUtils()
+		self.export = Export(self)
+		self.finish = Finish(self)
+		self.login = Login(self)
+		self.view = View(self)
+		self.qr = Scanner(self)
+		self.add = Add(self)
+		self.edit = Edit(self)
+		self.remove = Remove(self)
+		
 		self.user: str | None = None
 		self.all_items: list[Item] = []
+		self.screens: QStackedWidget | None = None
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
@@ -47,20 +59,58 @@ class App(QMainWindow):
 			)
 			raise SystemExit(1)
 		
-		self._handle_screens()
-		self._handle_side_ui()
+		def handle_screens() -> None:
+			screens_to_add: list[stock_manager.AbstractController] = [
+				self.login, self.view, self.qr, self.add,
+				self.edit, self.remove, self.export, self.finish
+			]
+			
+			for screen in screens_to_add:
+				self.screens.addWidget(screen)
+			
+			self.screens.currentChanged.connect(self._on_page_changed)
+		
+		def handle_connections() -> None:
+			"""Connects sidebar buttons to the appropriate screen navigation actions."""
+			
+			self.view_btn.clicked.connect(self.view.to_page)
+			self.qr_btn.clicked.connect(self.qr.to_page)
+			self.add_btn.clicked.connect(self.add.to_page)
+			self.edit_btn.clicked.connect(self.edit.to_page)
+			self.remove_btn.clicked.connect(self.remove.to_page)
+			self.exit_btn.clicked.connect(QCoreApplication.quit)
+		
+		handle_screens()
+		handle_connections()
 	
 	def run(self) -> None:
 		self.log.info_log("App Started")
-		self._login.to_page()
+		self.login.to_page()
 		self._on_page_changed()
 		self._async_load()
 	
 	@asyncSlot()
 	async def _async_load(self) -> None:
+		async def create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
+			"""
+			Creates and populates the internal list of all inventory items from the data source.
+			
+			This method parses raw data and instantiates Item objects accordingly.
+			"""
+			
+			obj_items: list[Item] = []
+			for item in gs_items:
+				vals: list[int | float | str | None] = [
+					None if val is None or val == ''
+					else val
+					for val in list(item.values())
+				]
+				obj_items.append(Item(*vals))
+			return obj_items
+		
 		try:
 			gs_data: list[dict[str, int | float | str]] = await self.db.get_all_data()
-			self.all_items = await self._create_all_items(gs_data)
+			self.all_items = await create_all_items(gs_data)
 			await self.update_tables()
 		except Exception as e:
 			print(f'Error Loading Data Asynchronously: {e}')
@@ -92,7 +142,7 @@ class App(QMainWindow):
 		
 		if idx != 1:
 			try:
-				self._qr.stop_video()
+				self.qr.stop_video()
 			except Exception as e:
 				print(f'Failed To Stop QR Scanner: {e}')
 				self.log.error_log(f"Failed To Stop QR Scanner: {e}")
@@ -116,58 +166,6 @@ class App(QMainWindow):
 		for i, button in enumerate(buttons, start=1):
 			button.setFont(active if i == idx else inactive)
 	
-	def _handle_screens(self) -> None:
-		from stock_manager import Edit, Export, Finish, Remove, Scanner, View, Add, Login
-		
-		self.export = Export(self)
-		self.finish = Finish(self)
-		self.view = View(self)
-		
-		self._login = Login(self)
-		self._qr = Scanner(self)
-		self._add = Add(self)
-		self._edit = Edit(self)
-		self._remove = Remove(self)
-		
-		self.screens.addWidget(self._login)
-		self.screens.addWidget(self.view)
-		self.screens.addWidget(self._qr)
-		self.screens.addWidget(self._add)
-		self.screens.addWidget(self._edit)
-		self.screens.addWidget(self._remove)
-		self.screens.addWidget(self.export)
-		self.screens.addWidget(self.finish)
-		
-		self.screens.currentChanged.connect(self._on_page_changed)
-	
-	def _handle_side_ui(self) -> None:
-		"""Connects sidebar buttons to the appropriate screen navigation actions."""
-		
-		self.view_btn.clicked.connect(self.view.to_page)
-		self.qr_btn.clicked.connect(self._qr.to_page)
-		self.add_btn.clicked.connect(self._add.to_page)
-		self.edit_btn.clicked.connect(self._edit.to_page)
-		self.remove_btn.clicked.connect(self._remove.to_page)
-		self.exit_btn.clicked.connect(QCoreApplication.quit)
-	
-	@staticmethod
-	async def _create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
-		"""
-		Creates and populates the internal list of all inventory items from the data source.
-		
-		This method parses raw data and instantiates Item objects accordingly.
-		"""
-		
-		obj_items: list[Item] = []
-		for item in gs_items:
-			vals: list[int | float | str | None] = [
-				None if val is None or val == ''
-				else val
-				for val in list(item.values())
-			]
-			obj_items.append(Item(*vals))
-		return obj_items
-	
 	@override
 	def closeEvent(self, event: QCloseEvent) -> None:
 		"""Handle the application close event and log exit."""
@@ -184,5 +182,5 @@ class App(QMainWindow):
 		"""
 		
 		await asyncio.gather(
-				*(controller.update_table(controller.table) for controller in [self.view, self._edit, self._remove])
+				*(controller.update_table(controller.table) for controller in [self.view, self.edit, self.remove])
 		)

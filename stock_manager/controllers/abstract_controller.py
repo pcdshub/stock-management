@@ -6,7 +6,7 @@ across controllers, such as navigation sidebar button behavior,
 table filtering and updating.
 """
 
-from abc import ABC, ABCMeta
+from abc import ABC, ABCMeta, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -51,13 +51,17 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 			loadUi(str(ui_path), self)
 		except Exception as e:
 			print(f'Failed To Load {file_name}.ui File: {e}')
-			app.log.error_log(f"Failed To Load {file_name}.ui File: {e}")
+			self.logger.error_log(f"Failed To Load {file_name}.ui File: {e}")
 			QMessageBox.critical(
 					self,
 					f'{file_name}.ui Failure',
 					f'Failed To Load {file_name}.ui File',
 					QMessageBox.StandardButton.Ok
 			)
+	
+	@abstractmethod
+	def handle_connections(self) -> None:
+		pass
 	
 	@staticmethod
 	def filter_table(text: str, table: QTableWidget) -> None:
