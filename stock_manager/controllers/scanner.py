@@ -28,7 +28,7 @@ class AbstractScanner(AbstractController):
 			self.start_video()
 		except Exception as e:
 			print(f'Failed To Start QR Scanner: {e}')
-			self.log.error_log(f"Failed To Start QR Scanner: {e}")
+			self.logger.error_log(f"Failed To Start QR Scanner: {e}")
 			QMessageBox.critical(
 					self,
 					'QR Scanner Error',
@@ -89,13 +89,13 @@ class AbstractScanner(AbstractController):
 			)
 	
 	@abstractmethod
-	async def check_for_qr(self, frame: ndarray) -> None: pass
+	async def check_for_qr(self, frame: ndarray) -> None:
+		pass
 
 
 class Scanner(AbstractScanner):
 	"""QR Scanner UI controller for capturing video and decoding QR codes."""
 	
-	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initializes the scanner UI.
@@ -108,6 +108,10 @@ class Scanner(AbstractScanner):
 		self._items: set[Item] = set()
 		self.PAGE_INDEX = 2
 		
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
 		self.clear_btn.clicked.connect(self._clear_form)
 		self.done_btn.clicked.connect(self._finish_form)
 	
@@ -175,7 +179,27 @@ class Scanner(AbstractScanner):
 			return
 		
 		try:
-			self._handle_remove_items()
+			for _item in self._items:
+				for item in self.app.all_items:
+					if not _item == item:
+						continue
+					
+					if self.b750_btn.isChecked():
+						item.stock_b750 -= 1
+					elif self.b757_btn.isChecked():
+						item.stock_b757 -= 1
+					else:
+						print("Neither Radio Button Is Selected")
+						raise ValueError("Neither Radio Button Is Selected")
+					
+					item.update_stats()
+					if item.excess <= 0:
+						pass  # TODO: handle alert send for specified item
+					
+					break
+			
+			self.app.update_tables()
+			self.database.update_database()
 		except Exception as e:
 			print(f'Item(s) Could Not Be Subtracted From Database: {e}')
 			self.logger.error_log(f'Item(s) Could Not Be Subtracted From Database: {e}')
@@ -190,40 +214,20 @@ class Scanner(AbstractScanner):
 			self._clear_form()
 		finally:
 			self.app.finish.to_page()
-	
-	def _handle_remove_items(self) -> None:
-		"""Handles the removal of selected items from the internal item list and updates the UI accordingly."""
-		
-		for item_name in self._items:
-			for item in self.app.all_items:
-				if not item_name == item:
-					continue
-				
-				if self.b750_btn.isChecked():
-					item.stock_b750 -= 1
-				elif self.b757_btn.isChecked():
-					item.stock_b757 -= 1
-				else:
-					self.logger.error_log("Neither Radio Button Is Selected")
-					raise ValueError("Neither Radio Button Is Selected")
-				
-				item.update_stats()
-				if item.excess <= 0:
-					pass  # TODO: handle alert send for specified item
-				
-				break
-		
-		self.app.update_tables()
-		self.database.update_database()
 
 
 class Login(AbstractScanner):
-	@override
 	def __init__(self, app: 'App'):
 		super().__init__('login', app)
 		
 		self._users_list = self.database.get_all_users()  # get user list from JIRA or database
 		self.PAGE_INDEX = 0
+		
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
+		pass
 	
 	@override
 	@asyncSlot()

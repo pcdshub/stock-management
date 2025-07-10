@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
 
 class Add(AbstractController):
-	@override
 	def __init__(self, app: 'App'):
 		super().__init__('add', app)
 		
@@ -28,6 +27,10 @@ class Add(AbstractController):
 		]
 		self.PAGE_INDEX = 3
 		
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
 		self.clear_btn.clicked.connect(self._clear_form)
 		self.submit_btn.clicked.connect(self._submit_form)
 		
@@ -51,7 +54,7 @@ class Add(AbstractController):
 			self.excess_lbl.setText("Excess: " + str(self._excess))
 		except Exception as e:
 			print(f"Spinner Change Error: {e}")
-			self.app.log.error_log(f"Spinner Change Error: {e}")
+			self.logger.error_log(f"Spinner Change Error: {e}")
 			QMessageBox.critical(
 					self,
 					'Spinner Change Error',
@@ -69,13 +72,11 @@ class Add(AbstractController):
 	def _submit_form(self) -> None:
 		empty_line_edits = {
 			field.objectName() for field in self._text_fields
-			if isinstance(field, QLineEdit)
-			   and not field.text().strip()
+			if isinstance(field, QLineEdit) and not field.text().strip()
 		}
 		empty_text_edits = {
 			field.objectName() for field in self._text_fields
-			if isinstance(field, QTextEdit)
-			   and not field.toPlainText().strip()
+			if isinstance(field, QTextEdit) and not field.toPlainText().strip()
 		}
 		valued_spinners = {
 			spinner.objectName() for spinner in self._spinners
@@ -106,7 +107,7 @@ class Add(AbstractController):
 		response = QMessageBox.information(
 				self,
 				'Item Creation Confirmation',
-				f'Are You Sure You Want To Add {new_item.part_num}'
+				f'Are You Sure You Want To Add {new_item.part_num} '
 				'To The Database?\n\nThis Item Can Be Removed Later.',
 				QMessageBox.StandardButton.Yes,
 				QMessageBox.StandardButton.No

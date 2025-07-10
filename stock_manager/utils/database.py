@@ -52,7 +52,7 @@ class DBUtils:
 			)
 			raise SystemExit(1)
 	
-	async def get_all_data(self) -> list[dict[str, int | float | str]]:
+	async def get_all_data(self) -> list[dict[str, int | float | str]]:  # TODO: Replace with JIRA methods
 		"""
 		Retrieves all records from the first worksheet of the 'Stock Management Sheet'.
 		

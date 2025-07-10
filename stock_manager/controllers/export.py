@@ -19,20 +19,23 @@ if TYPE_CHECKING:
 class Export(AbstractController):
 	"""UI controller for data export functionality."""
 	
-	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initialize the Export controller.
 		
 		:param app: Reference to the main application instance.
 		"""
+		
 		super().__init__('export', app)
 		
+		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
 		self.PAGE_INDEX = 6
 		
-		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
-		
-		self.back_btn.clicked.connect(lambda: app.screens.setCurrentIndex(1))
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
+		self.back_btn.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
 		self.location_btn.clicked.connect(self._get_directory)
 		self.location_btn.setText(f'...{self._path[-6:]}')
 		self.export_btn.clicked.connect(self._export_data)
@@ -67,7 +70,7 @@ class Export(AbstractController):
 					)
 		except Exception as e:
 			print(f'Export Failed: {e}')
-			self.app.log.error_log(f'Export Failed: {e}')
+			self.logger.error_log(f'Export Failed: {e}')
 			response = QMessageBox.critical(
 					self,
 					'Export Failure',
@@ -92,7 +95,7 @@ class Export(AbstractController):
 			self._path = response
 		except Exception as e:
 			print(f"Directory Selection Failure: {e}")
-			self.app.log.error_log(f"Directory Selection Failure: {e}")
+			self.logger.error_log(f"Directory Selection Failure: {e}")
 			response = QMessageBox.critical(
 					self,
 					'Directory Selection Failure',
@@ -124,8 +127,25 @@ class Export(AbstractController):
 			'psv': ' | '
 		}.get(ext)
 		
+		def get_valid_path() -> str:
+			"""
+			Generate a unique file path for the export file.
+			
+			:return: A unique file path as a string.
+			"""
+			
+			name = f'{ext}_export'
+			path = f'{self._path}/{name}.{ext}'
+			
+			count = 1
+			while os.path.exists(path):
+				path = f'{self._path}/{name}{count}.{ext}'
+				count += 1
+			
+			return path
+		
 		try:
-			with open(self._get_valid_path(ext), 'x') as f:
+			with open(get_valid_path(), 'x') as f:
 				for i, item in enumerate(self.app.all_items):
 					line = ''
 					for var in item:
@@ -134,7 +154,7 @@ class Export(AbstractController):
 					self.progressBar.setValue(i)
 		except FileExistsError as e:
 			print(f"That File Already Exists: {e}")
-			self.app.log.error_log(f'File Already Exists Error: {e}')
+			self.logger.error_log(f'File Already Exists Error: {e}')
 			QMessageBox.critical(
 					self,
 					'File Exists Error',
@@ -143,28 +163,10 @@ class Export(AbstractController):
 			)
 		except Exception as e:
 			print(f'Failed To Export Data To {ext.upper()}: {e}')
-			self.app.log.error_log(f'Failed To Export Data To {ext.upper()}: {e}')
+			self.logger.error_log(f'Failed To Export Data To {ext.upper()}: {e}')
 			QMessageBox.critical(
 					self,
 					f'{ext.upper()} Export Error',
 					f'Failed To Export Data To {ext.upper()}, Try Changing File Types',
 					QMessageBox.StandardButton.Ok
 			)
-	
-	def _get_valid_path(self, ext: str) -> str:
-		"""
-		Generate a unique file path for the export file.
-		
-		:param ext: The desired file extension.
-		:return: A unique file path as a string.
-		"""
-		
-		name = f'{ext}_export'
-		path = f'{self._path}/{name}.{ext}'
-		
-		count = 1
-		while os.path.exists(path):
-			path = f'{self._path}/{name}{count}.{ext}'
-			count += 1
-		
-		return path

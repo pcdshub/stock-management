@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 class Edit(AbstractController):
 	"""Controller for editing inventory items in the Stock Management Application."""
 	
-	@override
 	def __init__(self, app: 'App'):
 		"""
 		Initialize the Edit controller, load the UI, set up the table, and connect signals for user interactions.
@@ -41,6 +40,10 @@ class Edit(AbstractController):
 		self._text_fields: list[QLineEdit | QTextEdit] = [self.manufacturer, self.desc]
 		self.PAGE_INDEX = 4
 		
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
 		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
 		self.table.cellClicked.connect(self._on_cell_clicked)
 		self.clear_btn.clicked.connect(self._clear_form)
@@ -79,7 +82,7 @@ class Edit(AbstractController):
 			]
 		except Exception as e:
 			print(f"Item Parsing Error: {e}")
-			self.app.log.error_log(f"Item parsing error: {e}")
+			self.logger.error_log(f"Item parsing error: {e}")
 			QMessageBox.critical(
 					self,
 					'Item Parsing Error',
@@ -119,7 +122,7 @@ class Edit(AbstractController):
 			self.min_757_spinner.setValue(item.minimum_sallie if item.minimum_sallie is not None else 0)
 		except Exception as e:
 			print(f"Failed To Populate Fields: {e}")
-			self.app.log.error_log(f"Failed to populate fields: {e}")
+			self.logger.error_log(f"Failed to populate fields: {e}")
 			QMessageBox.critical(
 					self,
 					'Field Population Error',
@@ -150,7 +153,7 @@ class Edit(AbstractController):
 			self.excess_lbl.setText("Excess: " + str(self._excess))
 		except Exception as e:
 			print(f"Spinner Change Error: {e}")
-			self.app.log.error_log(f"Spinner Change Error: {e}")
+			self.logger.error_log(f"Spinner Change Error: {e}")
 			QMessageBox.critical(
 					self,
 					'Spinner Change Error',
