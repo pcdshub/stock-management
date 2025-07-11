@@ -1,9 +1,11 @@
 import os
+from typing import TYPE_CHECKING
 
 from PyQt6.QtWidgets import QMessageBox
 from qasync import asyncSlot
 
-import stock_manager
+if TYPE_CHECKING:
+	from stock_manager import AbstractController, ExportTypes
 
 
 class FileExports:
@@ -34,12 +36,17 @@ class FileExports:
 		pass  # TODO: add pdf generation
 	
 	@asyncSlot()
-	async def sv_export(self, instance: stock_manager.AbstractController, ext: str, path: str) -> None:
+	async def sv_export(
+			self,
+			instance: 'AbstractController',
+			export_type: 'ExportTypes',
+			path: str
+	) -> None:
 		"""
 		Export current data to a delimited text file (CSV, TSV, PSV).
 		
 		:param instance: Instance of controller class that method is being called from
-		:param ext: The file extension (e.g., 'csv', 'tsv', 'psv').
+		:param export_type: The file extension as a ExportType enum.
 		:param path: The directory to create file in.
 		"""
 		
@@ -47,10 +54,10 @@ class FileExports:
 			'csv': ',',
 			'tsv': '\t',
 			'psv': ' | '
-		}.get(ext)
+		}.get(export_type.value)
 		
 		try:
-			with open(self.get_valid_name(ext, path), 'x') as f:
+			with open(self.get_valid_name(export_type.value, path), 'x') as f:
 				for i, item in enumerate(instance.app.all_items):
 					line = ''
 					for var in item:

@@ -7,6 +7,8 @@ Defines the Item dataclass, which tracks part numbers, quantities, and stock sta
 from dataclasses import dataclass
 from typing import Generator, override
 
+from stock_manager.utils import StockStatus
+
 
 @dataclass
 class Item:
@@ -33,6 +35,7 @@ class Item:
 	minimum: int | None
 	excess: int | None
 	minimum_sallie: int | None
+	stock_status: StockStatus = None
 	
 	@override
 	def __hash__(self) -> int:
@@ -64,5 +67,11 @@ class Item:
 		total = TOTAL_EQUATION(self.stock_b750, self.stock_b757)
 		self.total = 0 if total <= 0 else total
 		
-		excess = EXCESS_EQUATION(total, self.minimum, self.minimum_sallie)
-		self.excess = 0 if excess <= 0 else excess
+		self.excess = EXCESS_EQUATION(total, self.minimum, self.minimum_sallie)
+		
+		if self.excess > 1:
+			self.stock_status = StockStatus.IN_STOCK
+		elif self.excess == 0:
+			self.stock_status = StockStatus.LOW_STOCK
+		else:
+			self.stock_status = StockStatus.OUT_OF_STOCK

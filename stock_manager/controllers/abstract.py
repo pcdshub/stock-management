@@ -7,6 +7,8 @@ from PyQt6.QtCore import pyqtSignal, QThread
 from PyQt6.QtWidgets import QMessageBox, QTableWidget, QTableWidgetItem, QWidget
 from PyQt6.uic import loadUi
 
+import stock_manager
+
 if TYPE_CHECKING:
 	from stock_manager import App
 	from stock_manager import Item
@@ -39,6 +41,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		self.logger = app.log
 		self.database = app.db
 		self.PAGE_INDEX = -1
+		self.PAGE_NAME: stock_manager.PageNames | None = None
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / f'{file_name}.ui'
@@ -96,6 +99,8 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 				table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))
 	
 	def to_page(self) -> None:
+		if hasattr(self, 'search'):
+			self.search.clear()
 		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
 
 

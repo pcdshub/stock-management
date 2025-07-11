@@ -6,7 +6,7 @@ for the SLAC Inventory Management application.
 from pathlib import Path
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QComboBox, QFileDialog, QMessageBox
 
 from .abstract import AbstractController
 
@@ -40,17 +40,15 @@ class Export(AbstractController):
 	
 	def _export_data(self) -> None:
 		"""Export data based on the selected file type in the UI."""
-		
+		self.export_combo: QComboBox
 		try:
-			match self.export_combo.currentText():
-				case 'PDF':
+			from stock_manager import ExportTypes
+			
+			match self.export_combo.currentText().lower():
+				case ExportTypes.PDF:
 					self.app.file_exports.pdf_export()
-				case 'CSV':
-					self.app.file_exports.sv_export(self, 'csv', self._path)
-				case 'TSV':
-					self.app.file_exports.sv_export(self, 'tsv', self._path)
-				case 'PSV':
-					self.app.file_exports.sv_export(self, 'psv', self._path)
+				case ExportTypes.CSV, ExportTypes.TSV, ExportTypes.PSV as export_type:
+					self.app.file_exports.sv_export(self, export_type, self._path)
 				case 'Select':
 					QMessageBox.information(
 							self,

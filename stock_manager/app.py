@@ -94,7 +94,7 @@ class App(QMainWindow):
 	
 	@asyncSlot()
 	async def _async_load(self) -> None:
-		async def create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
+		def create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
 			"""
 			Creates and populates the internal list of all inventory items from the data source.
 			
@@ -112,8 +112,8 @@ class App(QMainWindow):
 			return obj_items
 		
 		try:
-			gs_data: list[dict[str, int | float | str]] = await self.db.get_all_data()
-			self.all_items = await create_all_items(gs_data)
+			gs_data: list[dict[str, int | float | str]] = self.db.get_all_data()
+			self.all_items = create_all_items(gs_data)
 			await self.update_tables()
 		except Exception as e:
 			print(f'Error Loading Data Asynchronously: {e}')
@@ -143,7 +143,7 @@ class App(QMainWindow):
 			print(f'Page Index Not In constants.PAGE_NAMES: {e}')
 			self.setWindowTitle("SLAC Inventory Management Application" + username)
 		
-		if idx != 1:
+		if idx != 2:
 			try:
 				self.item_scanner.stop_video()
 			except Exception as e:
