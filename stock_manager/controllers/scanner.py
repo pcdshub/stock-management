@@ -1,100 +1,18 @@
-from abc import abstractmethod
 from typing import override, TYPE_CHECKING
 
 import cv2
 from numpy import ndarray
-from PyQt6.QtCore import pyqtSignal, QThread
-from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import QMessageBox
 from qasync import asyncSlot
 
-from .abstract_controller import AbstractController
+from .abstract import AbstractScanner
 
 if TYPE_CHECKING:
 	from stock_manager import App, Item
-	from stock_manager import Logger
 
 
-class AbstractScanner(AbstractController):
-	def __init__(self, file_name: str, app: 'App'):
-		super().__init__(file_name, app)
-		self.camera_thread = CameraThread(self.logger)
-	
-	@override
-	def to_page(self) -> None:
-		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
-		
-		try:
-			self.start_video()
-		except Exception as e:
-			print(f'Failed To Start QR Scanner: {e}')
-			self.logger.error_log(f"Failed To Start QR Scanner: {e}")
-			QMessageBox.critical(
-					self,
-					'QR Scanner Error',
-					'Failed To Start QR Scanner',
-					QMessageBox.StandardButton.Ok
-			)
-	
-	def start_video(self) -> None:
-		if self.camera_thread.running:
-			return
-		
-		try:
-			self.camera_thread.frame_ready.connect(self.process_frame)
-			self.camera_thread.start()
-		except Exception as e:
-			print(f'Error Starting Camera Thread: {e}')
-			self.logger.error_log(f'Error Starting Camera Thread: {e}')
-			QMessageBox.critical(
-					self,
-					'Camera Failure',
-					'Failed To Start Camera',
-					QMessageBox.StandardButton.Ok
-			)
-	
-	def stop_video(self) -> None:
-		if self.camera_thread.running:
-			self.camera_thread.stop()
-			self.camera_thread.wait()
-	
-	def process_frame(self, frame: ndarray) -> None:
-		self.check_for_qr(frame)
-		
-		try:
-			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-		except Exception as e:
-			print(f'Failed To Convert Frame Color: {e}')
-			self.logger.warning_log(f"Failed To Convert Frame Color: {e}")
-			QMessageBox.warning(
-					self,
-					'Color Conversion Error',
-					'Failed To Convert Frame Color',
-					QMessageBox.StandardButton.Ok
-			)
-		
-		try:
-			h, w, ch = frame.shape
-			bytes_per_line = ch * w
-			q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-			self.video_lbl.setPixmap(QPixmap.fromImage(q_img))
-		except Exception as e:
-			print(f'Failed To Update Video Label: {e}')
-			self.logger.error_log(f'Failed To Update Video Label: {e}')
-			QMessageBox.critical(
-					self,
-					'Video Label Failure',
-					'Failed To Update Video Label',
-					QMessageBox.StandardButton.Ok
-			)
-	
-	@abstractmethod
-	async def check_for_qr(self, frame: ndarray) -> None:
-		pass
-
-
-class Scanner(AbstractScanner):
-	"""QR Scanner UI controller for capturing video and decoding QR codes."""
+class ItemScanner(AbstractScanner):
+	"""QR Scanner UI controller for capturing video and decoding Item QR codes."""
 	
 	def __init__(self, app: 'App'):
 		"""
@@ -217,6 +135,8 @@ class Scanner(AbstractScanner):
 
 
 class Login(AbstractScanner):
+	"""QR Scanner UI controller for capturing video and decoding User QR codes."""
+
 	def __init__(self, app: 'App'):
 		super().__init__('login', app)
 		
@@ -254,50 +174,3 @@ class Login(AbstractScanner):
 		self.logger.info_log(f'User Logged In As: {data}')
 		self.app.view.to_page()
 		self.stop_video()
-
-
-class CameraThread(QThread):
-	frame_ready = pyqtSignal(object)
-	
-	def __init__(self, logger: 'Logger', parent=None):
-		super().__init__(parent)
-		self.running = False
-		self._logger = logger
-	
-	@override
-	def run(self) -> None:
-		self.running = True
-		cap = cv2.VideoCapture(0)
-		if not cap.isOpened():
-			self._logger.error_log('Could Not Access Camera')
-			print('Could Not Access Camera')
-			response = QMessageBox.critical(
-					None,
-					'Camera Failure',
-					'Failed To Access Camera',
-					QMessageBox.StandardButton.Ok,
-					QMessageBox.StandardButton.Retry
-			)
-			
-			if response == QMessageBox.StandardButton.Retry:
-				self.run()
-			
-			return
-		
-		while self.running:
-			worked, frame = cap.read()
-			if worked:
-				self.frame_ready.emit(frame)
-			else:
-				print('Failed To Read Frame From Camera')
-				self._logger.error_log('Failed To Read Frame From Camera')
-				QMessageBox.critical(
-						None,
-						'Frame Read Failure',
-						'Failed To Read Frame From Camera',
-						QMessageBox.StandardButton.Ok
-				)
-		cap.release()
-	
-	def stop(self) -> None:
-		self.running = False

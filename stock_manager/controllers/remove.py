@@ -3,7 +3,7 @@ from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QMessageBox
 
-from .abstract_controller import AbstractController
+from .abstract import AbstractController
 
 if TYPE_CHECKING:
 	from stock_manager import App

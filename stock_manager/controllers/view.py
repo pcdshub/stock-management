@@ -7,7 +7,7 @@ Handles the main table display and integrates with the database utility.
 from functools import partial
 from typing import override, TYPE_CHECKING
 
-from .abstract_controller import AbstractController
+from .abstract import AbstractController
 
 if TYPE_CHECKING:
 	from stock_manager import App
