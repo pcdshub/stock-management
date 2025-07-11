@@ -1,1 +1,8 @@
-pydm
+PyQt6
+cv2
+numpy
+gspread
+oauth2client
+pathlib
+typing
+qasync

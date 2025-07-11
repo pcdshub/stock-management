@@ -1,0 +1,41 @@
+from functools import partial
+from typing import override, TYPE_CHECKING
+
+from PyQt6.QtWidgets import QMessageBox
+
+from .abstract import AbstractController
+
+if TYPE_CHECKING:
+	from stock_manager import App
+
+
+class Remove(AbstractController):
+	def __init__(self, app: 'App'):
+		super().__init__('remove', app)
+		
+		self.PAGE_INDEX = 5
+		
+		self.handle_connections()
+	
+	@override
+	def handle_connections(self) -> None:
+		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
+		self.table.cellClicked.connect(self._on_cell_clicked)
+	
+	def _on_cell_clicked(self, row: int, _) -> None:
+		selected_item = self.app.all_items[row]
+		
+		response = QMessageBox.warning(
+				self,
+				'Item Removal Confirmation',
+				f'Are You Sure You Want To Remove {selected_item.part_num} '
+				'From The Database?\n\nThis Action Cannot Be Undone.',
+				QMessageBox.StandardButton.Yes,
+				QMessageBox.StandardButton.No
+		)
+		
+		if response == QMessageBox.StandardButton.Yes:
+			self.app.all_items.remove(selected_item)
+			self.logger.info_log(f'Item Removed From Database: {selected_item.part_num}')
+			self.app.update_tables()
+			self.database.update_database()
