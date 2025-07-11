@@ -26,17 +26,20 @@ class App(QMainWindow):
 	def __init__(self):
 		"""Initialize the main application window and setup screens."""
 		
-		from stock_manager import DBUtils, Logger, Edit, Export, Finish, Remove, Scanner, View, Add, Login
+		from stock_manager import DBUtils, Logger, Edit, Export, Finish, Remove, ItemScanner, View, Add, Login, \
+			FileExports, QRGenerator
 		
 		super(App, self).__init__()
 		
 		self.log = Logger()
 		self.db = DBUtils()
+		self.file_exports = FileExports()
+		self.qr_generator = QRGenerator()
 		self.export = Export(self)
 		self.finish = Finish(self)
 		self.login = Login(self)
 		self.view = View(self)
-		self.qr = Scanner(self)
+		self.item_scanner = ItemScanner(self)
 		self.add = Add(self)
 		self.edit = Edit(self)
 		self.remove = Remove(self)
@@ -61,7 +64,7 @@ class App(QMainWindow):
 		
 		def handle_screens() -> None:
 			screens_to_add: list[stock_manager.AbstractController] = [
-				self.login, self.view, self.qr, self.add,
+				self.login, self.view, self.item_scanner, self.add,
 				self.edit, self.remove, self.export, self.finish
 			]
 			
@@ -74,7 +77,7 @@ class App(QMainWindow):
 			"""Connects sidebar buttons to the appropriate screen navigation actions."""
 			
 			self.view_btn.clicked.connect(self.view.to_page)
-			self.qr_btn.clicked.connect(self.qr.to_page)
+			self.qr_btn.clicked.connect(self.item_scanner.to_page)
 			self.add_btn.clicked.connect(self.add.to_page)
 			self.edit_btn.clicked.connect(self.edit.to_page)
 			self.remove_btn.clicked.connect(self.remove.to_page)
@@ -142,7 +145,7 @@ class App(QMainWindow):
 		
 		if idx != 1:
 			try:
-				self.qr.stop_video()
+				self.item_scanner.stop_video()
 			except Exception as e:
 				print(f'Failed To Stop QR Scanner: {e}')
 				self.log.error_log(f"Failed To Stop QR Scanner: {e}")

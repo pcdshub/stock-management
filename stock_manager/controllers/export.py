@@ -3,14 +3,12 @@ Controls exporting inventory data to various file formats
 for the SLAC Inventory Management application.
 """
 
-import os
 from pathlib import Path
 from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
-from qasync import asyncSlot
 
-from .abstract_controller import AbstractController
+from .abstract import AbstractController
 
 if TYPE_CHECKING:
 	from stock_manager import App
@@ -46,13 +44,13 @@ class Export(AbstractController):
 		try:
 			match self.export_combo.currentText():
 				case 'PDF':
-					self._pdf_export()
+					self.app.file_exports.pdf_export()
 				case 'CSV':
-					self._sv_export('csv')
+					self.app.file_exports.sv_export(self, 'csv', self._path)
 				case 'TSV':
-					self._sv_export('tsv')
+					self.app.file_exports.sv_export(self, 'tsv', self._path)
 				case 'PSV':
-					self._sv_export('psv')
+					self.app.file_exports.sv_export(self, 'psv', self._path)
 				case 'Select':
 					QMessageBox.information(
 							self,
@@ -106,67 +104,3 @@ class Export(AbstractController):
 			
 			if response == QMessageBox.StandardButton.Retry:
 				self._get_directory()
-	
-	@asyncSlot()
-	async def _pdf_export(self) -> None:
-		"""Export current data to PDF format."""
-		
-		pass  # TODO: add pdf generation
-	
-	@asyncSlot()
-	async def _sv_export(self, ext: str) -> None:
-		"""
-		Export current data to a delimited text file (CSV, TSV, PSV).
-		
-		:param ext: The file extension (e.g., 'csv', 'tsv', 'psv').
-		"""
-		
-		delimiter = {
-			'csv': ',',
-			'tsv': '\t',
-			'psv': ' | '
-		}.get(ext)
-		
-		def get_valid_path() -> str:
-			"""
-			Generate a unique file path for the export file.
-			
-			:return: A unique file path as a string.
-			"""
-			
-			name = f'{ext}_export'
-			path = f'{self._path}/{name}.{ext}'
-			
-			count = 1
-			while os.path.exists(path):
-				path = f'{self._path}/{name}{count}.{ext}'
-				count += 1
-			
-			return path
-		
-		try:
-			with open(get_valid_path(), 'x') as f:
-				for i, item in enumerate(self.app.all_items):
-					line = ''
-					for var in item:
-						line += (str(var) if var else '') + delimiter
-					f.write(line[:-1] + '\n')
-					self.progressBar.setValue(i)
-		except FileExistsError as e:
-			print(f"That File Already Exists: {e}")
-			self.logger.error_log(f'File Already Exists Error: {e}')
-			QMessageBox.critical(
-					self,
-					'File Exists Error',
-					'That File Already Exists, Try Changing File Types',
-					QMessageBox.StandardButton.Ok
-			)
-		except Exception as e:
-			print(f'Failed To Export Data To {ext.upper()}: {e}')
-			self.logger.error_log(f'Failed To Export Data To {ext.upper()}: {e}')
-			QMessageBox.critical(
-					self,
-					f'{ext.upper()} Export Error',
-					f'Failed To Export Data To {ext.upper()}, Try Changing File Types',
-					QMessageBox.StandardButton.Ok
-			)

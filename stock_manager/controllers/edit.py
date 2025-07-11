@@ -11,7 +11,7 @@ from typing import override, TYPE_CHECKING
 from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 from stock_manager.model.item import Item
-from .abstract_controller import AbstractController
+from .abstract import AbstractController
 
 if TYPE_CHECKING:
 	from stock_manager import App

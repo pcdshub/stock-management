@@ -6,7 +6,7 @@ Manages the UI and logic for displaying the completion screen and returning the 
 
 from typing import override, TYPE_CHECKING
 
-from .abstract_controller import AbstractController
+from .abstract import AbstractController
 
 if TYPE_CHECKING:
 	from stock_manager import App
