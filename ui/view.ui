@@ -42,6 +42,11 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="styleSheet">
         <string notr="true">border: 1px solid black;
            border-radius: 12px;
@@ -123,6 +128,11 @@
      <column>
       <property name="text">
        <string>Sallie's Min</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Stock Status</string>
       </property>
      </column>
     </widget>
