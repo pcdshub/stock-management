@@ -37,7 +37,6 @@ def main():
 # 			QMessageBox.StandardButton.Ok
 # 	)
 # 	raise SystemExit(1)
-# TODO: uncomment try except later
 
 
 if __name__ == '__main__':

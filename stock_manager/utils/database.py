@@ -1,7 +1,7 @@
 """
 Database utilities for Stock Management Application.
 
-Provides DBUtils for connecting to and retrieving data from Google Sheets.
+Provides DBUtils for connecting to and getting/setting data from/to Google Sheets.
 """
 
 import os.path
@@ -17,7 +17,11 @@ class DBUtils:
 	"""Utility class for interacting with a Google Sheets database."""
 	
 	def __init__(self):
-		"""Initializes the Google Sheets client using credentials from a JSON keyfile."""
+		"""
+		Initializes the Google Sheets client using credentials from a JSON keyfile.
+		
+		:raises SystemExit: If the database fails to load
+		"""
 		
 		from .logger import Logger
 		
@@ -52,13 +56,12 @@ class DBUtils:
 			)
 			raise SystemExit(1)
 	
-	def get_all_data(self) -> list[dict[str, int | float | str]]:  # TODO: Replace with JIRA methods
+	def get_all_data(self) -> list[dict[str, int | float | str]]:
 		"""
 		Retrieves all records from the first worksheet of the 'Stock Management Sheet'.
 		
-		Raises RuntimeError if fetching data from Google Sheets fails.
-		
 		:return: List of dictionaries, each representing a row from the sheet.
+		:raises SystemExit: If user chooses to close application after fetching data from Google Sheets fails.
 		"""
 		
 		try:
@@ -79,7 +82,12 @@ class DBUtils:
 				raise SystemExit(1)
 	
 	def get_all_users(self) -> list[str]:  # TODO: possibly make user objects out of data
-		"""Retrieve a list of all users from the database."""
+		"""
+		Retrieve a list of all users from the database.
+		
+		:return: A list of strings representing all the usernames in the database
+		:raises SystemExit: If user fetch from database fails
+		"""
 		
 		try:
 			return ['QR_USERNAME']  # TODO: handle getting usernames from database

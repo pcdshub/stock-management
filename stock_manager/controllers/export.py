@@ -1,12 +1,9 @@
-"""
-Controls exporting inventory data to various file formats
-for the SLAC Inventory Management application.
-"""
+"""Export page controller for exporting inventory data in the Stock Management Application."""
 
 from pathlib import Path
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QComboBox, QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 from .abstract import AbstractController
 
@@ -15,7 +12,12 @@ if TYPE_CHECKING:
 
 
 class Export(AbstractController):
-	"""UI controller for data export functionality."""
+	"""
+	Controller for the 'Edit' page of the stock management application.
+	
+	Handles which type of file to export as and sends
+	the correct signal to `file_exports.py` to be exported.
+	"""
 	
 	def __init__(self, app: 'App'):
 		"""
@@ -25,10 +27,8 @@ class Export(AbstractController):
 		"""
 		
 		super().__init__('export', app)
-		
 		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
 		self.PAGE_INDEX = 6
-		
 		self.handle_connections()
 	
 	@override
@@ -39,8 +39,16 @@ class Export(AbstractController):
 		self.export_btn.clicked.connect(self._export_data)
 	
 	def _export_data(self) -> None:
-		"""Export data based on the selected file type in the UI."""
-		self.export_combo: QComboBox
+		"""
+		Export stock data to a file based on the selected export type.
+		
+		This method checks the current selection in the export combo box,
+		and calls the appropriate file export method.
+		If no valid type is selected, shows an information or warning dialog.
+		
+		If an exception occurs during export, the user is offered the option to retry.
+		"""
+		
 		try:
 			from stock_manager import ExportTypes
 			
@@ -79,7 +87,11 @@ class Export(AbstractController):
 				self._export_data()
 	
 	def _get_directory(self) -> None:
-		"""Open a dialog to select the export directory and update the UI."""
+		"""
+		Open a dialog to select the export directory and update the UI.
+		
+		If an exception occurs during selection, the user is offered the option to retry.
+		"""
 		
 		try:
 			response = QFileDialog.getExistingDirectory(

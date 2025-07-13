@@ -1,4 +1,10 @@
-from functools import partial
+"""
+Remove page controller for removing inventory data in the Stock Management Application.
+
+Provides functionality for removing stock items from the database.
+Includes search filtering and confirmation dialogs for safe item removal.
+"""
+
 from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QMessageBox
@@ -10,19 +16,37 @@ if TYPE_CHECKING:
 
 
 class Remove(AbstractController):
+	"""
+	Controller for the 'Remove' page of the stock management application.
+	
+	Handles user interactions for searching and removing stock items
+	from the database.
+	"""
+	
 	def __init__(self, app: 'App'):
+		"""
+		Initialize the Remove page.
+		
+		:param app: Reference to the main application instance.
+		"""
+		
 		super().__init__('remove', app)
-		
 		self.PAGE_INDEX = 5
-		
 		self.handle_connections()
 	
 	@override
 	def handle_connections(self) -> None:
-		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
+		self.search.textChanged.connect(self.filter_table)
 		self.table.cellClicked.connect(self._on_cell_clicked)
 	
 	def _on_cell_clicked(self, row: int, _) -> None:
+		"""
+		Confirms and deletes item after user confirmation
+		when a table row is clicked.
+		
+		:param row: The index of the clicked table row.
+		:param _: The column index (unused).
+		"""
 		selected_item = self.app.all_items[row]
 		
 		response = QMessageBox.warning(

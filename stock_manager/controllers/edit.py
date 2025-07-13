@@ -1,11 +1,10 @@
 """
-Edit controller for managing inventory item edits in the Stock Management Application.
+Edit page controller for managing inventory item edits in the Stock Management Application.
 
 This module provides the Edit class, which handles the UI and logic for editing inventory items,
 including updating item details, validating user input, and saving changes to the database.
 """
 
-from functools import partial
 from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
@@ -18,11 +17,16 @@ if TYPE_CHECKING:
 
 
 class Edit(AbstractController):
-	"""Controller for editing inventory items in the Stock Management Application."""
+	"""
+	Controller for the 'Edit' page of the stock management application.
+	
+	Handles editing already existing inventory items, validating input fields,
+	and updating the database.
+	"""
 	
 	def __init__(self, app: 'App'):
 		"""
-		Initialize the Edit controller, load the UI, set up the table, and connect signals for user interactions.
+		Initialize the Edit page controller.
 		
 		:param app: Reference to the main application instance.
 		"""
@@ -44,7 +48,7 @@ class Edit(AbstractController):
 	
 	@override
 	def handle_connections(self) -> None:
-		self.search.textChanged.connect(partial(self.filter_table, table=self.table))
+		self.search.textChanged.connect(self.filter_table)
 		self.table.cellClicked.connect(self._on_cell_clicked)
 		self.clear_btn.clicked.connect(self._clear_form)
 		self.submit_btn.clicked.connect(self._submit_form)
@@ -72,7 +76,7 @@ class Edit(AbstractController):
 		Construct and return an Item instance from the data in the specified table row.
 		
 		:param row: The index of the table row to extract item data from.
-		:return: The Item instance constructed from the row's values.
+		:return: The Item instance constructed from the row's values or None if an error occurs.
 		"""
 		
 		try:
@@ -134,7 +138,7 @@ class Edit(AbstractController):
 		"""
 		Update the total and excess labels when any spinner value changes.
 		
-		:param _: The value emitted by the spinner (unused)
+		:param _: The value emitted by the spinner (unused).
 		"""
 		
 		try:
@@ -193,7 +197,7 @@ class Edit(AbstractController):
 			)
 			return
 		
-		field_vals: list[str | int | None] = [
+		field_vals: list[str | int] = [
 			self.part_num.text(),
 			self.manufacturer.text(),
 			self.desc.toPlainText(),
@@ -206,7 +210,7 @@ class Edit(AbstractController):
 		]
 		
 		i: int
-		field_val: str | int | None
+		field_val: str | int
 		for i, field_val in enumerate(field_vals):
 			if isinstance(field_val, str):
 				field_vals[i] = self._parse_field(field_val)

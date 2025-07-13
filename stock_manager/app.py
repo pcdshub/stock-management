@@ -24,7 +24,13 @@ class App(QMainWindow):
 	"""
 	
 	def __init__(self):
-		"""Initialize the main application window and setup screens."""
+		"""
+		Initialize the main application window and setup screens.
+		
+		Creates instances of each controller and utility files.
+		
+		:raises SystemExit: If the main UI fails to load
+		"""
 		
 		from stock_manager import DBUtils, Logger, Edit, Export, Finish, Remove, ItemScanner, View, Add, Login, \
 			FileExports, QRGenerator
@@ -63,6 +69,8 @@ class App(QMainWindow):
 			raise SystemExit(1)
 		
 		def handle_screens() -> None:
+			"""Add all page controllers to the stacked widget and connect page change events."""
+			
 			screens_to_add: list[stock_manager.AbstractController] = [
 				self.login, self.view, self.item_scanner, self.add,
 				self.edit, self.remove, self.export, self.finish
@@ -87,6 +95,13 @@ class App(QMainWindow):
 		handle_connections()
 	
 	def run(self) -> None:
+		"""
+		Start the application workflow.
+		
+		Navigates to the login page, triggers the page change handler,
+		and begins any asynchronous loading.
+		"""
+		
 		self.log.info_log("App Started")
 		self.login.to_page()
 		self._on_page_changed()
@@ -94,13 +109,14 @@ class App(QMainWindow):
 	
 	@asyncSlot()
 	async def _async_load(self) -> None:
+		"""
+		Asynchronously load data from the database and update the application tables.
+		
+		:raises SystemExit: If the user chooses to close the application after a data load failure.
+		"""
+		
 		def create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
-			"""
-			Creates and populates the internal list of all inventory items from the data source.
-			
-			This method parses raw data and instantiates Item objects accordingly.
-			"""
-			
+			"""Convert a list of Google Sheets item records to Item objects."""
 			obj_items: list[Item] = []
 			for item in gs_items:
 				vals: list[int | float | str | None] = [
@@ -156,18 +172,22 @@ class App(QMainWindow):
 						QMessageBox.StandardButton.Ok
 				)
 		
-		buttons: list[QPushButton] = self.sideUI.children()[1:]  # exclude QVBox
+		def bold_current_screen_button() -> None:
+			"""Update sidebar buttons' font to indicate the currently active screen."""
+			buttons: list[QPushButton] = self.sideUI.children()[1:]  # exclude QVBox
+			
+			active = QFont()
+			active.setPointSize(SIDEBAR_BUTTON_SIZE)
+			active.setBold(True)
+			inactive = QFont()
+			inactive.setPointSize(SIDEBAR_BUTTON_SIZE)
+			
+			i: int
+			button: QPushButton
+			for i, button in enumerate(buttons, start=1):
+				button.setFont(active if i == idx else inactive)
 		
-		active = QFont()
-		active.setPointSize(SIDEBAR_BUTTON_SIZE)
-		active.setBold(True)
-		inactive = QFont()
-		inactive.setPointSize(SIDEBAR_BUTTON_SIZE)
-		
-		i: int
-		button: QPushButton
-		for i, button in enumerate(buttons, start=1):
-			button.setFont(active if i == idx else inactive)
+		bold_current_screen_button()
 	
 	@override
 	def closeEvent(self, event: QCloseEvent) -> None:
@@ -185,5 +205,5 @@ class App(QMainWindow):
 		"""
 		
 		await asyncio.gather(
-				*(controller.update_table(controller.table) for controller in [self.view, self.edit, self.remove])
+				*(controller.update_table() for controller in [self.view, self.edit, self.remove])
 		)

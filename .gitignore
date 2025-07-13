@@ -15,4 +15,3 @@ ui_*.py
 app.log
 TODO.txt
 thoughts.txt
-# TODO: remove unneeded ignores

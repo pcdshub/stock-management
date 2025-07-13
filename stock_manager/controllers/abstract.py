@@ -1,10 +1,19 @@
+"""
+Abstract base classes for shared controller logic.
+
+This module defines abstract classes used to enforce consistent structure
+across controllers and scanner components in the SLAC-LCLS-Stock-Management
+application. Each abstract class provides required methods, common functionality,
+or reusable connection logic for concrete page controllers.
+"""
+
 from abc import ABC, ABCMeta, abstractmethod
 from pathlib import Path
 from typing import override, TYPE_CHECKING
 
 from numpy import ndarray
 from PyQt6.QtCore import pyqtSignal, QThread
-from PyQt6.QtWidgets import QMessageBox, QTableWidget, QTableWidgetItem, QWidget
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QWidget
 from PyQt6.uic import loadUi
 
 import stock_manager
@@ -32,7 +41,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		Initialize the abstract controller, load its UI, and set up sidebar navigation handlers.
 		
 		:param file_name: The name of the .ui file (without extension) to load for this controller.
-		:param app: Reference to the main application instance
+		:param app: Reference to the main application instance.
 		"""
 		
 		super(AbstractController, self).__init__()
@@ -58,59 +67,106 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 	
 	@abstractmethod
 	def handle_connections(self) -> None:
+		"""
+		Define and connect all required signals and slots for the controller.
+		
+		Each subclass must implement this to set up its own UI event handlers
+		and internal logic connections.
+		"""
 		pass
 	
-	@staticmethod
-	def filter_table(text: str, table: QTableWidget) -> None:
+	def filter_table(self, text: str) -> None:
 		"""
-		Filter the rows of a QTableWidget to show only those matching the search text.
+		Filter the rows of a dynamically found QTableWidget to show only those matching the search text.
+		Only works if child controller has a QTableWidget object called 'table'.
 		
 		:param text: Search string to filter rows by. Only rows that contain this text will be shown.
-		:param table: The table widget to filter.
 		"""
 		
-		if text == '':
-			for row in range(table.rowCount()):
-				table.setRowHidden(row, False)
+		if not hasattr(self, 'table'):
+			QMessageBox.warning(
+					self,
+					'No Table Found',
+					'No Table Object Found In Controller, '
+					'Make Sure This Method Is Being Called In A Controller '
+					'That Has A Table Object Called "Table".',
+					QMessageBox.StandardButton.Ok
+			)
 			return
 		
-		for row in range(table.rowCount()):
+		if text == '':
+			for row in range(self.table.rowCount()):
+				self.table.setRowHidden(row, False)
+			return
+		
+		for row in range(self.table.rowCount()):
 			match = False
-			for col in range(table.columnCount()):
-				item = table.item(row, col)
+			for col in range(self.table.columnCount()):
+				item = self.table.item(row, col)
 				if item and text.lower() in item.text().lower():
 					match = True
 					break
 			
-			table.setRowHidden(row, not match)
+			self.table.setRowHidden(row, not match)
 	
-	async def update_table(self, table: QTableWidget) -> None:
+	async def update_table(self) -> None:
 		"""
 		Initializes the table widget with all inventory data from the database.
+		Only works if child controller has a QTableWidget object called 'table'.
 		"""
 		
+		if not hasattr(self, 'table'):
+			QMessageBox.warning(
+					self,
+					'No Table Found',
+					'No Table Object Found In Controller, '
+					'Make Sure This Method Is Being Called In A Controller '
+					'That Has A Table Object Called "Table".',
+					QMessageBox.StandardButton.Ok
+			)
+			return
+		
 		all_data = self.app.all_items
-		table.setRowCount(len(all_data))
+		self.table.setRowCount(len(all_data))
 		
 		row_num: int
 		item: 'Item'
 		for row_num, item in enumerate(all_data):
 			for col_num in range(len(item)):
-				table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))
+				self.table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))
 	
 	def to_page(self) -> None:
+		"""Navigate to this controller's page in the stacked widget."""
+		
 		if hasattr(self, 'search'):
 			self.search.clear()
 		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
 
 
 class AbstractScanner(AbstractController):
+	"""
+	Abstract base class for scanner page controllers.
+	
+	Provides common functionality for pages that need to handle
+	camera threads, QR code processing, and video display updates.
+	"""
+	
 	def __init__(self, file_name: str, app: 'App'):
+		"""
+		Initialize the scanner controller.
+		Creates reference to `_CameraThread` as `self.camera_thread`
+		
+		:param file_name: The name of the .ui file (without extension) to load for this controller.
+		:param app: Reference to the main application instance.
+		"""
+		
 		super().__init__(file_name, app)
 		self.camera_thread = self._CameraThread(self)
 	
 	@override
 	def to_page(self) -> None:
+		"""Navigate to this scanner page and start the video feed."""
+		
 		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
 		
 		try:
@@ -126,6 +182,12 @@ class AbstractScanner(AbstractController):
 			)
 	
 	def start_video(self) -> None:
+		"""
+		Start the camera thread and begin capturing video frames.
+
+		Connects the thread’s signal to the frame processor.
+		"""
+		
 		if self.camera_thread.running:
 			return
 		
@@ -143,11 +205,26 @@ class AbstractScanner(AbstractController):
 			)
 	
 	def stop_video(self) -> None:
+		"""
+		Stop the camera thread and release resources.
+
+		Ensures the camera thread is properly stopped when
+		leaving the scanner page.
+		"""
+		
 		if self.camera_thread.running:
 			self.camera_thread.stop()
 			self.camera_thread.wait()
 	
 	def process_frame(self, frame: ndarray) -> None:
+		"""
+		Process a single frame from the camera feed.
+		
+		Sends the frame to subclass's `check_for_qr()` to asynchronously decode and manage QR data.
+		
+		:param frame: A single image frame from the camera.
+		"""
+		
 		self.check_for_qr(frame)
 		
 		try:
@@ -182,18 +259,49 @@ class AbstractScanner(AbstractController):
 	
 	@abstractmethod
 	async def check_for_qr(self, frame: ndarray) -> None:
+		"""
+		Asynchronously check the given video frame for a QR code.
+		
+		Subclasses must implement this method to process the frame,
+		decode any QR codes found, and handle any related actions.
+		
+		:param frame: The video frame to analyze.
+		"""
 		pass
 	
 	class _CameraThread(QThread):
+		"""
+		Thread to handle continuous video capture from the camera.
+		
+		Runs in the background to read frames from the webcam and emit them
+		via the `frame_ready` signal for processing elsewhere in the application.
+		"""
+		
 		frame_ready = pyqtSignal(object)
 		
 		def __init__(self, outer_instance: AbstractController, parent=None):
+			"""
+			Initialize the camera thread.
+			
+			:param outer_instance: Reference to the outer controller to access logging.
+			:param parent: Parent Qt object.
+			"""
+			
 			super().__init__(parent)
 			self.running = False
 			self._logger = outer_instance.logger
 		
 		@override
 		def run(self) -> None:
+			"""
+			Start the video capture loop.
+			
+			Continuously captures frames from the default webcam and emits
+			each frame through the `frame_ready` signal.
+			
+			If an exception occurs, the user is offered the option to retry.
+			"""
+			
 			from cv2 import VideoCapture
 			
 			self.running = True
@@ -218,16 +326,18 @@ class AbstractScanner(AbstractController):
 				worked, frame = cap.read()
 				if worked:
 					self.frame_ready.emit(frame)
-				else:
-					print('Failed To Read Frame From Camera')
-					self._logger.error_log('Failed To Read Frame From Camera')
-					QMessageBox.critical(
-							None,
-							'Frame Read Failure',
-							'Failed To Read Frame From Camera',
-							QMessageBox.StandardButton.Ok
-					)
+					continue
+				
+				print('Failed To Read Frame From Camera')
+				self._logger.error_log('Failed To Read Frame From Camera')
+				QMessageBox.critical(
+						None,
+						'Frame Read Failure',
+						'Failed To Read Frame From Camera',
+						QMessageBox.StandardButton.Ok
+				)
 			cap.release()
 		
 		def stop(self) -> None:
+			"""Stop the video capture loop."""
 			self.running = False
