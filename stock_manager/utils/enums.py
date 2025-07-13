@@ -2,20 +2,23 @@ from dataclasses import dataclass
 from enum import Enum
 
 
-class PageNames(Enum):
+class Pages(Enum):
 	@dataclass
-	class PageDetails:
+	class _PageDetails:
 		TITLE: str
 		FILE_NAME: str
+		PAGE_INDEX: int
+	# TODO: Possibly add admin boolean
+	#  to only display certain pages
 	
-	LOGIN = PageDetails('Login', 'login')
-	VIEW = 'View'
-	SCAN = 'QR Scanner'
-	ADD = 'Add'
-	EDIT = 'Edit'
-	REMOVE = 'Remove'
-	EXPORT = 'Export'
-	FINISHED = 'Finished'
+	LOGIN = _PageDetails('Login', 'login', 0)
+	VIEW = _PageDetails('View', 'view', 1)
+	SCAN = _PageDetails('QR Scanner', 'scanner', 2)
+	ADD = _PageDetails('Add', 'add', 3)
+	EDIT = _PageDetails('Edit', 'edit', 4)
+	REMOVE = _PageDetails('Remove', 'remove', 5)
+	EXPORT = _PageDetails('Export', 'export', 6)
+	FINISHED = _PageDetails('Finished', 'finish', 7)
 
 
 class ExportTypes(Enum):

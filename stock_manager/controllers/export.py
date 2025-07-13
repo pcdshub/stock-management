@@ -5,6 +5,7 @@ from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
+import stock_manager
 from .abstract import AbstractController
 
 if TYPE_CHECKING:
@@ -26,9 +27,10 @@ class Export(AbstractController):
 		:param app: Reference to the main application instance.
 		"""
 		
-		super().__init__('export', app)
+		page = stock_manager.Pages.EXPORT
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
 		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
-		self.PAGE_INDEX = 6
 		self.handle_connections()
 	
 	@override

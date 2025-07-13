@@ -14,6 +14,7 @@ from numpy import ndarray
 from PyQt6.QtWidgets import QMessageBox
 from qasync import asyncSlot
 
+import stock_manager
 from .abstract import AbstractScanner
 
 if TYPE_CHECKING:
@@ -34,9 +35,10 @@ class ItemScanner(AbstractScanner):
 		:param app: Reference to the main application instance.
 		"""
 		
-		super().__init__('scanner', app)
+		page = stock_manager.Pages.SCAN
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
 		self._items: set[Item] = set()
-		self.PAGE_INDEX = 2
 		self.handle_connections()
 	
 	@override
@@ -167,9 +169,10 @@ class Login(AbstractScanner):
 		:param app: Reference to the main application instance.
 		"""
 		
-		super().__init__('login', app)
-		self._users_list = self.database.get_all_users()  # get user list from JIRA or database
-		self.PAGE_INDEX = 0
+		page = stock_manager.Pages.LOGIN
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
+		self._users_list = self.database.get_all_users()
 		self.handle_connections()
 	
 	@override
