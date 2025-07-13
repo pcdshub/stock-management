@@ -81,16 +81,16 @@ class DBUtils:
 			if response == QMessageBox.StandardButton.Close:
 				raise SystemExit(1)
 	
-	def get_all_users(self) -> list[str]:  # TODO: possibly make user objects out of data
+	def get_all_users(self) -> set[str]:  # TODO: possibly make user objects out of data
 		"""
-		Retrieve a list of all users from the database.
+		Retrieve a set of all users from the database.
 		
-		:return: A list of strings representing all the usernames in the database
+		:return: A set of strings representing all the usernames in the database
 		:raises SystemExit: If user fetch from database fails
 		"""
 		
 		try:
-			return ['QR_USERNAME']  # TODO: handle getting usernames from database
+			return {'QR_USERNAME'}  # TODO: handle getting usernames from database
 		except Exception as e:
 			print(f'Failed To Get All Users From {self._file_name}: {e}')
 			self._log.error_log(f'Failed To Get All Users From {self._file_name}: {e}')
