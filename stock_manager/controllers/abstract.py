@@ -49,8 +49,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		self.app = app
 		self.logger = app.log
 		self.database = app.db
-		self.PAGE_INDEX = -1
-		self.PAGE_NAME: stock_manager.PageNames | None = None
+		self.PAGE_NAME: stock_manager.Pages | None = None
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / f'{file_name}.ui'
@@ -140,7 +139,9 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		
 		if hasattr(self, 'search'):
 			self.search.clear()
-		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
+		
+		self.app.current_page = self.PAGE_NAME
+		self.app.screens.setCurrentIndex(self.PAGE_NAME.value.PAGE_INDEX)
 
 
 class AbstractScanner(AbstractController):
@@ -167,7 +168,8 @@ class AbstractScanner(AbstractController):
 	def to_page(self) -> None:
 		"""Navigate to this scanner page and start the video feed."""
 		
-		self.app.screens.setCurrentIndex(self.PAGE_INDEX)
+		self.app.current_page = self.PAGE_NAME
+		self.app.screens.setCurrentIndex(self.PAGE_NAME.value.PAGE_INDEX)
 		
 		try:
 			self.start_video()

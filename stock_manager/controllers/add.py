@@ -30,8 +30,10 @@ class Add(AbstractController):
 		
 		:param app: Reference to the main application instance.
 		"""
-		super().__init__('add', app)
 		
+		page = stock_manager.Pages.ADD
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
 		self._total = self._excess = 0
 		self._spinners: list[QSpinBox] = [
 			self.b750_spinner,
@@ -44,7 +46,6 @@ class Add(AbstractController):
 			self.manufacturer,
 			self.desc
 		]
-		self.PAGE_INDEX = 3
 		
 		self.handle_connections()
 	

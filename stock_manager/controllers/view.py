@@ -6,6 +6,7 @@ Handles the main table display and navigation to the export page.
 
 from typing import override, TYPE_CHECKING
 
+import stock_manager
 from .abstract import AbstractController
 
 if TYPE_CHECKING:
@@ -26,8 +27,9 @@ class View(AbstractController):
 		:param app: Reference to the main application instance.
 		"""
 		
-		super().__init__('view', app)
-		self.PAGE_INDEX = 1
+		page = stock_manager.Pages.VIEW
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
 		self.handle_connections()
 	
 	@override

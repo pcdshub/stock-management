@@ -16,14 +16,3 @@ EXCESS_EQUATION: Callable[[int, int, int], int] = \
 		total - (b750_minimum + b757_minimum)
 
 SIDEBAR_BUTTON_SIZE = 14
-
-PAGE_NAMES = [
-	'Login',
-	'View',
-	'QR Scanner',
-	'Add',
-	'Edit',
-	'Remove',
-	'Export',
-	'Finished',
-]

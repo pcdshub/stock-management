@@ -9,6 +9,7 @@ from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QMessageBox
 
+import stock_manager
 from .abstract import AbstractController
 
 if TYPE_CHECKING:
@@ -30,8 +31,9 @@ class Remove(AbstractController):
 		:param app: Reference to the main application instance.
 		"""
 		
-		super().__init__('remove', app)
-		self.PAGE_INDEX = 5
+		page = stock_manager.Pages.REMOVE
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
 		self.handle_connections()
 	
 	@override

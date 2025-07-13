@@ -9,6 +9,7 @@ from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
+import stock_manager
 from stock_manager.model.item import Item
 from .abstract import AbstractController
 
@@ -31,7 +32,9 @@ class Edit(AbstractController):
 		:param app: Reference to the main application instance.
 		"""
 		
-		super().__init__('edit', app)
+		page = stock_manager.Pages.EDIT
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
 		
 		self._selected_item: Item | None = None
 		self._total = self._excess = 0
@@ -42,7 +45,6 @@ class Edit(AbstractController):
 			self.min_757_spinner
 		]
 		self._text_fields: list[QLineEdit | QTextEdit] = [self.manufacturer, self.desc]
-		self.PAGE_INDEX = 4
 		
 		self.handle_connections()
 	

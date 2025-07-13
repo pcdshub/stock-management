@@ -53,6 +53,7 @@ class App(QMainWindow):
 		self.user: str | None = None
 		self.all_items: list[Item] = []
 		self.screens: QStackedWidget | None = None
+		self.current_page: stock_manager.Pages | None = None
 		
 		try:
 			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
@@ -148,18 +149,20 @@ class App(QMainWindow):
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
 		
-		from stock_manager import SIDEBAR_BUTTON_SIZE, PAGE_NAMES
+		from stock_manager import SIDEBAR_BUTTON_SIZE
 		
 		idx = self.screens.currentIndex()
 		username = f' - {self.user}' if self.user else ''
 		
 		try:
-			self.setWindowTitle(PAGE_NAMES[idx] + " | SLAC Inventory Management Application" + username)
-		except IndexError as e:
-			print(f'Page Index Not In constants.PAGE_NAMES: {e}')
+			self.setWindowTitle(self.current_page.value.TITLE + " | SLAC Inventory Management Application" + username)
+		except Exception as e:
+			print(f'Page Title Update Error: {e}')
+			self.log.warning_log(f'Error Updating Window Title With Current Page Title: {e}')
 			self.setWindowTitle("SLAC Inventory Management Application" + username)
 		
-		if idx != 2:
+		if self.item_scanner.camera_thread.running and \
+				self.screens.currentIndex() != stock_manager.Pages.SCAN.value.PAGE_INDEX:
 			try:
 				self.item_scanner.stop_video()
 			except Exception as e:
