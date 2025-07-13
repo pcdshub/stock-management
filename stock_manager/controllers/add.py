@@ -35,17 +35,17 @@ class Add(AbstractController):
 		super().__init__(page.value.FILE_NAME, app)
 		self.PAGE_NAME = page
 		self._total = self._excess = 0
-		self._spinners: list[QSpinBox] = [
+		self._spinners: set[QSpinBox] = {
 			self.b750_spinner,
 			self.b757_spinner,
 			self.min_750_spinner,
 			self.min_757_spinner
-		]
-		self._text_fields: list[QLineEdit | QTextEdit] = [
+		}
+		self._text_fields: set[QLineEdit | QTextEdit] = {
 			self.part_num,
 			self.manufacturer,
 			self.desc
-		]
+		}
 		
 		self.handle_connections()
 	

@@ -117,7 +117,13 @@ class App(QMainWindow):
 		"""
 		
 		def create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
-			"""Convert a list of Google Sheets item records to Item objects."""
+			"""
+			Convert a list dictionaries (Google Sheet Columns) to a list of `Item` objects
+			
+			:param gs_items: A list of Google Sheet columns
+			:return: a list of `Item` objects
+			"""
+			
 			obj_items: list[Item] = []
 			for item in gs_items:
 				vals: list[int | float | str | None] = [
@@ -129,8 +135,7 @@ class App(QMainWindow):
 			return obj_items
 		
 		try:
-			gs_data: list[dict[str, int | float | str]] = self.db.get_all_data()
-			self.all_items = create_all_items(gs_data)
+			self.all_items = create_all_items(self.db.get_all_data())
 			await self.update_tables()
 		except Exception as e:
 			print(f'Error Loading Data Asynchronously: {e}')
