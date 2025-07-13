@@ -24,6 +24,7 @@ class Item:
 	:var minimum: Minimum required stock for B750.
 	:var excess: The amount of stock above minimum levels.
 	:var minimum_sallie: Minimum required stock for B757.
+	:var stock_status: The current state of the stock item represented as a StockStatus enum.
 	"""
 	
 	part_num: str | None
@@ -39,10 +40,12 @@ class Item:
 	
 	@override
 	def __hash__(self) -> int:
+		"""Allows hashing of an Item object, allows Item objects to be put into sets"""
 		return hash((value for value in self))
 	
 	@override
 	def __eq__(self, other: object) -> bool:
+		"""Allows comparing of two objects by checking if all fields are equal in value."""
 		if not isinstance(other, Item):
 			return False
 		return all(s == o for s, o, in zip(self, other))
@@ -60,7 +63,7 @@ class Item:
 		return (value for value in self.__dict__.values())
 	
 	def update_stats(self) -> None:
-		"""Updates the 'total' and 'excess' fields based on current stock and minimums."""
+		"""Updates the `total`, `excess`, and `stock_status` fields based on current stock and minimums."""
 		
 		from stock_manager import EXCESS_EQUATION, TOTAL_EQUATION
 		

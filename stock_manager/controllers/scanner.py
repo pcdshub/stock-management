@@ -1,3 +1,12 @@
+"""
+Scanner Controller Classes For Camera Functionality
+
+This module defines multiple classes related to QR code scanning functionality.
+Each class provides a different implementation or specialization for handling
+camera input, processing frames, and integrating QR scanning into different
+parts of the application.
+"""
+
 from typing import override, TYPE_CHECKING
 
 import cv2
@@ -12,20 +21,22 @@ if TYPE_CHECKING:
 
 
 class ItemScanner(AbstractScanner):
-	"""QR Scanner UI controller for capturing video and decoding Item QR codes."""
+	"""
+	Controller for the 'QR Scan' page of the stock management application.
+	
+	Handles decoding of Item QR codes and form functionality.
+	"""
 	
 	def __init__(self, app: 'App'):
 		"""
-		Initializes the scanner UI.
+		Initializes the QR Scan page.
 		
 		:param app: Reference to the main application instance.
 		"""
 		
 		super().__init__('scanner', app)
-		
 		self._items: set[Item] = set()
 		self.PAGE_INDEX = 2
-		
 		self.handle_connections()
 	
 	@override
@@ -37,7 +48,8 @@ class ItemScanner(AbstractScanner):
 	@asyncSlot()
 	async def check_for_qr(self, frame: ndarray) -> None:
 		"""
-		Scans the current frame for a QR code and logs if found.
+		Scans the current frame for an item QR code, adding it to an
+		internal list to be used when submitting a form and updating the UI.
 		
 		:param frame: Current video frame as a numpy ndarray.
 		"""
@@ -108,7 +120,14 @@ class ItemScanner(AbstractScanner):
 						item.stock_b757 -= 1
 					else:
 						print("Neither Radio Button Is Selected")
-						raise ValueError("Neither Radio Button Is Selected")
+						QMessageBox.information(
+								self,
+								'Radio Button Error',
+								'Neither Radio Button Is Selected, '
+								'Please Select A Radio Button Before Submitting Form',
+								QMessageBox.StandardButton.Ok
+						)
+						return
 					
 					item.update_stats()
 					if item.excess <= 0:
@@ -135,14 +154,22 @@ class ItemScanner(AbstractScanner):
 
 
 class Login(AbstractScanner):
-	"""QR Scanner UI controller for capturing video and decoding User QR codes."""
-
+	"""
+	Controller for the 'Login' page of the stock management application.
+	
+	Handles the login functionality for both user QR code scan and the login form.
+	"""
+	
 	def __init__(self, app: 'App'):
-		super().__init__('login', app)
+		"""
+		Initializes the Login page.
 		
+		:param app: Reference to the main application instance.
+		"""
+		
+		super().__init__('login', app)
 		self._users_list = self.database.get_all_users()  # get user list from JIRA or database
 		self.PAGE_INDEX = 0
-		
 		self.handle_connections()
 	
 	@override
@@ -152,6 +179,13 @@ class Login(AbstractScanner):
 	@override
 	@asyncSlot()
 	async def check_for_qr(self, frame: ndarray) -> None:
+		"""
+		Scans the current frame for a user QR code, logging them in and
+		navigating to `view.ui` and `view.py`.
+		
+		:param frame: Current video frame as a numpy ndarray.
+		"""
+		
 		data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
 		if not data or self.app.user:
 			return

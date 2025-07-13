@@ -31,7 +31,7 @@ class FileExports:
 	
 	@asyncSlot()
 	async def pdf_export(self) -> None:
-		"""Export current data to PDF format."""
+		"""Asynchronously exports current data to PDF format."""
 		
 		pass  # TODO: add pdf generation
 	
@@ -43,9 +43,9 @@ class FileExports:
 			path: str
 	) -> None:
 		"""
-		Export current data to a delimited text file (CSV, TSV, PSV).
+		Asynchronously exports current data to a delimited text file (CSV, TSV, PSV).
 		
-		:param instance: Instance of controller class that method is being called from
+		:param instance: Instance of controller class that method is being called from.
 		:param export_type: The file extension as a ExportType enum.
 		:param path: The directory to create file in.
 		"""
@@ -74,11 +74,11 @@ class FileExports:
 					QMessageBox.StandardButton.Ok
 			)
 		except Exception as e:
-			print(f'Failed To Export Data To {ext.upper()}: {e}')
-			instance.logger.error_log(f'Failed To Export Data To {ext.upper()}: {e}')
+			print(f'Failed To Export Data To {export_type.value.upper()}: {e}')
+			instance.logger.error_log(f'Failed To Export Data To {export_type.value.upper()}: {e}')
 			QMessageBox.critical(
 					None,
-					f'{ext.upper()} Export Error',
-					f'Failed To Export Data To {ext.upper()}, Try Changing File Types',
+					f'{export_type.value.upper()} Export Error',
+					f'Failed To Export Data To {export_type.value.upper()}, Try Changing File Types',
 					QMessageBox.StandardButton.Ok
 			)

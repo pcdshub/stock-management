@@ -1,3 +1,10 @@
+"""
+Add page controller for adding inventory items in the Stock Management Application.
+
+Provides logic for the user to add new stock items, including form validation,
+computation of totals and excess, and updating the database.
+"""
+
 from typing import override, TYPE_CHECKING
 
 from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
@@ -10,7 +17,19 @@ if TYPE_CHECKING:
 
 
 class Add(AbstractController):
+	"""
+	Controller for the 'Add' page of the stock management application.
+	
+	Handles user input for creating new stock items, validating input fields,
+	computing totals and excess, and updating the database.
+	"""
+	
 	def __init__(self, app: 'App'):
+		"""
+		Initialize the Add page controller.
+		
+		:param app: Reference to the main application instance.
+		"""
 		super().__init__('add', app)
 		
 		self._total = self._excess = 0
@@ -38,6 +57,12 @@ class Add(AbstractController):
 			spinner.valueChanged.connect(self._on_spinner_change)
 	
 	def _on_spinner_change(self, _) -> None:
+		"""
+		Handle changes in spinner values.
+		
+		:param _: The spinner event parameter (unused).
+		"""
+		
 		try:
 			from stock_manager import EXCESS_EQUATION, TOTAL_EQUATION
 			self._total = TOTAL_EQUATION(
@@ -63,6 +88,12 @@ class Add(AbstractController):
 			)
 	
 	def _clear_form(self) -> None:
+		"""
+		Clear all text fields and reset all spinner values.
+		
+		Resets the form to its initial state for new input.
+		"""
+		
 		text_field: QLineEdit | QTextEdit
 		for text_field in self._text_fields:
 			text_field.clear()
@@ -70,6 +101,14 @@ class Add(AbstractController):
 			spinner.setValue(0)
 	
 	def _submit_form(self) -> None:
+		"""
+		Validate the form and submit a new stock item.
+		
+		Checks that all required text fields are filled and at least one
+		spinner has a value. Adds the item to the database, updates tables,
+		and clears the form.
+		"""
+		
 		empty_line_edits = {
 			field.objectName() for field in self._text_fields
 			if isinstance(field, QLineEdit) and not field.text().strip()

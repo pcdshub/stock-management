@@ -1,3 +1,10 @@
+"""
+Module containing application-wide constants.
+
+Defines fixed values used throughout the SLAC-LCLS-Stock-Management
+application to maintain consistency and simplify updates.
+"""
+
 from typing import Callable
 
 TOTAL_EQUATION: Callable[[int, int], int] = \
