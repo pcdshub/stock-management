@@ -65,12 +65,12 @@ class Add(AbstractController):
 		"""
 		
 		try:
-			from stock_manager import EXCESS_EQUATION, TOTAL_EQUATION
-			self._total = TOTAL_EQUATION(
+			from stock_manager import excess_equation, total_equation
+			self._total = total_equation(
 					self.b750_spinner.value(),
 					self.b757_spinner.value()
 			)
-			self._excess = EXCESS_EQUATION(
+			self._excess = excess_equation(
 					self._total,
 					self.min_750_spinner.value(),
 					self.min_757_spinner.value()
