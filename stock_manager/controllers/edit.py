@@ -246,5 +246,5 @@ class Edit(AbstractController):
 		
 		self.logger.info_log(f'Database Item Edited: {new_item.part_num}')
 		self.app.update_tables()
-		self.database.update_database()
+		self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
 		self._clear_form()

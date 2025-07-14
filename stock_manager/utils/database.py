@@ -6,11 +6,15 @@ Provides DBUtils for connecting to and getting/setting data from/to Google Sheet
 
 import os.path
 from pathlib import Path
+from typing import Iterable, TYPE_CHECKING
 
 import gspread
-from gspread import Client
+from gspread import Cell, Spreadsheet, Worksheet
 from oauth2client.service_account import ServiceAccountCredentials
 from PyQt6.QtWidgets import QMessageBox
+
+if TYPE_CHECKING:
+	from stock_manager import Item, DatabaseUpdateType
 
 
 class DBUtils:
@@ -40,11 +44,10 @@ class DBUtils:
 					str(credentials_path),
 					scope
 			)
-			self._client: Client = gspread.authorize(credentials)
 			
 			self._log = Logger()
 			self._file_name = 'Stock Management Sheet'
-			self._sheet = self._client.open(self._file_name).sheet1
+			self._client: Spreadsheet = gspread.authorize(credentials).open(self._file_name)
 		except Exception as e:
 			print(f'Failed To Connect To Database: {e}')
 			Logger().error_log(f'Failed To Connect To Database: {e}')
@@ -65,7 +68,7 @@ class DBUtils:
 		"""
 		
 		try:
-			return self._sheet.get_all_records()
+			return self._client.worksheet('Parts').get_all_records()
 		except Exception as e:
 			print(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
 			self._log.error_log(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
@@ -83,14 +86,17 @@ class DBUtils:
 	
 	def get_all_users(self) -> set[str]:  # TODO: possibly make user objects out of data
 		"""
-		Retrieve a set of all users from the database.
+		Retrieves a set of all users from the database.
 		
 		:return: A set of strings representing all the usernames in the database
 		:raises SystemExit: If user fetch from database fails
 		"""
 		
 		try:
-			return {'QR_USERNAME'}  # TODO: handle getting usernames from database
+			return {
+				str(user)
+				for user in self._client.worksheet('Users').col_values(1)
+			}
 		except Exception as e:
 			print(f'Failed To Get All Users From {self._file_name}: {e}')
 			self._log.error_log(f'Failed To Get All Users From {self._file_name}: {e}')
@@ -102,6 +108,90 @@ class DBUtils:
 			)
 			raise SystemExit(1)
 	
-	def update_database(self) -> None:
-		"""Update the database with the latest changes and synchronize its contents."""
-		pass  # TODO: handle update database
+	def update_database(
+			self,
+			update_type: 'DatabaseUpdateType',
+			changelist: Iterable['Item'] | 'Item'
+	) -> None:
+		"""
+		Update the database with the latest changes
+		
+		:param update_type: The type of database update as a `DatabaseUpdateType` enum (e.g. `ADD`, `EDIT`, `REMOVE`)
+		:param changelist: An iterable list of items to repeat the same process or a single item
+		"""
+		
+		from stock_manager import DatabaseUpdateType
+		
+		sheet: Worksheet = self._client.worksheet('Parts')
+		if not isinstance(changelist, list):
+			changelist = [changelist]
+		
+		for item in changelist:
+			match update_type:
+				case DatabaseUpdateType.ADD:
+					try:
+						sheet.append_row([value for value in item])
+					except Exception as e:
+						print(f'Error Adding "{item.part_num}" To Database: {e}')
+						self._log.error_log(f'Error Adding "{item.part_num} To Database: {e}"')
+						QMessageBox.critical(
+								None,
+								'Database Add Item Error',
+								f'Error Adding "{item.part_num}" To Database.',
+								QMessageBox.StandardButton.Ok
+						)
+				case DatabaseUpdateType.EDIT:
+					try:
+						cell: Cell | None = sheet.find(item.part_num)
+						if cell:
+							for i, value in enumerate(item):
+								sheet.update_cell(cell.row, i + 1, value)
+							continue
+					except Exception as e:
+						print(f'Error Editing "{item.part_num}" In Database: {e}')
+						self._log.error_log(f'Error Editing "{item.part_num}" In Database: {e}')
+						QMessageBox.critical(
+								None,
+								'Database Edit Item Error',
+								f'Error Editing "{item.part_num}" In Database.',
+								QMessageBox.StandardButton.Ok
+						)
+					else:
+						QMessageBox.warning(
+								None,
+								'Database Update Item Warning',
+								f'Cannot Update Item: "{item.part_num}" '
+								f'Because It Does Not Exist In Database',
+								QMessageBox.StandardButton.Ok
+						)
+				case DatabaseUpdateType.REMOVE:
+					try:
+						cell: Cell | None = sheet.find(item.part_num)
+						if cell:
+							sheet.delete_rows(cell.row)
+							continue
+					except Exception as e:
+						print(f'Error Deleting "{item.part_num}" From Database: {e}')
+						self._log.error_log(f'Error Deleting "{item.part_num}" From Database: {e}')
+						QMessageBox.critical(
+								None,
+								'Database Delete Item Error',
+								f'Error Deleting "{item.part_num}" From Database.',
+								QMessageBox.StandardButton.Ok
+						)
+					else:
+						QMessageBox.warning(
+								None,
+								'Database Delete Item Warning',
+								f'Cannot Delete Item: "{item.part_num}" '
+								f'Because It Does Not Exist In Database',
+								QMessageBox.StandardButton.Ok
+						)
+				case _ as unknown:
+					QMessageBox.critical(
+							None,
+							'Unknown Database Update Type',
+							f'Unknown Database Update Type: "{unknown}", '
+							'Only Use stock_manager.DatabaseUpdateType Enums When Updating Database',
+							QMessageBox.StandardButton.Ok
+					)
