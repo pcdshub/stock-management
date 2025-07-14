@@ -139,6 +139,11 @@
        <string>Sallie's Min</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Stock Status</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
