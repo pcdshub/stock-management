@@ -27,7 +27,7 @@ test:
     - stock_manager
 
 about:
-  home: https://github.com/CalciumKing/SLAC-LCLS-Stock-Management.git
+  home: https://github.com/pcdshub/stock-management.git
   license: SLAC Open License
   license_file: LICENSE
   summary: "SLAC LCLS stock management application with QR code support and simple UI."
