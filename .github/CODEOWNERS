@@ -1,2 +1,14 @@
-# Default owner
-* @CalciumKing
+# default group
+* @pcdshub/python-reviewers
+
+# language-specific group(s)
+## PYTHON files
+*.py @pcdshub/python-reviewers @pcdshub/ui-sme
+*.pyi @pcdshub/python-reviewers @pcdshub/ui-sme
+*.pyc @pcdshub/python-reviewers @pcdshub/ui-sme
+*.pyw @pcdshub/python-reviewers @pcdshub/ui-sme
+*.pyx @pcdshub/python-reviewers @pcdshub/ui-sme
+*.pyd @pcdshub/python-reviewers @pcdshub/ui-sme
+
+# github folder holds administrative files
+.github/** @pcdshub/software-admin
