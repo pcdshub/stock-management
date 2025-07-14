@@ -25,7 +25,7 @@ setup(
             'stock_manager=stock_manager.__main__:main'
         ]
     },
-    python_requires='>=3.8',
+    python_requires='>=3.10',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: BSD License",
