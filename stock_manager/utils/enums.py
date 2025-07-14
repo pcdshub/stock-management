@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import auto, Enum
 
 
 class Pages(Enum):
@@ -32,3 +32,9 @@ class StockStatus(Enum):
 	IN_STOCK = 'In Stock'
 	LOW_STOCK = 'Low Stock'
 	OUT_OF_STOCK = 'Out Of Stock'
+
+
+class DatabaseUpdateType(Enum):
+	ADD = auto()
+	EDIT = auto()
+	REMOVE = auto()

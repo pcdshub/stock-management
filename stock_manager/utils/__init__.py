@@ -19,6 +19,7 @@ __all__ = [
 	'Pages',
 	'ExportTypes',
 	'StockStatus',
+	'DatabaseUpdateType',
 	'TOTAL_EQUATION',
 	'EXCESS_EQUATION',
 	'SIDEBAR_BUTTON_SIZE'

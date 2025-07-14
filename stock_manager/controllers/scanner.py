@@ -138,7 +138,7 @@ class ItemScanner(AbstractScanner):
 					break
 			
 			self.app.update_tables()
-			self.database.update_database()
+			self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, self._items)
 		except Exception as e:
 			print(f'Item(s) Could Not Be Subtracted From Database: {e}')
 			self.logger.error_log(f'Item(s) Could Not Be Subtracted From Database: {e}')
