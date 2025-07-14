@@ -110,20 +110,30 @@ class Add(AbstractController):
 		and clears the form.
 		"""
 		
-		empty_line_edits = {
-			field.objectName() for field in self._text_fields
-			if isinstance(field, QLineEdit) and not field.text().strip()
-		}
-		empty_text_edits = {
-			field.objectName() for field in self._text_fields
-			if isinstance(field, QTextEdit) and not field.toPlainText().strip()
-		}
-		valued_spinners = {
-			spinner.objectName() for spinner in self._spinners
-			if spinner.value()
-		}
+		def empty_fields_check() -> bool:
+			"""
+			Checks form for empty QLineEdits and QTextEdits.
+			Checks for at least one filled out QSpinBox.
+			
+			:return: True if any fields are empty or False if all are filled
+			"""
+			
+			empty_line_edits = {
+				field.objectName() for field in self._text_fields
+				if isinstance(field, QLineEdit) and not field.text().strip()
+			}
+			empty_text_edits = {
+				field.objectName() for field in self._text_fields
+				if isinstance(field, QTextEdit) and not field.toPlainText().strip()
+			}
+			valued_spinners = {
+				spinner.objectName() for spinner in self._spinners
+				if spinner.value()
+			}
+			
+			return True if any([empty_line_edits, empty_text_edits]) or not any(valued_spinners) else False
 		
-		if any([empty_line_edits, empty_text_edits]) or not any(valued_spinners):
+		if empty_fields_check():
 			QMessageBox.information(
 					self,
 					'Empty Fields',
@@ -144,6 +154,15 @@ class Add(AbstractController):
 				self.min_757_spinner.value()
 		)
 		
+		if any([item for item in self.app.all_items if item.part_num == self.part_num.text().strip()]):
+			QMessageBox.warning(
+					self,
+					'Item Already Exists Error',
+					f'"{new_item.part_num}" Already Exists In The Database, '
+					'Please Make A New Item That Does Not Already Exist.'
+			)
+			return
+		
 		response = QMessageBox.information(
 				self,
 				'Item Creation Confirmation',
@@ -153,9 +172,14 @@ class Add(AbstractController):
 				QMessageBox.StandardButton.No
 		)
 		
-		if response == QMessageBox.StandardButton.Yes:
-			self.app.all_items.append(new_item)
-			self.logger.info_log(f"Item Added To Database: {new_item.part_num}")
-			self.app.update_tables()
-			self.database.update_database(stock_manager.DatabaseUpdateType.ADD, new_item)
-			self._clear_form()
+		if response == QMessageBox.StandardButton.No:
+			return
+		
+		self.app.all_items.append(new_item)
+		self.logger.info_log(f"Item Added To Database: {new_item.part_num}")
+		self.app.update_tables()
+		self.database.update_database(stock_manager.DatabaseUpdateType.ADD, new_item)
+		self._clear_form()
+		
+		self.app.finish.set_text(f'Successfully Added {new_item.part_num} To The Database')
+		self.app.finish.to_page()
