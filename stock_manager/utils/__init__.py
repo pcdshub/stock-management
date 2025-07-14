@@ -20,7 +20,7 @@ __all__ = [
 	'ExportTypes',
 	'StockStatus',
 	'DatabaseUpdateType',
-	'TOTAL_EQUATION',
-	'EXCESS_EQUATION',
+	'total_equation',
+	'excess_equation',
 	'SIDEBAR_BUTTON_SIZE'
 ]

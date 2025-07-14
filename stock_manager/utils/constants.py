@@ -5,14 +5,31 @@ Defines fixed values used throughout the SLAC-LCLS-Stock-Management
 application to maintain consistency and simplify updates.
 """
 
-from typing import Callable
 
-TOTAL_EQUATION: Callable[[int, int], int] = \
-	lambda b750_stock, b757_stock: \
-		b750_stock + b757_stock
+def total_equation(b750_stock: int, b757_stock: int) -> int:
+	"""
+	Calculates the total stock from both locations.
+	
+	:param b750_stock: the stock at B750
+	:param b757_stock: the stock at B757
+	:return: the sum of the two values
+	"""
+	
+	return b750_stock + b757_stock
 
-EXCESS_EQUATION: Callable[[int, int, int], int] = \
-	lambda total, b750_minimum, b757_minimum: \
-		total - (b750_minimum + b757_minimum)
+
+def excess_equation(total: int, b750_minimum: int, b757_minimum: int) -> int:
+	"""
+	Calculates the excess of total stock based on
+	the total stock and the minimums for each location.
+	
+	:param total: the total stock
+	:param b750_minimum: the minimum stock at B750
+	:param b757_minimum: the minimum stock at B757
+	:return: the calculated total excess of the stock item
+	"""
+	
+	return total - (b750_minimum + b757_minimum)
+
 
 SIDEBAR_BUTTON_SIZE = 14
