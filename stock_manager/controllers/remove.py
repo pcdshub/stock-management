@@ -49,6 +49,7 @@ class Remove(AbstractController):
 		:param row: The index of the clicked table row.
 		:param _: The column index (unused).
 		"""
+		
 		selected_item = self.app.all_items[row]
 		
 		response = QMessageBox.warning(

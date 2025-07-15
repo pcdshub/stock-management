@@ -57,7 +57,7 @@ class Export(AbstractController):
 			match self.export_combo.currentText().lower():
 				case ExportTypes.PDF:
 					self.app.file_exports.pdf_export()
-				case ExportTypes.CSV, ExportTypes.TSV, ExportTypes.PSV as export_type:
+				case ExportTypes.CSV | ExportTypes.TSV | ExportTypes.PSV as export_type:
 					self.app.file_exports.sv_export(self, export_type, self._path)
 				case 'Select':
 					QMessageBox.information(
@@ -104,8 +104,8 @@ class Export(AbstractController):
 			self.location_btn.setText(f'...{response[-6:]}' if len(response) > 6 else response)
 			self._path = response
 		except Exception as e:
-			print(f"Directory Selection Failure: {e}")
-			self.logger.error_log(f"Directory Selection Failure: {e}")
+			print(f'Directory Selection Failure: {e}')
+			self.logger.error_log(f'Directory Selection Failure: {e}')
 			response = QMessageBox.critical(
 					self,
 					'Directory Selection Failure',

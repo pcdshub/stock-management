@@ -33,10 +33,10 @@ class DBUtils:
 		credentials_path = os.path.join(base_dir, 'assets', 'gs_credentials.json')
 		
 		scope = [
-			"https://spreadsheets.google.com/feeds",
-			"https://www.googleapis.com/auth/spreadsheets",
-			"https://www.googleapis.com/auth/drive.file",
-			"https://www.googleapis.com/auth/drive"
+			'https://spreadsheets.google.com/feeds',
+			'https://www.googleapis.com/auth/spreadsheets',
+			'https://www.googleapis.com/auth/drive.file',
+			'https://www.googleapis.com/auth/drive'
 		]
 		
 		try:
@@ -133,7 +133,7 @@ class DBUtils:
 						sheet.append_row([value for value in item])
 					except Exception as e:
 						print(f'Error Adding "{item.part_num}" To Database: {e}')
-						self._log.error_log(f'Error Adding "{item.part_num} To Database: {e}"')
+						self._log.error_log(f'Error Adding "{item.part_num}" To Database: {e}')
 						QMessageBox.critical(
 								None,
 								'Database Add Item Error',

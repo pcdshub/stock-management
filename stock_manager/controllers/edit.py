@@ -64,7 +64,7 @@ class Edit(AbstractController):
 		Convert text from a table cell into the appropriate type (int, str, or None).
 		
 		:param text: The text to parse.
-		:return: The parsed value.
+		:return: The parsed value or `None` if no value exists.
 		"""
 		
 		if text in ['None', '']:
@@ -72,34 +72,6 @@ class Edit(AbstractController):
 		elif text.isdigit():
 			return int(text)
 		return text
-	
-	def _get_selected_item(self, row: int) -> Item | None:  # TODO: delete this method if not needed
-		"""
-		Construct and return an Item instance from the data in the specified table row.
-		
-		:param row: The index of the table row to extract item data from.
-		:return: The Item instance constructed from the row's values or None if an error occurs.
-		"""
-		
-		try:
-			info: list[int | str | None] = [
-				self._parse_field(self.table.item(row, i).text())
-				for i in range(len(Item))
-			]
-		except Exception as e:
-			print(f"Item Parsing Error: {e}")
-			self.logger.error_log(f"Item parsing error: {e}")
-			QMessageBox.critical(
-					self,
-					'Item Parsing Error',
-					'Failed To Parse Selected Item',
-					QMessageBox.StandardButton.Ok
-			)
-			return None
-		else:
-			temp_item = Item(*info)
-			self._selected_item = temp_item
-			return temp_item
 	
 	def _on_cell_clicked(self, row: int, _) -> None:
 		"""
@@ -111,24 +83,21 @@ class Edit(AbstractController):
 		
 		try:
 			self._selected_item = item = self.app.all_items[row]
-			# item = self._get_selected_item(row)
-			# if not item:
-			# 	raise
 			self._total = item.total
 			self._excess = item.excess
 			
 			self.part_num.setText(str(item.part_num))
 			self.manufacturer.setText(item.manufacturer)
 			self.desc.setText(item.description)
-			self.total_lbl.setText("Total: " + str(self._total))
-			self.excess_lbl.setText("Excess: " + str(self._excess))
+			self.total_lbl.setText('Total: ' + str(self._total))
+			self.excess_lbl.setText('Excess: ' + str(self._excess))
 			self.b750_spinner.setValue(item.stock_b750 if item.stock_b750 is not None else 0)
 			self.b757_spinner.setValue(item.stock_b757 if item.stock_b757 is not None else 0)
 			self.min_750_spinner.setValue(item.minimum if item.minimum is not None else 0)
 			self.min_757_spinner.setValue(item.minimum_sallie if item.minimum_sallie is not None else 0)
 		except Exception as e:
-			print(f"Failed To Populate Fields: {e}")
-			self.logger.error_log(f"Failed to populate fields: {e}")
+			print(f'Failed To Populate Fields: {e}')
+			self.logger.error_log(f'Failed to populate fields: {e}')
 			QMessageBox.critical(
 					self,
 					'Field Population Error',
@@ -144,22 +113,21 @@ class Edit(AbstractController):
 		"""
 		
 		try:
-			from stock_manager import excess_equation, total_equation
-			self._total = total_equation(
+			self._total = stock_manager.total_equation(
 					self.b750_spinner.value(),
 					self.b757_spinner.value()
 			)
-			self._excess = excess_equation(
+			self._excess = stock_manager.excess_equation(
 					self._total,
 					self.min_750_spinner.value(),
 					self.min_757_spinner.value()
 			)
 			
-			self.total_lbl.setText("Total: " + str(self._total))
-			self.excess_lbl.setText("Excess: " + str(self._excess))
+			self.total_lbl.setText('Total: ' + str(self._total))
+			self.excess_lbl.setText('Excess: ' + str(self._excess))
 		except Exception as e:
-			print(f"Spinner Change Error: {e}")
-			self.logger.error_log(f"Spinner Change Error: {e}")
+			print(f'Spinner Change Error: {e}')
+			self.logger.error_log(f'Spinner Change Error: {e}')
 			QMessageBox.critical(
 					self,
 					'Spinner Change Error',
@@ -173,7 +141,7 @@ class Edit(AbstractController):
 		if not self._selected_item:
 			return
 		
-		self.part_num.setText("Part Number...")
+		self.part_num.setText('Part Number...')
 		
 		text_field: QLineEdit | QTextEdit
 		for text_field in self._text_fields:

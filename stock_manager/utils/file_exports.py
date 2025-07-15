@@ -65,7 +65,7 @@ class FileExports:
 					f.write(line[:-1] + '\n')
 					instance.progressBar.setValue(i)
 		except FileExistsError as e:
-			print(f"That File Already Exists: {e}")
+			print(f'That File Already Exists: {e}')
 			instance.logger.error_log(f'File Already Exists Error: {e}')
 			QMessageBox.critical(
 					None,
