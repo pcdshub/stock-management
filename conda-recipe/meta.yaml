@@ -1,8 +1,6 @@
-{% set data = load_setup_py_data() %}
-
 package:
-  name: appname
-  version : {{ data.get('version') }}
+  name: SLAC-LCLS-Stock-Management
+  version: { { load_setup_py_data().get('version') } }
 
 source:
   path: ..
@@ -17,13 +15,19 @@ requirements:
     - setuptools
   run:
     - python >=3.9
-    - pydm
+    - pyqt6
+    - opencv
+    - numpy
+    - pathlib
+    - typing
+    - qasync
 
 test:
   imports:
-    - appname
+    - stock_manager
 
 about:
-  home: https://github.com/pcdshub/pydm-application-template
+  home: https://github.com/pcdshub/stock-management.git
   license: SLAC Open License
-  summary: Generic pydm application template
+  license_file: LICENSE
+  summary: "SLAC LCLS stock management application with QR code support and simple UI."
