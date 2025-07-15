@@ -176,7 +176,7 @@ class Add(AbstractController):
 			return
 		
 		self.app.all_items.append(new_item)
-		self.logger.info_log(f'Item Added To Database: {new_item.part_num}')
+		self.logger.info_log(f'{self.app.user} Added Item To Database: {new_item.part_num}')
 		self.app.update_tables()
 		self.database.update_database(stock_manager.DatabaseUpdateType.ADD, new_item)
 		self._clear_form()

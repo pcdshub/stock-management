@@ -50,7 +50,7 @@ class App(QMainWindow):
 		self.edit = Edit(self)
 		self.remove = Remove(self)
 		
-		self.user: str | None = None
+		self.user = ''
 		self.all_items: list[Item] = []
 		self.screens: QStackedWidget | None = None
 		self.current_page: stock_manager.Pages | None = None
