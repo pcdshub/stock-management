@@ -167,9 +167,6 @@ class AbstractScanner(AbstractController):
 	def to_page(self) -> None:
 		"""Navigate to this scanner page and start the video feed."""
 		
-		self.app.current_page = self.PAGE_NAME
-		self.app.screens.setCurrentIndex(self.PAGE_NAME.value.PAGE_INDEX)
-		
 		try:
 			self.start_video()
 		except Exception as e:
@@ -181,6 +178,8 @@ class AbstractScanner(AbstractController):
 					'Failed To Start QR Scanner',
 					QMessageBox.StandardButton.Ok
 			)
+		finally:
+			super().to_page()
 	
 	def start_video(self) -> None:
 		"""

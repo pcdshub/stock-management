@@ -6,7 +6,6 @@ import asyncio
 from pathlib import Path
 from typing import override
 
-from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QCloseEvent, QFont
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QPushButton, QStackedWidget
 from PyQt6.uic import loadUi
@@ -90,7 +89,7 @@ class App(QMainWindow):
 			self.add_btn.clicked.connect(self.add.to_page)
 			self.edit_btn.clicked.connect(self.edit.to_page)
 			self.remove_btn.clicked.connect(self.remove.to_page)
-			self.exit_btn.clicked.connect(QCoreApplication.quit)
+			self.log_out_btn.clicked.connect(self.login.to_page)
 		
 		handle_screens()
 		handle_connections()

@@ -177,14 +177,25 @@ class Login(AbstractScanner):
 	
 	@override
 	def handle_connections(self) -> None:
-		pass
+		self.login_btn.clicked.connect(self._login_clicked)
+	
+	@override
+	def to_page(self) -> None:
+		"""Navigate to this login page, logging out, and hiding sidebar."""
+		
+		self.app.sideUI.hide()
+		user = self.app.user
+		if user:
+			print(f'User Logged Out As: {user}')
+			self.logger.info_log(f'User Logged Out As: {user}')
+			self.app.user = ''
+		super().to_page()
 	
 	@override
 	@asyncSlot()
 	async def check_for_qr(self, frame: ndarray) -> None:
 		"""
-		Scans the current frame for a user QR code, logging them in and
-		navigating to `view.ui` and `view.py`.
+		Scans the current frame for a user QR code, logging them in if valid.
 		
 		:param frame: Current video frame as a numpy ndarray.
 		"""
@@ -195,19 +206,61 @@ class Login(AbstractScanner):
 		
 		self.logger.info_log(f'QR Code Scanned: {data}')
 		
-		if data not in self._users_list:
-			print(f'QR Code Not Recognized: "{data}"')
-			self.logger.info_log(f'QR Code Not Recognized: "{data}"')
+		if data in self._users_list:
+			self._finish_login(data)
+			return
+		
+		print(f'QR Code Not Recognized: "{data}"')
+		self.logger.info_log(f'QR Code Not Recognized: "{data}"')
+		QMessageBox.information(
+				self,
+				'Unknown QR Code',
+				'QR Code Not Recognized In Database',
+				QMessageBox.StandardButton.Ok
+		)
+	
+	def _login_clicked(self) -> None:
+		"""Checks if the user entered a valid username and logs them in if valid."""
+		
+		text = self.username.text().strip()
+		
+		if text in [None, '']:
 			QMessageBox.information(
 					self,
-					'Unknown QR Code',
-					'QR Code Not Recognized In Database',
+					'Empty Field',
+					'Please Fill Out Login Field Before Submitting',
 					QMessageBox.StandardButton.Ok
 			)
 			return
 		
-		self.app.user = data
-		print(f'User Logged In As: {data}')
-		self.logger.info_log(f'User Logged In As: {data}')
+		if text in self._users_list:
+			self._finish_login(text)
+			return
+		
+		print(f'Username Not Recognized: "{text}"')
+		self.logger.info_log(f'Username Not Recognized: "{text}"')
+		QMessageBox.information(
+				self,
+				'Unknown Username Entered',
+				'Entered Username Not Recognized In Database',
+				QMessageBox.StandardButton.Ok
+		)
+	
+	def _finish_login(self, username) -> None:
+		"""
+		Finalizing the login process after either scanning a
+		user QR code or entering a username.
+		
+		Sets the currently logged-in user and navigates
+		to `view.ui` and `view.py`.
+		
+		:param username: the username of the newly logged-in user
+		"""
+		
+		self.app.user = username
+		print(f'User Logged In As: {username}')
+		self.logger.info_log(f'User Logged In As: {username}')
 		self.app.view.to_page()
 		self.stop_video()
+		self.username.clear()
+		self.app.sideUI.show()
