@@ -28,8 +28,8 @@ def main():
 	# except Exception as e:
 	# 	from stock_manager.utils.logger import Logger
 
-# 	print(f"Fatal Error In Main(): {e}")
-# 	Logger().error_log(f"Fatal Error In Main(): {e}")
+# 	print(f'Fatal Error In Main(): {e}')
+# 	Logger().error_log(f'Fatal Error In Main(): {e}')
 # 	QMessageBox.critical(
 # 			None,
 # 			'Fatal Error',

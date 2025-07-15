@@ -19,8 +19,7 @@ from PyQt6.uic import loadUi
 import stock_manager
 
 if TYPE_CHECKING:
-	from stock_manager import App
-	from stock_manager import Item
+	from stock_manager import App, Item
 
 
 class CombinedMeta(type(QWidget), ABCMeta):
@@ -56,7 +55,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 			loadUi(str(ui_path), self)
 		except Exception as e:
 			print(f'Failed To Load {file_name}.ui File: {e}')
-			self.logger.error_log(f"Failed To Load {file_name}.ui File: {e}")
+			self.logger.error_log(f'Failed To Load {file_name}.ui File: {e}')
 			QMessageBox.critical(
 					self,
 					f'{file_name}.ui Failure',
@@ -175,7 +174,7 @@ class AbstractScanner(AbstractController):
 			self.start_video()
 		except Exception as e:
 			print(f'Failed To Start QR Scanner: {e}')
-			self.logger.error_log(f"Failed To Start QR Scanner: {e}")
+			self.logger.error_log(f'Failed To Start QR Scanner: {e}')
 			QMessageBox.critical(
 					self,
 					'QR Scanner Error',
@@ -234,7 +233,7 @@ class AbstractScanner(AbstractController):
 			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 		except Exception as e:
 			print(f'Failed To Convert Frame Color: {e}')
-			self.logger.warning_log(f"Failed To Convert Frame Color: {e}")
+			self.logger.warning_log(f'Failed To Convert Frame Color: {e}')
 			QMessageBox.warning(
 					self,
 					'Color Conversion Error',

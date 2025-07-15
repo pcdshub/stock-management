@@ -38,7 +38,7 @@ class ItemScanner(AbstractScanner):
 		page = stock_manager.Pages.SCAN
 		super().__init__(page.value.FILE_NAME, app)
 		self.PAGE_NAME = page
-		self._items: set[Item] = set()
+		self._items: list[Item] = []
 		self.handle_connections()
 	
 	@override
@@ -60,11 +60,11 @@ class ItemScanner(AbstractScanner):
 		if not data or data in [item.part_num for item in self._items]:
 			return
 		
-		self.logger.info_log(f"QR Code Scanned: {data}")
+		self.logger.info_log(f'QR Code Scanned: {data}')
 		
 		for item in self.app.all_items:
 			if data == item.part_num:
-				self._items.add(item)
+				self._items.append(item)
 				self.logger.info_log(f'{data} Added To Items List')
 				self.items_list.append(f'<ul><li>{data}</li></ul>')
 				return
@@ -97,7 +97,7 @@ class ItemScanner(AbstractScanner):
 			)
 			return
 		
-		string_items = ''.join(f'{item.part_num}\n' for item in self._items)
+		string_items = ''.join(f'\n{item.part_num}' for item in self._items)
 		
 		response = QMessageBox.question(
 				self,
@@ -121,7 +121,7 @@ class ItemScanner(AbstractScanner):
 					elif self.b757_btn.isChecked():
 						item.stock_b757 -= 1
 					else:
-						print("Neither Radio Button Is Selected")
+						print('Neither Radio Button Is Selected')
 						QMessageBox.information(
 								self,
 								'Radio Button Error',
@@ -146,10 +146,10 @@ class ItemScanner(AbstractScanner):
 		else:
 			length = len(self._items)
 			self.app.finish.set_text(
-					f"{'1 item has' if length == 1 else f'{length} items have'} "
-					f"successfully been subtracted from database."
+					f'{"1 item has" if length == 1 else f"{length} items have"} '
+					f'successfully been subtracted from database.'
 			)
-			self.logger.info_log(f'{self.app.user} has checked out items:\n{string_items}')
+			self.logger.info_log(f'{self.app.user} has checked out items:{string_items}')
 			self._clear_form()
 		finally:
 			self.app.finish.to_page()
@@ -193,7 +193,7 @@ class Login(AbstractScanner):
 		if not data or self.app.user:
 			return
 		
-		self.logger.info_log(f"QR Code Scanned: {data}")
+		self.logger.info_log(f'QR Code Scanned: {data}')
 		
 		if data not in self._users_list:
 			print(f'QR Code Not Recognized: "{data}"')
