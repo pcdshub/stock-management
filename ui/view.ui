@@ -21,7 +21,7 @@
     <enum>QLayout::SetMaximumSize</enum>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1,0">
      <item>
       <widget class="QLabel" name="label">
        <property name="font">
@@ -49,14 +49,27 @@
        </property>
        <property name="styleSheet">
         <string notr="true">border: 1px solid black;
-           border-radius: 12px;
-           padding-left: 5%;</string>
+         border-radius: 12px;
+         padding-left: 5%;
+        </string>
        </property>
        <property name="text">
         <string/>
        </property>
        <property name="placeholderText">
         <string>Search...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent;</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
+        </iconset>
        </property>
       </widget>
      </item>
@@ -170,6 +183,11 @@
        </property>
        <property name="text">
         <string>Export</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/export.svg</normaloff>../assets/icons/export.svg
+        </iconset>
        </property>
       </widget>
      </item>

@@ -26,7 +26,7 @@
     <enum>QLayout::SetMaximumSize</enum>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
      </property>
@@ -61,6 +61,18 @@
        </property>
        <property name="placeholderText">
         <string>Search...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent;</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
+        </iconset>
        </property>
       </widget>
      </item>
@@ -287,6 +299,11 @@
        <property name="text">
         <string>Clear Form</string>
        </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/backspace.svg</normaloff>../assets/icons/backspace.svg
+        </iconset>
+       </property>
       </widget>
      </item>
      <item>
@@ -299,6 +316,11 @@
        </property>
        <property name="text">
         <string>Submit Change</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/edit.svg</normaloff>../assets/icons/edit.svg
+        </iconset>
        </property>
       </widget>
      </item>
