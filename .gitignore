@@ -1,3 +1,17 @@
-__pycache__
+# Default ignored files
+/shelf/
+
+# Template ignored files
+__pycache__/
 *.swp
 ~*
+
+# Custom ignored files
+*credentials.json
+.idea
+*.pyc
+ui_*.py
+*Copy.ui
+app.log
+TODO.txt
+thoughts.txt
