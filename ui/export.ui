@@ -16,7 +16,7 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-     <layout class="QVBoxLayout" name="_2" stretch="2,1,0,1,0,2">
+  <layout class="QVBoxLayout" name="_2" stretch="2,1,0,1,0,2">
    <property name="sizeConstraint">
     <enum>QLayout::SetMaximumSize</enum>
    </property>
@@ -31,6 +31,11 @@
        </property>
        <property name="text">
         <string>Back</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/arrow-left.svg</normaloff>../assets/icons/arrow-left.svg
+        </iconset>
        </property>
       </widget>
      </item>
@@ -79,6 +84,38 @@
      <item>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="1">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Export To:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="QPushButton" name="location_btn">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Select</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../assets/icons/folder-tree.svg</normaloff>../assets/icons/folder-tree.svg
+          </iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
         <widget class="QComboBox" name="export_combo">
          <property name="font">
           <font>
@@ -112,22 +149,7 @@
          </item>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <pointsize>16</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Export To:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
+       <item row="3" column="1">
         <widget class="QLabel" name="label_3">
          <property name="font">
           <font>
@@ -135,22 +157,34 @@
           </font>
          </property>
          <property name="text">
-          <string>At:</string>
+          <string>In Folder:</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="location_btn">
-         <property name="font">
-          <font>
-           <pointsize>16</pointsize>
-          </font>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton">
+         <property name="styleSheet">
+          <string notr="true">background-color: transparent;</string>
          </property>
-         <property name="text">
-          <string>PushButton</string>
+         <property name="icon">
+          <iconset>
+           <normaloff>../assets/icons/file.svg</normaloff>../assets/icons/file.svg
+          </iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="styleSheet">
+          <string notr="true">background-color: transparent;</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../assets/icons/folder.svg</normaloff>../assets/icons/folder.svg
+          </iconset>
          </property>
         </widget>
        </item>
@@ -196,6 +230,11 @@
        <property name="text">
         <string>Export</string>
        </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/download.svg</normaloff>../assets/icons/download.svg
+        </iconset>
+       </property>
       </widget>
      </item>
      <item>
@@ -213,15 +252,15 @@
      </item>
     </layout>
    </item>
-         <item>
-             <widget class="QProgressBar" name="progressBar">
-                 <property name="value">
-                     <number>0</number>
-                 </property>
-                 <property name="textVisible">
-                     <bool>false</bool>
-                 </property>
-             </widget>
+   <item>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

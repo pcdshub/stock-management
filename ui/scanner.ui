@@ -173,6 +173,11 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>Clear</string>
        </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/backspace.svg</normaloff>../assets/icons/backspace.svg
+        </iconset>
+       </property>
       </widget>
      </item>
      <item>
@@ -184,6 +189,11 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>Done</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../assets/icons/check.svg</normaloff>../assets/icons/check.svg
+        </iconset>
        </property>
       </widget>
      </item>

@@ -59,27 +59,20 @@
         <layout class="QVBoxLayout">
          <item>
           <layout class="QGridLayout" name="_3">
-           <item row="3" column="1">
-            <widget class="QLabel" name="video_lbl">
+           <item row="1" column="1">
+            <widget class="QLabel" name="title">
              <property name="font">
               <font>
-               <pointsize>55</pointsize>
+               <pointsize>18</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Loading Video</string>
+              <string>Please Scan User QR Code:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
-           </item>
-           <item row="2" column="1">
-            <spacer name="verticalSpacer_6">
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="3" column="2">
             <spacer name="horizontalSpacer_4">
@@ -90,16 +83,6 @@
               <size>
                <width>40</width>
                <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="4" column="1">
-            <spacer name="verticalSpacer_5">
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
               </size>
              </property>
             </spacer>
@@ -117,18 +100,41 @@
              </property>
             </spacer>
            </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="title">
+           <item row="2" column="1">
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="4" column="1">
+            <spacer name="verticalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="video_lbl">
              <property name="font">
               <font>
-               <pointsize>18</pointsize>
+               <pointsize>55</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Please Scan User QR Code:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <string>Loading Video</string>
              </property>
             </widget>
            </item>
@@ -169,6 +175,9 @@
              <layout class="QVBoxLayout" name="_5">
               <item>
                <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>20</width>
@@ -222,10 +231,18 @@
                 <property name="text">
                  <string>Login</string>
                 </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../assets/icons/log-in.svg</normaloff>../assets/icons/log-in.svg
+                 </iconset>
+                </property>
                </widget>
               </item>
               <item>
                <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>20</width>
@@ -270,6 +287,9 @@
       </item>
       <item row="2" column="1">
        <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
@@ -280,6 +300,9 @@
       </item>
       <item row="0" column="1">
        <spacer name="verticalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
