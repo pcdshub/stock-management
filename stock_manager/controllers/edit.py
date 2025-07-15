@@ -97,7 +97,7 @@ class Edit(AbstractController):
 			self.min_757_spinner.setValue(item.minimum_sallie if item.minimum_sallie is not None else 0)
 		except Exception as e:
 			print(f'Failed To Populate Fields: {e}')
-			self.logger.error_log(f'Failed to populate fields: {e}')
+			self.logger.error_log(f'Failed To Populate Fields: {e}')
 			QMessageBox.critical(
 					self,
 					'Field Population Error',
@@ -212,7 +212,7 @@ class Edit(AbstractController):
 				self.app.all_items[i] = new_item
 				break
 		
-		self.logger.info_log(f'Database Item Edited: {new_item.part_num}')
+		self.logger.info_log(f'{self.app.user} Edited Database Item: {new_item.part_num}')
 		self.app.update_tables()
 		self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
 		self._clear_form()

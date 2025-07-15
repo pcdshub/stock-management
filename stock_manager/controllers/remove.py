@@ -63,6 +63,6 @@ class Remove(AbstractController):
 		
 		if response == QMessageBox.StandardButton.Yes:
 			self.app.all_items.remove(selected_item)
-			self.logger.info_log(f'Item Removed From Database: {selected_item.part_num}')
+			self.logger.info_log(f'{self.app.user} Removed Item From Database: {selected_item.part_num}')
 			self.app.update_tables()
 			self.database.update_database(stock_manager.DatabaseUpdateType.REMOVE, selected_item)

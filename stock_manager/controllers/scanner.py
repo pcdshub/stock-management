@@ -60,17 +60,17 @@ class ItemScanner(AbstractScanner):
 		if not data or data in [item.part_num for item in self._items]:
 			return
 		
-		self.logger.info_log(f'QR Code Scanned: {data}')
+		self.logger.info_log(f'{self.app.user} Scanned Item QR Code: {data}')
 		
 		for item in self.app.all_items:
 			if data == item.part_num:
 				self._items.append(item)
-				self.logger.info_log(f'{data} Added To Items List')
+				self.logger.info_log(f'{self.app.user} Added {data} To Items List')
 				self.items_list.append(f'<ul><li>{data}</li></ul>')
 				return
 		
-		print(f'QR Code Not Recognized: "{data}"')
-		self.logger.info_log(f'QR Code Not Recognized: "{data}"')
+		print(f'Item QR Code Not Recognized: "{data}"')
+		self.logger.info_log(f'Item QR Code Not Recognized: "{data}"')
 		QMessageBox.information(
 				self,
 				'Unknown QR Code',
@@ -81,7 +81,7 @@ class ItemScanner(AbstractScanner):
 	def _clear_form(self) -> None:
 		"""Clears all fields in the scanner UI form and resets the scanned item list."""
 		
-		self.logger.info_log('Items List Cleared')
+		self.logger.info_log(f'{self.app.user} Cleared Items List')
 		self._items.clear()
 		self.items_list.clear()
 	
@@ -149,7 +149,7 @@ class ItemScanner(AbstractScanner):
 					f'{"1 item has" if length == 1 else f"{length} items have"} '
 					f'successfully been subtracted from database.'
 			)
-			self.logger.info_log(f'{self.app.user} has checked out items:{string_items}')
+			self.logger.info_log(f'{self.app.user} Checked Out Items: {string_items}')
 			self._clear_form()
 		finally:
 			self.app.finish.to_page()
