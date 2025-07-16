@@ -130,7 +130,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../assets/icons/qr-code.svg</normaloff>../assets/icons/qr-code.svg
+           <normaloff>../assets/icons/video.svg</normaloff>../assets/icons/video.svg
           </iconset>
          </property>
         </widget>
@@ -200,6 +200,29 @@
          <property name="icon">
           <iconset>
            <normaloff>../assets/icons/remove.svg</normaloff>../assets/icons/remove.svg
+          </iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="generate_btn">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Generate QR</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../assets/icons/qr-code.svg</normaloff>../assets/icons/qr-code.svg
           </iconset>
          </property>
         </widget>

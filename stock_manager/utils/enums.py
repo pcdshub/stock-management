@@ -19,6 +19,7 @@ class Pages(Enum):
 	REMOVE = _PageDetails('Remove', 'remove', 5)
 	EXPORT = _PageDetails('Export', 'export', 6)
 	FINISHED = _PageDetails('Finished', 'finish', 7)
+	GENERATE = _PageDetails('QR Generate', 'qr_generate', 8)
 
 
 class ExportTypes(Enum):
