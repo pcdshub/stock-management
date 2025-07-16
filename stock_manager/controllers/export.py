@@ -57,10 +57,10 @@ class Export(AbstractExporter):
 			from stock_manager import ExportTypes
 			
 			match self.export_combo.currentText().lower():
-				case ExportTypes.PDF:
+				case ExportTypes.PDF.value:
 					self.app.export_utils.pdf_export()
-				case ExportTypes.CSV | ExportTypes.TSV | ExportTypes.PSV as export_type:
-					self.app.export_utils.sv_export(self, export_type, self.path)
+				case ExportTypes.CSV.value | ExportTypes.TSV.value | ExportTypes.PSV.value as export_type:
+					self.app.export_utils.sv_export(export_type, self.path)
 				case 'Select':
 					QMessageBox.information(
 							self,
