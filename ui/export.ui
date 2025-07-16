@@ -16,7 +16,7 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <layout class="QVBoxLayout" name="_2" stretch="2,1,0,1,0,2">
+  <layout class="QVBoxLayout" name="_2">
    <property name="sizeConstraint">
     <enum>QLayout::SetMaximumSize</enum>
    </property>
@@ -65,6 +65,19 @@
       <string>Export Data:</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -251,16 +264,6 @@
       </spacer>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QProgressBar" name="progressBar">
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="textVisible">
-      <bool>false</bool>
-     </property>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

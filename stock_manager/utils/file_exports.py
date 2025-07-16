@@ -7,7 +7,7 @@ from qasync import asyncSlot
 from qrcode.image.base import BaseImage
 
 if TYPE_CHECKING:
-	from stock_manager import App, ExportTypes
+	from stock_manager import App
 
 
 class ExportUtils:
@@ -47,28 +47,27 @@ class ExportUtils:
 		pass  # TODO: add pdf generation
 	
 	@asyncSlot()
-	async def sv_export(self, export_type: 'ExportTypes', path: str) -> None:
+	async def sv_export(self, export_type: str, path: str) -> None:
 		"""
 		Asynchronously exports current data to a delimited text file (CSV, TSV, PSV).
 		
-		:param export_type: The file extension as a ExportType enum.
+		:param export_type: The file extension as the value (str) of an ExportType enum.
 		:param path: The directory to create file in.
 		"""
 		
 		delimiter = {
 			'csv': ',',
 			'tsv': '\t',
-			'psv': ' | '
-		}.get(export_type.value)
+			'psv': '|'
+		}.get(export_type)
 		
 		try:
-			with open(self._get_valid_name(export_type.value, path), 'x') as f:
+			with open(self._get_valid_name(export_type, path), 'x') as f:
 				for i, item in enumerate(self.instance.all_items):
 					line = ''
 					for var in item:
 						line += (str(var) if var else '') + delimiter
 					f.write(line[:-1] + '\n')
-					self.instance.progressBar.setValue(i)  # TODO: remove progress bar from export page
 		except FileExistsError as e:
 			print(f'That File Already Exists: {e}')
 			self.instance.log.error_log(f'File Already Exists Error: {e}')
@@ -79,12 +78,13 @@ class ExportUtils:
 					QMessageBox.StandardButton.Ok
 			)
 		except Exception as e:
-			print(f'Failed To Export Data To {export_type.value.upper()}: {e}')
-			self.instance.log.error_log(f'Failed To Export Data To {export_type.value.upper()}: {e}')
+			export_type = export_type.upper()
+			print(f'Failed To Export Data To {export_type}: {e}')
+			self.instance.log.error_log(f'Failed To Export Data To {export_type}: {e}')
 			QMessageBox.critical(
 					self.instance,
-					f'{export_type.value.upper()} Export Error',
-					f'Failed To Export Data To {export_type.value.upper()}, Try Changing File Types',
+					f'{export_type} Export Error',
+					f'Failed To Export Data To {export_type}, Try Changing File Types',
 					QMessageBox.StandardButton.Ok
 			)
 	
