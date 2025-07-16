@@ -13,7 +13,7 @@ from typing import override, TYPE_CHECKING
 
 from numpy import ndarray
 from PyQt6.QtCore import pyqtSignal, QThread
-from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QWidget
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QTableWidgetItem, QWidget
 from PyQt6.uic import loadUi
 
 import stock_manager
@@ -37,7 +37,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 	
 	def __init__(self, file_name: str, app: 'App'):
 		"""
-		Initialize the abstract controller, load its UI, and set up sidebar navigation handlers.
+		Initialize the abstract controller, load its child's UI.
 		
 		:param file_name: The name of the .ui file (without extension) to load for this controller.
 		:param app: Reference to the main application instance.
@@ -153,8 +153,8 @@ class AbstractScanner(AbstractController):
 	
 	def __init__(self, file_name: str, app: 'App'):
 		"""
-		Initialize the scanner controller.
-		Creates reference to `_CameraThread` as `self.camera_thread`
+		Initialize the Abstract Scanner controller.
+		Creates reference to `_CameraThread` as `self.camera_thread`.
 		
 		:param file_name: The name of the .ui file (without extension) to load for this controller.
 		:param app: Reference to the main application instance.
@@ -341,3 +341,60 @@ class AbstractScanner(AbstractController):
 		def stop(self) -> None:
 			"""Stop the video capture loop."""
 			self.running = False
+
+
+class AbstractExporter(AbstractController):
+	"""
+	Abstract base class for export controllers.
+	
+	Provides common functionality for pages that need to handle
+	file exports, file dialogues, and file name generation.
+	"""
+	
+	def __init__(self, file_name: str, app: 'App'):
+		"""
+		Initialize the AbstractExporter controller.
+		Creates reference to the `../../../export` folder as `self.path`.
+		
+		:param file_name: The name of the .ui file (without extension) to load for this controller.
+		:param app: Reference to the main application instance.
+		"""
+		
+		super().__init__(file_name, app)
+		self.path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
+	
+	def get_directory(self, button: QPushButton = None) -> None:
+		"""
+		Open a dialog to select the export directory and update the UI.
+		
+		If an exception occurs during selection, the user is offered the option to retry.
+		
+		:param button: sets the text of `button` to the last 6 characters of the user chosen path.
+		"""
+		
+		try:
+			response = QFileDialog.getExistingDirectory(
+					self, 'Select A Folder',
+					str(Path(__file__).resolve().parent.parent.parent / 'exports')
+			)
+			response = str(response)
+			self.path = response
+			if button:
+				button.setText(f'...{response[-6:]}' if len(response) > 6 else response)
+		except Exception as e:
+			print(f'Directory Selection Failure: {e}')
+			self.logger.error_log(f'Directory Selection Failure: {e}')
+			response = QMessageBox.critical(
+					self,
+					'Directory Selection Failure',
+					'Failed To Select Directory',
+					QMessageBox.StandardButton.Ok,
+					QMessageBox.StandardButton.Retry
+			)
+			
+			if response == QMessageBox.StandardButton.Retry:
+				self.get_directory()
+	
+	@abstractmethod
+	def export(self) -> None:
+		pass

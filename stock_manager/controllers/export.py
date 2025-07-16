@@ -1,23 +1,25 @@
 """Export page controller for exporting inventory data in the Stock Management Application."""
 
-from pathlib import Path
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QFileDialog, QMessageBox
+import numpy
+from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtWidgets import QMessageBox
+from qrcode.image.base import BaseImage
 
 import stock_manager
-from .abstract import AbstractController
+from .abstract import AbstractExporter
 
 if TYPE_CHECKING:
 	from stock_manager import App
 
 
-class Export(AbstractController):
+class Export(AbstractExporter):
 	"""
 	Controller for the 'Edit' page of the stock management application.
 	
 	Handles which type of file to export as and sends
-	the correct signal to `file_exports.py` to be exported.
+	the correct signal to `export_utils.py` to be exported.
 	"""
 	
 	def __init__(self, app: 'App'):
@@ -30,17 +32,17 @@ class Export(AbstractController):
 		page = stock_manager.Pages.EXPORT
 		super().__init__(page.value.FILE_NAME, app)
 		self.PAGE_NAME = page
-		self._path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
+		self.location_btn.setText(f'...{self.path[-6:]}')
 		self.handle_connections()
 	
 	@override
 	def handle_connections(self) -> None:
 		self.back_btn.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
-		self.location_btn.clicked.connect(self._get_directory)
-		self.location_btn.setText(f'...{self._path[-6:]}')
-		self.export_btn.clicked.connect(self._export_data)
+		self.location_btn.clicked.connect(lambda: self.get_directory(self.location_btn))
+		self.export_btn.clicked.connect(self.export)
 	
-	def _export_data(self) -> None:
+	@override
+	def export(self) -> None:
 		"""
 		Export stock data to a file based on the selected export type.
 		
@@ -56,9 +58,9 @@ class Export(AbstractController):
 			
 			match self.export_combo.currentText().lower():
 				case ExportTypes.PDF:
-					self.app.file_exports.pdf_export()
+					self.app.export_utils.pdf_export()
 				case ExportTypes.CSV | ExportTypes.TSV | ExportTypes.PSV as export_type:
-					self.app.file_exports.sv_export(self, export_type, self._path)
+					self.app.export_utils.sv_export(self, export_type, self.path)
 				case 'Select':
 					QMessageBox.information(
 							self,
@@ -86,33 +88,75 @@ class Export(AbstractController):
 			)
 			
 			if response == QMessageBox.StandardButton.Retry:
-				self._export_data()
+				self.export()
+
+
+class QRGenerate(AbstractExporter):
+	def __init__(self, app: 'App'):
+		page = stock_manager.Pages.GENERATE
+		super().__init__(page.value.FILE_NAME, app)
+		self.PAGE_NAME = page
+		self._selected_qr: BaseImage | None = None
+		self.location_btn.setText(f'...{self.path[-6:]}')
+		self.handle_connections()
 	
-	def _get_directory(self) -> None:
-		"""
-		Open a dialog to select the export directory and update the UI.
-		
-		If an exception occurs during selection, the user is offered the option to retry.
-		"""
+	@override
+	def handle_connections(self) -> None:
+		self.search.textChanged.connect(self.filter_table)
+		self.table.cellClicked.connect(self._on_cell_clicked)
+		self.location_btn.clicked.connect(lambda: self.get_directory(self.location_btn))
+		self.save_btn.clicked.connect(self.export)
+	
+	@override
+	def export(self):
+		if not self._selected_qr:
+			QMessageBox.warning(
+					self,
+					'Please Choose Item',
+					'Please Choose An Item From The Table Before Exporting QR Code.'
+			)
+			return
 		
 		try:
-			response = QFileDialog.getExistingDirectory(
-					self, 'Select A Folder',
-					str(Path(__file__).resolve().parent.parent.parent / 'exports')
-			)
-			response = str(response)
-			self.location_btn.setText(f'...{response[-6:]}' if len(response) > 6 else response)
-			self._path = response
+			self.app.export_utils.save_code(self._selected_qr, self.path)
 		except Exception as e:
-			print(f'Directory Selection Failure: {e}')
-			self.logger.error_log(f'Directory Selection Failure: {e}')
-			response = QMessageBox.critical(
+			print(f'Failed To Save QR Code To File: {e}')
+			self.logger.error_log(f'Failed To Save QR Code To File: {e}')
+			QMessageBox.critical(
 					self,
-					'Directory Selection Failure',
-					'Failed To Select Directory',
-					QMessageBox.StandardButton.Ok,
-					QMessageBox.StandardButton.Retry
+					'QR Code Download Failure',
+					'Failed To Download QR Code',
+					QMessageBox.StandardButton.Ok
 			)
-			
-			if response == QMessageBox.StandardButton.Retry:
-				self._get_directory()
+	
+	def _on_cell_clicked(self, row: int, _) -> None:
+		try:
+			item = self.app.all_items[row]
+			self._selected_qr = self.app.export_utils.create_code(item.part_num)
+		except Exception as e:
+			print(f'Failed To Get Selected Item QR Code: {e}')
+			self.logger.error_log(f'Failed To Get Selected Item QR Code: {e}')
+			QMessageBox.critical(
+					self,
+					'Item QR Code Creation Failure',
+					'Failed To Create Item QR Code.',
+					QMessageBox.StandardButton.Ok
+			)
+			return
+		
+		try:
+			pil_image = self._selected_qr.get_image().convert("RGB")
+			frame = numpy.asarray(pil_image)
+			h, w, ch = frame.shape
+			bytes_per_line = ch * w
+			q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+			self.qr_lbl.setPixmap(QPixmap.fromImage(q_img))
+		except Exception as e:
+			print(f'Failed To Update QR Label: {e}')
+			self.logger.error_log(f'Failed To Update QR Label: {e}')
+			QMessageBox.critical(
+					self,
+					'QR Label Failure',
+					'Failed To Update QR Label',
+					QMessageBox.StandardButton.Ok
+			)

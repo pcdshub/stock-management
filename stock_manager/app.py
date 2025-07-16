@@ -32,14 +32,13 @@ class App(QMainWindow):
 		"""
 		
 		from stock_manager import DBUtils, Logger, Edit, Export, Finish, Remove, ItemScanner, View, Add, Login, \
-			FileExports, QRGenerator
+			ExportUtils, QRGenerate
 		
 		super(App, self).__init__()
 		
 		self.log = Logger()
 		self.db = DBUtils()
-		self.file_exports = FileExports()
-		self.qr_generator = QRGenerator()
+		self.export_utils = ExportUtils(self)
 		self.export = Export(self)
 		self.finish = Finish(self)
 		self.login = Login(self)
@@ -48,6 +47,7 @@ class App(QMainWindow):
 		self.add = Add(self)
 		self.edit = Edit(self)
 		self.remove = Remove(self)
+		self.generate = QRGenerate(self)
 		
 		self.user = ''
 		self.all_items: list[Item] = []
@@ -73,7 +73,7 @@ class App(QMainWindow):
 			
 			screens_to_add: list[stock_manager.AbstractController] = [
 				self.login, self.view, self.item_scanner, self.add,
-				self.edit, self.remove, self.export, self.finish
+				self.edit, self.remove, self.export, self.finish, self.generate
 			]
 			
 			for screen in screens_to_add:
@@ -89,6 +89,7 @@ class App(QMainWindow):
 			self.add_btn.clicked.connect(self.add.to_page)
 			self.edit_btn.clicked.connect(self.edit.to_page)
 			self.remove_btn.clicked.connect(self.remove.to_page)
+			self.generate_btn.clicked.connect(self.generate.to_page)
 			self.log_out_btn.clicked.connect(self.login.to_page)
 		
 		handle_screens()
@@ -212,5 +213,5 @@ class App(QMainWindow):
 		"""
 		
 		await asyncio.gather(
-				*(controller.update_table() for controller in [self.view, self.edit, self.remove])
+				*(controller.update_table() for controller in [self.view, self.edit, self.remove, self.generate])
 		)
