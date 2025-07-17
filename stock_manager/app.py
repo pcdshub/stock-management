@@ -54,7 +54,7 @@ class App(QMainWindow):
 		self.current_page: stock_manager.Pages | None = None
 		
 		try:
-			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
+			ui_path: Path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
 			loadUi(str(ui_path), self)
 		except Exception as e:
 			print(f'Failed To Load Main UI File: {e}')
@@ -67,26 +67,38 @@ class App(QMainWindow):
 			)
 			raise SystemExit(1)
 		
-		self.buttons: list[QPushButton] = [
-			child for child in self.sideUI.children()
-		]
+		self.buttons: list[QPushButton] = [child for child in self.sideUI.children()]
 		
-		for controller in self.controllers.values():
-			self.screens.addWidget(controller)
+		for screen in self.controllers.values():
+			self.screens.addWidget(screen)
 		
-		def handle_connections() -> None:
-			"""Connects sidebar buttons to the appropriate screen navigation actions."""
+		self.handle_connections()
+	
+	def handle_connections(self) -> None:
+		"""
+		Connects sidebar buttons to the appropriate screen
+		navigation actions and connects application shortcuts
+		to a method.
+		"""
+		
+		button: QPushButton
+		controller: stock_manager.AbstractController
+		enum: stock_manager.Pages
+		for button, controller, enum in zip(self.buttons[:-1], self.controllers.values(), stock_manager.Pages):
+			if not isinstance(button, QPushButton):
+				self.log_out_btn.clicked.connect(self.login.to_page)
+				continue
 			
-			button: QPushButton
-			controller: stock_manager.AbstractController
-			enum: stock_manager.Pages
-			for button, controller, enum in zip(self.buttons[:-1], self.controllers.values(), stock_manager.Pages):
-				if not isinstance(button, QPushButton):
-					continue
-				
-				button.clicked.connect(controller.to_page)
-			self.screens.currentChanged.connect(self._on_page_changed)
-		handle_connections()
+			button.clicked.connect(controller.to_page)
+			button.setShortcut(str(enum.value.PAGE_INDEX))
+		
+		self.screens.currentChanged.connect(self._on_page_changed)
+		self.actionToggle_Maximize.triggered.connect(self.toggle_maximize)
+		self.actionEscape_Maximize.triggered.connect(self.escape_maximize)
+		self.actionMinimize.triggered.connect(self.minimize)
+		self.actionSearch.triggered.connect(self.search)
+		self.actionLog_Out.triggered.connect(self.login.to_page)
+		self.actionClose_Application.triggered.connect(self.close)
 	
 	def run(self) -> None:
 		"""
@@ -205,3 +217,41 @@ class App(QMainWindow):
 					   and hasattr(controller, 'table')
 				)
 		)
+	
+	def toggle_maximize(self):
+		"""Toggles maximization of the application window."""
+		
+		if self.isMaximized():
+			self.showNormal()
+		else:
+			self.showMaximized()
+	
+	def escape_maximize(self):
+		"""Returns window to windowed state if application is maximized."""
+		
+		if self.isMaximized():
+			self.showNormal()
+	
+	def minimize(self):
+		"""Minimizes the application window to the taskbar."""
+		
+		self.showMinimized()
+	
+	def search(self):
+		"""
+		Focuses current page's search bar if one is present.
+		
+		If a search bar is not present, application navigates
+		to `view.ui` and focuses `search` there.
+		"""
+		
+		if not self.user:
+			return
+		
+		controller = self.controllers[self.current_page.value.FILE_NAME]
+		if hasattr(controller, 'search'):
+			controller.search.setFocus()
+			return
+		
+		self.view.to_page()
+		self.view.search.setFocus()
