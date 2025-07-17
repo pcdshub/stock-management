@@ -35,4 +35,4 @@ class View(AbstractController):
 	@override
 	def handle_connections(self) -> None:
 		self.search.textChanged.connect(self.filter_table)
-		self.export_btn.clicked.connect(self.app.export.to_page)
+		self.export_btn.clicked.connect(lambda: self.app.export.to_page())

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class DBUtils:
 	"""Utility class for interacting with a Google Sheets database."""
 	
-	def __init__(self):
+	def __init__(self) -> None:
 		"""
 		Initializes the Google Sheets client using credentials from a JSON keyfile.
 		
