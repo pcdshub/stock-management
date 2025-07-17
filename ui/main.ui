@@ -245,7 +245,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>../assets/icons/log-out.svg</normaloff>../assets/icons/log-out.svg
+           <normaloff>../assets/icons/log-out-white.svg</normaloff>../assets/icons/log-out-white.svg
           </iconset>
          </property>
         </widget>
@@ -258,7 +258,111 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1280</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuWindow_Options">
+    <property name="title">
+     <string>Shortcuts</string>
+    </property>
+    <addaction name="actionToggle_Maximize"/>
+    <addaction name="actionEscape_Maximize"/>
+    <addaction name="actionMinimize"/>
+    <addaction name="separator"/>
+    <addaction name="actionSearch"/>
+    <addaction name="separator"/>
+    <addaction name="actionLog_Out"/>
+    <addaction name="actionClose_Application"/>
+   </widget>
+   <addaction name="menuWindow_Options"/>
+  </widget>
+  <action name="actionToggle_Maximize">
+   <property name="icon">
+    <iconset>
+     <normaloff>../assets/icons/maximize.svg</normaloff>../assets/icons/maximize.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Maximize</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
+  <action name="actionEscape_Maximize">
+   <property name="icon">
+    <iconset>
+     <normaloff>../assets/icons/unmaximize.svg</normaloff>../assets/icons/unmaximize.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Escape Maximize</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionMinimize">
+   <property name="icon">
+    <iconset>
+     <normaloff>../assets/icons/minimize.svg</normaloff>../assets/icons/minimize.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Minimize</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="icon">
+    <iconset>
+     <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Search</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionLog_Out">
+   <property name="icon">
+    <iconset>
+     <normaloff>../assets/icons/log-out-black.svg</normaloff>../assets/icons/log-out-black.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Log Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionClose_Application">
+   <property name="icon">
+    <iconset>
+     <normaloff>../assets/icons/off.svg</normaloff>../assets/icons/off.svg
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Close Application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../assets/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

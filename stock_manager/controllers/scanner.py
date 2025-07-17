@@ -178,6 +178,7 @@ class Login(AbstractScanner):
 	@override
 	def handle_connections(self) -> None:
 		self.login_btn.clicked.connect(self._login_clicked)
+		self.username.returnPressed.connect(self._login_clicked)
 	
 	@override
 	def to_page(self) -> None:

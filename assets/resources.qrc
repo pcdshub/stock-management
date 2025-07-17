@@ -15,10 +15,16 @@
     <file>icons/folder-tree.svg</file>
     <file>icons/grid.svg</file>
     <file>icons/log-in.svg</file>
-    <file>icons/log-out.svg</file>
+    <file>icons/log-out-black.svg</file>
+    <file>icons/log-out-white.svg</file>
     <file>icons/magnifying-glass.svg</file>
+    <file>icons/maximize.svg</file>
+    <file>icons/minimize.svg</file>
+    <file>icons/off.svg</file>
     <file>icons/qr-code.svg</file>
     <file>icons/remove.svg</file>
     <file>icons/trash.svg</file>
+    <file>icons/unmaximize.svg</file>
+    <file>icons/video.svg</file>
   </qresource>
 </RCC>
