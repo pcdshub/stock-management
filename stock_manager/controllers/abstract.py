@@ -141,6 +141,17 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
 		
 		self.app.current_page = self.PAGE_NAME
 		self.app.screens.setCurrentIndex(self.PAGE_NAME.value.PAGE_INDEX)
+		
+		username = f' - {self.app.user}' if self.app.user else ''
+		
+		try:
+			self.app.setWindowTitle(
+					self.PAGE_NAME.value.PAGE_TITLE + ' | SLAC Inventory Management Application' + username
+			)
+		except Exception as e:
+			print(f'Page Title Update Error: {e}')
+			self.logger.warning_log(f'Error Updating Window Title With Current Page Title: {e}')
+			self.setWindowTitle('SLAC Inventory Management Application' + username)
 
 
 class AbstractScanner(AbstractController):
