@@ -147,18 +147,6 @@ class App(QMainWindow):
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
 		
-		from stock_manager import SIDEBAR_BUTTON_SIZE
-		
-		idx = self.screens.currentIndex()
-		username = f' - {self.user}' if self.user else ''
-		
-		try:
-			self.setWindowTitle(self.current_page.value.TITLE + ' | SLAC Inventory Management Application' + username)
-		except Exception as e:
-			print(f'Page Title Update Error: {e}')
-			self.log.warning_log(f'Error Updating Window Title With Current Page Title: {e}')
-			self.setWindowTitle('SLAC Inventory Management Application' + username)
-		
 		if self.scanner.camera_thread.running and \
 				self.screens.currentIndex() != stock_manager.Pages.SCAN.value.PAGE_INDEX:
 			try:
@@ -175,7 +163,11 @@ class App(QMainWindow):
 		
 		def bold_current_screen_button() -> None:
 			"""Update sidebar buttons' font to indicate the currently active screen."""
+			
+			from stock_manager import SIDEBAR_BUTTON_SIZE
+			
 			buttons: list[QPushButton] = self.sideUI.children()[1:]  # exclude QVBox
+			idx = self.screens.currentIndex()
 			
 			active = QFont()
 			active.setPointSize(SIDEBAR_BUTTON_SIZE)
