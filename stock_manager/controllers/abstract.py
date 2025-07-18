@@ -408,4 +408,12 @@ class AbstractExporter(AbstractController):
 	
 	@abstractmethod
 	def export(self) -> None:
+		"""
+		Export data to an external format or destination.
+		
+		Subclasses must implement this to define the logic
+		for exporting application data. The specifics of what
+		data is exported, where it is sent, and the export
+		format must be handled by the implementing subclass.
+		"""
 		pass

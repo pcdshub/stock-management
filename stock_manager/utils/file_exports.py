@@ -89,6 +89,14 @@ class ExportUtils:
 			)
 	
 	def create_code(self, part_num: str) -> BaseImage:
+		"""
+		This method creates a QR code using the input `part_num` string and returns
+		it as a `BaseImage` object.
+		
+		:param part_num: The string to encode in the QR code.
+		:return: The generated QR code image.
+		"""
+		
 		try:
 			qr = qrcode.QRCode()
 			qr.add_data(part_num)
@@ -105,6 +113,13 @@ class ExportUtils:
 			)
 	
 	def save_code(self, qr_code: BaseImage, path: str) -> None:
+		"""
+		Save a QR code image to a specified file path in `.png` format.
+		
+		:param qr_code: The QR code image to save.
+		:param path: The desired file path for saving the image.
+		"""
+		
 		try:
 			qr_code.save(self._get_valid_name('png', path))
 		except Exception as e:
