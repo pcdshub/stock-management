@@ -43,16 +43,6 @@ class Export(AbstractExporter):
 	
 	@override
 	def export(self) -> None:
-		"""
-		Export stock data to a file based on the selected export type.
-		
-		This method checks the current selection in the export combo box,
-		and calls the appropriate file export method.
-		If no valid type is selected, shows an information or warning dialog.
-		
-		If an exception occurs during export, the user is offered the option to retry.
-		"""
-		
 		try:
 			from stock_manager import ExportTypes
 			
