@@ -6,3 +6,4 @@ oauth2client
 pathlib
 typing
 qasync
+qrcode
