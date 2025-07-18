@@ -32,7 +32,7 @@ class Export(AbstractExporter):
 		page = stock_manager.Pages.EXPORT
 		super().__init__(page.value.FILE_NAME, app)
 		self.PAGE_NAME = page
-		self.location_btn.setText(f'...{self.path[-6:]}')
+		self.location_btn.setText('.../' + self.path.split('\\')[-1])
 		self.handle_connections()
 	
 	@override
@@ -82,12 +82,24 @@ class Export(AbstractExporter):
 
 
 class QRGenerate(AbstractExporter):
+	"""
+	Controller for the `QR Generate` page of the stock management application.
+	
+	Handles generating and exporting QR codes associated with inventory items.
+	"""
+	
 	def __init__(self, app: 'App'):
+		"""
+		Initialize the QRGenerate controller.
+		
+		:param app: Reference to the main application instance.
+		"""
+		
 		page = stock_manager.Pages.GENERATE
 		super().__init__(page.value.FILE_NAME, app)
 		self.PAGE_NAME = page
 		self._selected_qr: BaseImage | None = None
-		self.location_btn.setText(f'...{self.path[-6:]}')
+		self.location_btn.setText('.../' + self.path.split('\\')[-1])
 		self.handle_connections()
 	
 	@override
@@ -120,6 +132,14 @@ class QRGenerate(AbstractExporter):
 			)
 	
 	def _on_cell_clicked(self, row: int, _) -> None:
+		"""
+		Generates and displays a QR code corresponding
+		to the selected table item's part number.
+		
+		:param row: The index of the clicked table row.
+		:param _: The column index (unused).
+		"""
+		
 		try:
 			item = self.app.all_items[row]
 			self._selected_qr = self.app.export_utils.create_code(item.part_num)
