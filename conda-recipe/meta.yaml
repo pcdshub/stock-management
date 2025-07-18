@@ -21,6 +21,7 @@ requirements:
     - pathlib
     - typing
     - qasync
+    - qrcode
 
 test:
   imports:
