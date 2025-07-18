@@ -391,7 +391,7 @@ class AbstractExporter(AbstractController):
 			response = str(response)
 			self.path = response
 			if button:
-				button.setText(f'...{response[-6:]}' if len(response) > 6 else response)
+				button.setText(f'...{response.split("/")[-1]}' if len(response) > 6 else response)
 		except Exception as e:
 			print(f'Directory Selection Failure: {e}')
 			self.logger.error_log(f'Directory Selection Failure: {e}')

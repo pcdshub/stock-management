@@ -78,7 +78,7 @@ class App(QMainWindow):
 		"""
 		Connects sidebar buttons to the appropriate screen
 		navigation actions and connects application shortcuts
-		to a method.
+		to a controllers `to_page()` method.
 		"""
 		
 		button: QPushButton
