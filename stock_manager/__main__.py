@@ -13,20 +13,22 @@ from stock_manager import App
 
 
 def main():
-	"""Start the Qt application and show the main window."""
-	
-	# try:
-	app = QApplication([])  # TODO: if command line arguments are used, swap [] for sys.argv
-	loop = QEventLoop(app)
-	asyncio.set_event_loop(loop)
-	window = App()
-	window.run()
-	window.show()
-	
-	with loop:
-		loop.run_forever()
-	# except Exception as e:
-	# 	from stock_manager.utils.logger import Logger
+    """Start the Qt application and show the main window."""
+    
+    # try:
+    app = QApplication([])  # TODO: if command line arguments are used, swap [] for sys.argv
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+    window = App()
+    window.run()
+    window.show()
+    
+    with loop:
+        loop.run_forever()
+
+
+# except Exception as e:
+# 	from stock_manager.utils.logger import Logger
 
 # 	print(f'Fatal Error In Main(): {e}')
 # 	Logger().error_log(f'Fatal Error In Main(): {e}')
@@ -40,4 +42,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+    main()

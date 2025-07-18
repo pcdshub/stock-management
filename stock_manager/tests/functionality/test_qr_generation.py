@@ -1,9 +1,9 @@
 import qrcode
 
 qr = qrcode.QRCode(
-		None,
-		box_size=10,
-		border=4,
+        None,
+        box_size=10,
+        border=4,
 )
 
 qr.add_data("BK9000")

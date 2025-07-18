@@ -11,14 +11,14 @@ from .file_exports import ExportUtils
 from .logger import Logger
 
 __all__ = [
-	'Logger',
-	'DBUtils',
-	'ExportUtils',
-	'Pages',
-	'ExportTypes',
-	'StockStatus',
-	'DatabaseUpdateType',
-	'total_equation',
-	'excess_equation',
-	'SIDEBAR_BUTTON_SIZE'
+    'Logger',
+    'DBUtils',
+    'ExportUtils',
+    'Pages',
+    'ExportTypes',
+    'StockStatus',
+    'DatabaseUpdateType',
+    'total_equation',
+    'excess_equation',
+    'SIDEBAR_BUTTON_SIZE'
 ]

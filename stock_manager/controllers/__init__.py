@@ -10,15 +10,15 @@ from .scanner import ItemScanner, Login
 from .view import View
 
 __all__ = [
-	'AbstractController',
-	'AbstractScanner',
-	'Login',
-	'View',
-	'ItemScanner',
-	'Finish',
-	'Export',
-	'Add',
-	'Edit',
-	'Remove',
-	'QRGenerate'
+    'AbstractController',
+    'AbstractScanner',
+    'Login',
+    'View',
+    'ItemScanner',
+    'Finish',
+    'Export',
+    'Add',
+    'Edit',
+    'Remove',
+    'QRGenerate'
 ]
