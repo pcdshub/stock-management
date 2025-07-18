@@ -11,7 +11,7 @@ from typing import Iterable, TYPE_CHECKING
 import gspread
 from gspread import Cell, Spreadsheet, Worksheet
 from oauth2client.service_account import ServiceAccountCredentials
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
 if TYPE_CHECKING:
     from stock_manager import Item, DatabaseUpdateType
@@ -54,8 +54,7 @@ class DBUtils:
             QMessageBox.critical(
                     None,
                     'Database Connection Failure',
-                    'Failed To Connect To Database, Try Restarting The Application',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Connect To Database, Make Sure You Have An Internet Connection'
             )
             raise SystemExit(1)
     
@@ -77,11 +76,11 @@ class DBUtils:
                     'Data Fetching Error',
                     f'Failed To Fetch All Data From {self._file_name}.\n\n'
                     'Continue To Application?',
-                    QMessageBox.StandardButton.Yes,
-                    QMessageBox.StandardButton.Close
+                    QMessageBox.Yes,
+                    QMessageBox.Close
             )
             
-            if response == QMessageBox.StandardButton.Close:
+            if response == QMessageBox.Close:
                 raise SystemExit(1)
     
     def get_all_users(self) -> set[str]:  # TODO: possibly make user objects out of data
@@ -104,7 +103,7 @@ class DBUtils:
                     None,
                     'User Fetch Error',
                     'Failed To Fetch Users From Database',
-                    QMessageBox.StandardButton.Close
+                    QMessageBox.Close
             )
             raise SystemExit(1)
     
@@ -137,8 +136,7 @@ class DBUtils:
                         QMessageBox.critical(
                                 None,
                                 'Database Add Item Error',
-                                f'Error Adding "{item.part_num}" To Database.',
-                                QMessageBox.StandardButton.Ok
+                                f'Error Adding "{item.part_num}" To Database.'
                         )
                 case DatabaseUpdateType.EDIT:
                     try:
@@ -153,16 +151,14 @@ class DBUtils:
                         QMessageBox.critical(
                                 None,
                                 'Database Edit Item Error',
-                                f'Error Editing "{item.part_num}" In Database.',
-                                QMessageBox.StandardButton.Ok
+                                f'Error Editing "{item.part_num}" In Database.'
                         )
                     else:
                         QMessageBox.warning(
                                 None,
                                 'Database Update Item Warning',
                                 f'Cannot Update Item: "{item.part_num}" '
-                                f'Because It Does Not Exist In Database',
-                                QMessageBox.StandardButton.Ok
+                                f'Because It Does Not Exist In Database'
                         )
                 case DatabaseUpdateType.REMOVE:
                     try:
@@ -176,22 +172,19 @@ class DBUtils:
                         QMessageBox.critical(
                                 None,
                                 'Database Delete Item Error',
-                                f'Error Deleting "{item.part_num}" From Database.',
-                                QMessageBox.StandardButton.Ok
+                                f'Error Deleting "{item.part_num}" From Database.'
                         )
                     else:
                         QMessageBox.warning(
                                 None,
                                 'Database Delete Item Warning',
                                 f'Cannot Delete Item: "{item.part_num}" '
-                                f'Because It Does Not Exist In Database',
-                                QMessageBox.StandardButton.Ok
+                                f'Because It Does Not Exist In Database'
                         )
                 case _ as unknown:
                     QMessageBox.critical(
                             None,
                             'Unknown Database Update Type',
                             f'Unknown Database Update Type: "{unknown}", '
-                            'Only Use stock_manager.DatabaseUpdateType Enums When Updating Database',
-                            QMessageBox.StandardButton.Ok
+                            'Only Use stock_manager.DatabaseUpdateType Enums When Updating Database'
                     )

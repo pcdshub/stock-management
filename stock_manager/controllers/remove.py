@@ -7,7 +7,7 @@ Includes search filtering and confirmation dialogs for safe item removal.
 
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
 import stock_manager
 from .abstract import AbstractController
@@ -57,11 +57,11 @@ class Remove(AbstractController):
                 'Item Removal Confirmation',
                 f'Are You Sure You Want To Remove {selected_item.part_num} '
                 'From The Database?\n\nThis Action Cannot Be Undone.',
-                QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.No
+                QMessageBox.Yes,
+                QMessageBox.No
         )
         
-        if response == QMessageBox.StandardButton.Yes:
+        if response == QMessageBox.Yes:
             self.app.all_items.remove(selected_item)
             self.logger.info_log(f'{self.app.user} Removed Item From Database: {selected_item.part_num}')
             self.app.update_tables()

@@ -6,7 +6,7 @@ Initializes the Qt Application and launches the main application window.
 
 import asyncio
 
-from PyQt6.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
 from qasync import QEventLoop
 
 from stock_manager import App
@@ -35,8 +35,7 @@ def main():
 # 	QMessageBox.critical(
 # 			None,
 # 			'Fatal Error',
-# 			'Fatal Error Starting The Application',
-# 			QMessageBox.StandardButton.Ok
+# 			'Fatal Error Starting The Application'
 # 	)
 # 	raise SystemExit(1)
 

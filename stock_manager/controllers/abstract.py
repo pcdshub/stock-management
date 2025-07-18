@@ -12,9 +12,9 @@ from pathlib import Path
 from typing import override, TYPE_CHECKING
 
 from numpy import ndarray
-from PyQt6.QtCore import pyqtSignal, QThread
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QPushButton, QTableWidgetItem, QWidget
-from PyQt6.uic import loadUi
+from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QPushButton, QTableWidgetItem, QWidget
+from PyQt5.uic import loadUi
 
 import stock_manager
 
@@ -59,8 +59,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             QMessageBox.critical(
                     self,
                     f'{file_name}.ui Failure',
-                    f'Failed To Load {file_name}.ui File',
-                    QMessageBox.StandardButton.Ok
+                    f'Failed To Load {file_name}.ui File'
             )
     
     @abstractmethod
@@ -87,8 +86,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
                     'No Table Found',
                     'No Table Object Found In Controller, '
                     'Make Sure This Method Is Being Called In A Controller '
-                    'That Has A Table Object Called "Table".',
-                    QMessageBox.StandardButton.Ok
+                    'That Has A Table Object Called "Table".'
             )
             return
         
@@ -119,8 +117,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
                     'No Table Found',
                     'No Table Object Found In Controller, '
                     'Make Sure This Method Is Being Called In A Controller '
-                    'That Has A Table Object Called "Table".',
-                    QMessageBox.StandardButton.Ok
+                    'That Has A Table Object Called "Table".'
             )
             return
         
@@ -186,8 +183,7 @@ class AbstractScanner(AbstractController):
             QMessageBox.critical(
                     self,
                     'QR Scanner Error',
-                    'Failed To Start QR Scanner',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Start QR Scanner'
             )
         finally:
             super().to_page()
@@ -211,8 +207,7 @@ class AbstractScanner(AbstractController):
             QMessageBox.critical(
                     self,
                     'Camera Failure',
-                    'Failed To Start Camera',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Start Camera'
             )
     
     def stop_video(self) -> None:
@@ -247,12 +242,11 @@ class AbstractScanner(AbstractController):
             QMessageBox.warning(
                     self,
                     'Color Conversion Error',
-                    'Failed To Convert Frame Color',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Convert Frame Color'
             )
         
         try:
-            from PyQt6.QtGui import QImage, QPixmap
+            from PyQt5.QtGui import QImage, QPixmap
             
             h, w, ch = frame.shape
             bytes_per_line = ch * w
@@ -264,8 +258,7 @@ class AbstractScanner(AbstractController):
             QMessageBox.critical(
                     self,
                     'Video Label Failure',
-                    'Failed To Update Video Label',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Update Video Label'
             )
     
     @abstractmethod
@@ -320,17 +313,6 @@ class AbstractScanner(AbstractController):
             if not cap.isOpened():
                 self._logger.error_log('Could Not Access Camera')
                 print('Could Not Access Camera')
-                response = QMessageBox.critical(
-                        None,
-                        'Camera Failure',
-                        'Failed To Access Camera',
-                        QMessageBox.StandardButton.Ok,
-                        QMessageBox.StandardButton.Retry
-                )
-                
-                if response == QMessageBox.StandardButton.Retry:
-                    self.run()
-                
                 return
             
             while self.running:
@@ -341,12 +323,6 @@ class AbstractScanner(AbstractController):
                 
                 print('Failed To Read Frame From Camera')
                 self._logger.error_log('Failed To Read Frame From Camera')
-                QMessageBox.critical(
-                        None,
-                        'Frame Read Failure',
-                        'Failed To Read Frame From Camera',
-                        QMessageBox.StandardButton.Ok
-                )
             cap.release()
         
         def stop(self) -> None:
@@ -399,11 +375,11 @@ class AbstractExporter(AbstractController):
                     self,
                     'Directory Selection Failure',
                     'Failed To Select Directory',
-                    QMessageBox.StandardButton.Ok,
-                    QMessageBox.StandardButton.Retry
+                    QMessageBox.Ok,
+                    QMessageBox.Retry
             )
             
-            if response == QMessageBox.StandardButton.Retry:
+            if response == QMessageBox.Retry:
                 self.get_directory()
     
     @abstractmethod

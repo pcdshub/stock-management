@@ -3,8 +3,8 @@
 from typing import override, TYPE_CHECKING
 
 import numpy
-from PyQt6.QtGui import QImage, QPixmap
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QMessageBox
 from qrcode.image.base import BaseImage
 
 import stock_manager
@@ -55,16 +55,14 @@ class Export(AbstractExporter):
                     QMessageBox.information(
                             self,
                             'Please Choose File Type',
-                            'Please Select A File Type Before Exporting',
-                            QMessageBox.StandardButton.Ok
+                            'Please Select A File Type Before Exporting'
                     )
                 case _ as unknown:
                     print(f'Unknown Export Type: "{unknown}"')
                     QMessageBox.warning(
                             self,
                             'Selection Error',
-                            'Please Select A Valid File Type To Export',
-                            QMessageBox.StandardButton.Ok
+                            'Please Select A Valid File Type To Export'
                     )
         except Exception as e:
             print(f'Export Failed: {e}')
@@ -73,11 +71,11 @@ class Export(AbstractExporter):
                     self,
                     'Export Failure',
                     'Failed To Export Data To File',
-                    QMessageBox.StandardButton.Ok,
-                    QMessageBox.StandardButton.Retry
+                    QMessageBox.Ok,
+                    QMessageBox.Retry
             )
             
-            if response == QMessageBox.StandardButton.Retry:
+            if response == QMessageBox.Retry:
                 self.export()
 
 
@@ -127,8 +125,7 @@ class QRGenerate(AbstractExporter):
             QMessageBox.critical(
                     self,
                     'QR Code Download Failure',
-                    'Failed To Download QR Code',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Download QR Code'
             )
     
     def _on_cell_clicked(self, row: int, _) -> None:
@@ -149,8 +146,7 @@ class QRGenerate(AbstractExporter):
             QMessageBox.critical(
                     self,
                     'Item QR Code Creation Failure',
-                    'Failed To Create Item QR Code.',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Create Item QR Code.'
             )
             return
         
@@ -167,6 +163,5 @@ class QRGenerate(AbstractExporter):
             QMessageBox.critical(
                     self,
                     'QR Label Failure',
-                    'Failed To Update QR Label',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Update QR Label'
             )
