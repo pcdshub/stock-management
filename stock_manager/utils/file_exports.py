@@ -2,7 +2,7 @@ import os
 from typing import TYPE_CHECKING
 
 import qrcode
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 from qasync import asyncSlot
 from qrcode.image.base import BaseImage
 
@@ -74,8 +74,7 @@ class ExportUtils:
             QMessageBox.critical(
                     self.instance,
                     'File Exists Error',
-                    'That File Already Exists, Try Changing File Types',
-                    QMessageBox.StandardButton.Ok
+                    'That File Already Exists, Try Changing File Types'
             )
         except Exception as e:
             export_type = export_type.upper()
@@ -84,8 +83,7 @@ class ExportUtils:
             QMessageBox.critical(
                     self.instance,
                     f'{export_type} Export Error',
-                    f'Failed To Export Data To {export_type}, Try Changing File Types',
-                    QMessageBox.StandardButton.Ok
+                    f'Failed To Export Data To {export_type}, Try Changing File Types'
             )
     
     def create_code(self, part_num: str) -> BaseImage:
@@ -108,8 +106,7 @@ class ExportUtils:
             QMessageBox.critical(
                     self.instance,
                     'QR Code Conversion Error',
-                    f'Failed To Convert {part_num} To QR Image',
-                    QMessageBox.StandardButton.Ok
+                    f'Failed To Convert {part_num} To QR Image'
             )
     
     def save_code(self, qr_code: BaseImage, path: str) -> None:
@@ -128,6 +125,5 @@ class ExportUtils:
             QMessageBox.critical(
                     self.instance,
                     'QR Code Export Error',
-                    'Failed To Export QR Image',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Export QR Image'
             )

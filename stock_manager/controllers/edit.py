@@ -7,7 +7,7 @@ including updating item details, validating user input, and saving changes to th
 
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
+from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 import stock_manager
 from stock_manager.model.item import Item
@@ -101,8 +101,7 @@ class Edit(AbstractController):
             QMessageBox.critical(
                     self,
                     'Field Population Error',
-                    'Failed To Populate Fields',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Populate Fields'
             )
     
     def _on_spinner_change(self, _) -> None:
@@ -131,8 +130,7 @@ class Edit(AbstractController):
             QMessageBox.critical(
                     self,
                     'Spinner Change Error',
-                    'Failed To Compute Spinner Data',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Compute Spinner Data'
             )
     
     def _clear_form(self) -> None:
@@ -162,8 +160,7 @@ class Edit(AbstractController):
             QMessageBox.information(
                     self,
                     'No Item Selected',
-                    'Please Select An Item Before Submitting The Form',
-                    QMessageBox.StandardButton.Ok
+                    'Please Select An Item Before Submitting The Form'
             )
             return
         
@@ -191,8 +188,7 @@ class Edit(AbstractController):
             QMessageBox.information(
                     self,
                     'Identical Items',
-                    'Item Is Unchanged, Please Change A Field Before Submitting Form',
-                    QMessageBox.StandardButton.Ok
+                    'Item Is Unchanged, Please Change A Field Before Submitting Form'
             )
             return
         
@@ -200,11 +196,11 @@ class Edit(AbstractController):
                 self,
                 'Item Change Confirmation',
                 f'Are You Sure You Want To Update Item {new_item.part_num}?',
-                QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.No
+                QMessageBox.Yes,
+                QMessageBox.No
         )
         
-        if response == QMessageBox.StandardButton.No:
+        if response == QMessageBox.No:
             return
         
         for i, old_item in enumerate(self.app.all_items):

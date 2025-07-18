@@ -11,7 +11,7 @@ from typing import override, TYPE_CHECKING
 
 import cv2
 from numpy import ndarray
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 from qasync import asyncSlot
 
 import stock_manager
@@ -74,8 +74,7 @@ class ItemScanner(AbstractScanner):
         QMessageBox.information(
                 self,
                 'Unknown QR Code',
-                'QR Code Not Recognized In Database',
-                QMessageBox.StandardButton.Ok
+                'QR Code Not Recognized In Database'
         )
     
     def _clear_form(self) -> None:
@@ -92,8 +91,7 @@ class ItemScanner(AbstractScanner):
             QMessageBox.critical(
                     self,
                     'Item Required',
-                    'Please Scan At Least One Item',
-                    QMessageBox.StandardButton.Ok
+                    'Please Scan At Least One Item'
             )
             return
         
@@ -103,11 +101,11 @@ class ItemScanner(AbstractScanner):
                 self,
                 'Item Checkout Confirmation',
                 'Are You Sure You Want To Checkout Items:\n' + string_items,
-                QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.No
+                QMessageBox.Yes,
+                QMessageBox.No
         )
         
-        if response == QMessageBox.StandardButton.No:
+        if response == QMessageBox.No:
             return
         
         try:
@@ -126,8 +124,7 @@ class ItemScanner(AbstractScanner):
                                 self,
                                 'Radio Button Error',
                                 'Neither Radio Button Is Selected, '
-                                'Please Select A Radio Button Before Submitting Form',
-                                QMessageBox.StandardButton.Ok
+                                'Please Select A Radio Button Before Submitting Form'
                         )
                         return
                     
@@ -216,8 +213,7 @@ class Login(AbstractScanner):
         QMessageBox.information(
                 self,
                 'Unknown QR Code',
-                'QR Code Not Recognized In Database',
-                QMessageBox.StandardButton.Ok
+                'QR Code Not Recognized In Database'
         )
     
     def _login_clicked(self) -> None:
@@ -229,8 +225,7 @@ class Login(AbstractScanner):
             QMessageBox.information(
                     self,
                     'Empty Field',
-                    'Please Fill Out Login Field Before Submitting',
-                    QMessageBox.StandardButton.Ok
+                    'Please Fill Out Login Field Before Submitting'
             )
             return
         
@@ -243,8 +238,7 @@ class Login(AbstractScanner):
         QMessageBox.information(
                 self,
                 'Unknown Username Entered',
-                'Entered Username Not Recognized In Database',
-                QMessageBox.StandardButton.Ok
+                'Entered Username Not Recognized In Database'
         )
     
     def _finish_login(self, username) -> None:

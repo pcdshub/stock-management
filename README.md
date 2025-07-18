@@ -50,7 +50,7 @@ tool streamlines inventory tracking, integrates QR code scanning, and connects t
    pip install -r requirements.txt
    ```
    Main dependencies include:
-   - PyQt6
+    - PyQt5
    - opencv-python
    - numpy
    - gspread
@@ -182,6 +182,6 @@ This project is licensed under the SLAC National Accelerator Laboratory License.
 ## Acknowledgements
 
 - [SLAC National Accelerator Laboratory](https://www6.slac.stanford.edu/)
-- [PyQt6](https://riverbankcomputing.com/software/pyqt/intro)
+- [PyQt5](https://www.riverbankcomputing.com/static/Docs/PyQt5/introduction.html)
 - [OpenCV](https://opencv.org/)
 - [gspread](https://gspread.readthedocs.io/)

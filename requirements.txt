@@ -1,4 +1,4 @@
-PyQt6
+PyQt5
 cv2
 numpy
 gspread

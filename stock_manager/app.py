@@ -6,9 +6,9 @@ import asyncio
 from pathlib import Path
 from typing import override
 
-from PyQt6.QtGui import QCloseEvent, QFont
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QPushButton, QStackedWidget
-from PyQt6.uic import loadUi
+from PyQt5.QtGui import QCloseEvent, QFont
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QStackedWidget
+from PyQt5.uic import loadUi
 from qasync import asyncSlot
 
 import stock_manager
@@ -33,7 +33,7 @@ class App(QMainWindow):
         
         from stock_manager import DBUtils, Logger, ExportUtils
         
-        super(App, self).__init__()
+        super().__init__()
         
         self.log = Logger()
         self.db = DBUtils()
@@ -60,10 +60,9 @@ class App(QMainWindow):
             print(f'Failed To Load Main UI File: {e}')
             self.log.error_log(f'Failed To Load Main UI File: {e}')
             QMessageBox.critical(
-                    None,
+                    self,
                     'UI Failure',
-                    'Failed To Load Main UI File',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Load Main UI File'
             )
             raise SystemExit(1)
         
@@ -149,11 +148,11 @@ class App(QMainWindow):
                     self,
                     'Data Load Failure',
                     'Failed To Load Data From Database',
-                    QMessageBox.StandardButton.Ok,
-                    QMessageBox.StandardButton.Close
+                    QMessageBox.Ok,
+                    QMessageBox.Close
             )
             
-            if response == QMessageBox.StandardButton.Close:
+            if response == QMessageBox.Close:
                 raise SystemExit(1)
     
     def _on_page_changed(self) -> None:
@@ -169,8 +168,7 @@ class App(QMainWindow):
                 QMessageBox.critical(
                         self,
                         'QR Scanner Error',
-                        'Failed To Stop QR Scanner',
-                        QMessageBox.StandardButton.Ok
+                        'Failed To Stop QR Scanner'
                 )
         
         def bold_current_screen_button() -> None:
@@ -213,8 +211,7 @@ class App(QMainWindow):
                 *(
                     controller.update_table()
                     for controller in self.controllers.values()
-                    if isinstance(controller, stock_manager.AbstractController)
-                       and hasattr(controller, 'table')
+                    if isinstance(controller, stock_manager.AbstractController) and hasattr(controller, 'table')
                 )
         )
     

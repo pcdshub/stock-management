@@ -7,7 +7,7 @@ computation of totals and excess, and updating the database.
 
 from typing import override, TYPE_CHECKING
 
-from PyQt6.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
+from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 import stock_manager
 from .abstract import AbstractController
@@ -83,8 +83,7 @@ class Add(AbstractController):
             QMessageBox.critical(
                     self,
                     'Spinner Change Error',
-                    'Failed To Compute Spinner Data',
-                    QMessageBox.StandardButton.Ok
+                    'Failed To Compute Spinner Data'
             )
     
     def _clear_form(self) -> None:
@@ -137,8 +136,7 @@ class Add(AbstractController):
                     self,
                     'Empty Fields',
                     'Please Fill Out All Text Fields And '
-                    'At Least One Spinner Before Submitting Form',
-                    QMessageBox.StandardButton.Ok
+                    'At Least One Spinner Before Submitting Form'
             )
             return
         
@@ -168,11 +166,11 @@ class Add(AbstractController):
                 'Item Creation Confirmation',
                 f'Are You Sure You Want To Add {new_item.part_num} '
                 'To The Database?\n\nThis Item Can Be Removed Later.',
-                QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.No
+                QMessageBox.Yes,
+                QMessageBox.No
         )
         
-        if response == QMessageBox.StandardButton.No:
+        if response == QMessageBox.No:
             return
         
         self.app.all_items.append(new_item)
