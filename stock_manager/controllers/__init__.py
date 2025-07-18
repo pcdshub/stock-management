@@ -3,7 +3,7 @@
 from .abstract import AbstractController, AbstractScanner
 from .add import Add
 from .edit import Edit
-from .export import Export
+from .export import Export, QRGenerate
 from .finish import Finish
 from .remove import Remove
 from .scanner import ItemScanner, Login
@@ -20,4 +20,5 @@ __all__ = [
 	'Add',
 	'Edit',
 	'Remove',
+	'QRGenerate'
 ]

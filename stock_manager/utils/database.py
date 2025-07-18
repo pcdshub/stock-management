@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class DBUtils:
 	"""Utility class for interacting with a Google Sheets database."""
 	
-	def __init__(self):
+	def __init__(self) -> None:
 		"""
 		Initializes the Google Sheets client using credentials from a JSON keyfile.
 		
@@ -71,7 +71,7 @@ class DBUtils:
 			return self._client.worksheet('Parts').get_all_records()
 		except Exception as e:
 			print(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
-			self._log.error_log(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
+			self._log.error_log(f'Failed To Fetch All Data From {self._file_name}: {e}')
 			response = QMessageBox.critical(
 					None,
 					'Data Fetching Error',

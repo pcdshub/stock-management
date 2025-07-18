@@ -26,7 +26,7 @@
     <enum>QLayout::SetMaximumSize</enum>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
      </property>
@@ -50,6 +50,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+          <property name="focusPolicy">
+              <enum>Qt::ClickFocus</enum>
+          </property>
        <property name="styleSheet">
         <string notr="true">border: 1px solid black;
            border-radius: 12px;
@@ -61,6 +64,18 @@
        </property>
        <property name="placeholderText">
         <string>Search...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent;</string>
+       </property>
+       <property name="icon">
+        <iconset>
+            <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
+        </iconset>
        </property>
       </widget>
      </item>
@@ -180,6 +195,9 @@
          </item>
          <item>
           <widget class="QLineEdit" name="manufacturer">
+              <property name="focusPolicy">
+                  <enum>Qt::ClickFocus</enum>
+              </property>
            <property name="placeholderText">
             <string>Manufacturer...</string>
            </property>
@@ -194,6 +212,12 @@
            <pointsize>10</pointsize>
           </font>
          </property>
+            <property name="focusPolicy">
+                <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="tabChangesFocus">
+                <bool>true</bool>
+            </property>
          <property name="placeholderText">
           <string>Part Description...</string>
          </property>
@@ -287,6 +311,11 @@
        <property name="text">
         <string>Clear Form</string>
        </property>
+       <property name="icon">
+        <iconset>
+            <normaloff>../assets/icons/backspace.svg</normaloff>../assets/icons/backspace.svg
+        </iconset>
+       </property>
       </widget>
      </item>
      <item>
@@ -299,6 +328,11 @@
        </property>
        <property name="text">
         <string>Submit Change</string>
+       </property>
+       <property name="icon">
+        <iconset>
+            <normaloff>../assets/icons/edit.svg</normaloff>../assets/icons/edit.svg
+        </iconset>
        </property>
       </widget>
      </item>

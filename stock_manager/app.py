@@ -6,7 +6,6 @@ import asyncio
 from pathlib import Path
 from typing import override
 
-from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QCloseEvent, QFont
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QPushButton, QStackedWidget
 from PyQt6.uic import loadUi
@@ -32,31 +31,30 @@ class App(QMainWindow):
 		:raises SystemExit: If the main UI fails to load
 		"""
 		
-		from stock_manager import DBUtils, Logger, Edit, Export, Finish, Remove, ItemScanner, View, Add, Login, \
-			FileExports, QRGenerator
+		from stock_manager import DBUtils, Logger, ExportUtils
 		
 		super(App, self).__init__()
 		
 		self.log = Logger()
 		self.db = DBUtils()
-		self.file_exports = FileExports()
-		self.qr_generator = QRGenerator()
-		self.export = Export(self)
-		self.finish = Finish(self)
-		self.login = Login(self)
-		self.view = View(self)
-		self.item_scanner = ItemScanner(self)
-		self.add = Add(self)
-		self.edit = Edit(self)
-		self.remove = Remove(self)
+		self.export_utils = ExportUtils(self)
 		
-		self.user: str | None = None
+		self.controllers: dict[str, type[stock_manager.AbstractController]] = {
+			page.value.FILE_NAME: page.value.CONTROLLER
+			for page in stock_manager.Pages
+		}
+		
+		for name, cls in self.controllers.items():
+			setattr(self, name, cls(self))
+			self.controllers[name] = getattr(self, name)
+		
+		self.user = ''
 		self.all_items: list[Item] = []
 		self.screens: QStackedWidget | None = None
 		self.current_page: stock_manager.Pages | None = None
 		
 		try:
-			ui_path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
+			ui_path: Path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
 			loadUi(str(ui_path), self)
 		except Exception as e:
 			print(f'Failed To Load Main UI File: {e}')
@@ -69,31 +67,38 @@ class App(QMainWindow):
 			)
 			raise SystemExit(1)
 		
-		def handle_screens() -> None:
-			"""Add all page controllers to the stacked widget and connect page change events."""
-			
-			screens_to_add: list[stock_manager.AbstractController] = [
-				self.login, self.view, self.item_scanner, self.add,
-				self.edit, self.remove, self.export, self.finish
-			]
-			
-			for screen in screens_to_add:
-				self.screens.addWidget(screen)
-			
-			self.screens.currentChanged.connect(self._on_page_changed)
+		self.buttons: list[QPushButton] = [child for child in self.sideUI.children()]
 		
-		def handle_connections() -> None:
-			"""Connects sidebar buttons to the appropriate screen navigation actions."""
-			
-			self.view_btn.clicked.connect(self.view.to_page)
-			self.qr_btn.clicked.connect(self.item_scanner.to_page)
-			self.add_btn.clicked.connect(self.add.to_page)
-			self.edit_btn.clicked.connect(self.edit.to_page)
-			self.remove_btn.clicked.connect(self.remove.to_page)
-			self.exit_btn.clicked.connect(QCoreApplication.quit)
+		for screen in self.controllers.values():
+			self.screens.addWidget(screen)
 		
-		handle_screens()
-		handle_connections()
+		self.handle_connections()
+	
+	def handle_connections(self) -> None:
+		"""
+		Connects sidebar buttons to the appropriate screen
+		navigation actions and connects application shortcuts
+		to a method.
+		"""
+		
+		button: QPushButton
+		controller: stock_manager.AbstractController
+		enum: stock_manager.Pages
+		for button, controller, enum in zip(self.buttons[:-1], self.controllers.values(), stock_manager.Pages):
+			if not isinstance(button, QPushButton):
+				self.log_out_btn.clicked.connect(self.login.to_page)
+				continue
+			
+			button.clicked.connect(controller.to_page)
+			button.setShortcut(str(enum.value.PAGE_INDEX))
+		
+		self.screens.currentChanged.connect(self._on_page_changed)
+		self.actionToggle_Maximize.triggered.connect(self.toggle_maximize)
+		self.actionEscape_Maximize.triggered.connect(self.escape_maximize)
+		self.actionMinimize.triggered.connect(self.minimize)
+		self.actionSearch.triggered.connect(self.search)
+		self.actionLog_Out.triggered.connect(self.login.to_page)
+		self.actionClose_Application.triggered.connect(self.close)
 	
 	def run(self) -> None:
 		"""
@@ -154,22 +159,10 @@ class App(QMainWindow):
 	def _on_page_changed(self) -> None:
 		"""Update window title and manage QR scanner based on current screen."""
 		
-		from stock_manager import SIDEBAR_BUTTON_SIZE
-		
-		idx = self.screens.currentIndex()
-		username = f' - {self.user}' if self.user else ''
-		
-		try:
-			self.setWindowTitle(self.current_page.value.TITLE + ' | SLAC Inventory Management Application' + username)
-		except Exception as e:
-			print(f'Page Title Update Error: {e}')
-			self.log.warning_log(f'Error Updating Window Title With Current Page Title: {e}')
-			self.setWindowTitle('SLAC Inventory Management Application' + username)
-		
-		if self.item_scanner.camera_thread.running and \
+		if self.scanner.camera_thread.running and \
 				self.screens.currentIndex() != stock_manager.Pages.SCAN.value.PAGE_INDEX:
 			try:
-				self.item_scanner.stop_video()
+				self.scanner.stop_video()
 			except Exception as e:
 				print(f'Failed To Stop QR Scanner: {e}')
 				self.log.error_log(f'Failed To Stop QR Scanner: {e}')
@@ -182,7 +175,11 @@ class App(QMainWindow):
 		
 		def bold_current_screen_button() -> None:
 			"""Update sidebar buttons' font to indicate the currently active screen."""
+			
+			from stock_manager import SIDEBAR_BUTTON_SIZE
+			
 			buttons: list[QPushButton] = self.sideUI.children()[1:]  # exclude QVBox
+			idx = self.screens.currentIndex()
 			
 			active = QFont()
 			active.setPointSize(SIDEBAR_BUTTON_SIZE)
@@ -213,5 +210,48 @@ class App(QMainWindow):
 		"""
 		
 		await asyncio.gather(
-				*(controller.update_table() for controller in [self.view, self.edit, self.remove])
+				*(
+					controller.update_table()
+					for controller in self.controllers.values()
+					if isinstance(controller, stock_manager.AbstractController)
+					   and hasattr(controller, 'table')
+				)
 		)
+	
+	def toggle_maximize(self):
+		"""Toggles maximization of the application window."""
+		
+		if self.isMaximized():
+			self.showNormal()
+		else:
+			self.showMaximized()
+	
+	def escape_maximize(self):
+		"""Returns window to windowed state if application is maximized."""
+		
+		if self.isMaximized():
+			self.showNormal()
+	
+	def minimize(self):
+		"""Minimizes the application window to the taskbar."""
+		
+		self.showMinimized()
+	
+	def search(self):
+		"""
+		Focuses current page's search bar if one is present.
+		
+		If a search bar is not present, application navigates
+		to `view.ui` and focuses `search` there.
+		"""
+		
+		if not self.user:
+			return
+		
+		controller = self.controllers[self.current_page.value.FILE_NAME]
+		if hasattr(controller, 'search'):
+			controller.search.setFocus()
+			return
+		
+		self.view.to_page()
+		self.view.search.setFocus()
