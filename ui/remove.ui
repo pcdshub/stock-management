@@ -47,9 +47,9 @@
          <pointsize>14</pointsize>
         </font>
        </property>
-          <property name="focusPolicy">
-              <enum>Qt::ClickFocus</enum>
-          </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
        <property name="styleSheet">
         <string notr="true">border: 1px solid black;
          border-radius: 12px;
@@ -71,7 +71,7 @@
        </property>
        <property name="icon">
         <iconset>
-            <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
+         <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
         </iconset>
        </property>
       </widget>
