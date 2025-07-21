@@ -40,6 +40,20 @@ class Export(AbstractExporter):
         self.back_btn.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
         self.location_btn.clicked.connect(lambda: self.get_directory(self.location_btn))
         self.export_btn.clicked.connect(self.export)
+        
+        def handle_icons():
+            import qtawesome as qta
+            
+            qta.set_defaults(color='black')
+            self.file_icon.setIcon(qta.icon('fa5s.file-alt'))
+            self.folder_icon.setIcon(qta.icon('fa5s.folder-open'))
+            
+            qta.set_defaults(color='white')
+            self.back_btn.setIcon(qta.icon('fa5s.arrow-left'))
+            self.location_btn.setIcon(qta.icon('fa6s.folder-tree'))
+            self.export_btn.setIcon(qta.icon('fa5s.download'))
+        
+        handle_icons()
     
     @override
     def export(self) -> None:
@@ -102,10 +116,16 @@ class QRGenerate(AbstractExporter):
     
     @override
     def handle_connections(self) -> None:
+        import qtawesome as qta
+        
         self.search.textChanged.connect(self.filter_table)
         self.table.cellClicked.connect(self._on_cell_clicked)
         self.location_btn.clicked.connect(lambda: self.get_directory(self.location_btn))
         self.save_btn.clicked.connect(self.export)
+        
+        self.search_icon.setIcon(qta.icon('fa5s.search'))
+        self.location_btn.setIcon(qta.icon('fa6s.folder-tree'))
+        self.save_btn.setIcon(qta.icon('fa5s.download'))
     
     @override
     def export(self):

@@ -7,3 +7,4 @@ pathlib
 typing
 qasync
 qrcode
+qtawesome

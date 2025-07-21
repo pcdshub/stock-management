@@ -63,11 +63,6 @@
        <property name="text">
         <string>View</string>
        </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/grid.svg</normaloff>../assets/icons/grid.svg
-        </iconset>
-       </property>
       </widget>
      </item>
      <item>

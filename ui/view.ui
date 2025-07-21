@@ -65,14 +65,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="search_icon">
        <property name="styleSheet">
         <string notr="true">background-color: transparent;</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
-        </iconset>
        </property>
       </widget>
      </item>
@@ -186,11 +181,6 @@
        </property>
        <property name="text">
         <string>Export</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/export.svg</normaloff>../assets/icons/export.svg
-        </iconset>
        </property>
       </widget>
      </item>

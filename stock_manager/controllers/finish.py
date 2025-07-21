@@ -36,7 +36,10 @@ class Finish(AbstractController):
     
     @override
     def handle_connections(self) -> None:
+        import qtawesome as qta
+        
         self.pushButton.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
+        self.pushButton.setIcon(qta.icon('fa5s.table', color='white'))
     
     def set_text(self, title_txt: str) -> None:
         """

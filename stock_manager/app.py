@@ -114,6 +114,30 @@ class App(QMainWindow):
         self.actionSearch.triggered.connect(self.search)
         self.actionLog_Out.triggered.connect(self.login.to_page)
         self.actionClose_Application.triggered.connect(self.close)
+        
+        def handle_icons():
+            import qtawesome as qta
+            
+            qta.set_defaults(color='black')
+            
+            self.actionToggle_Maximize.setIcon(qta.icon('mdi.fullscreen'))
+            self.actionEscape_Maximize.setIcon(qta.icon('mdi.fullscreen-exit'))
+            self.actionMinimize.setIcon(qta.icon('fa5s.minus'))
+            self.actionSearch.setIcon(qta.icon('fa5s.search'))
+            self.actionLog_Out.setIcon(qta.icon('fa5s.sign-out-alt'))
+            self.actionClose_Application.setIcon(qta.icon('fa5s.power-off'))
+            
+            qta.set_defaults(color='white')
+            
+            self.view_btn.setIcon(qta.icon('fa5s.table'))
+            self.qr_btn.setIcon(qta.icon('fa5s.video'))
+            self.add_btn.setIcon(qta.icon('fa5s.plus-square'))
+            self.edit_btn.setIcon(qta.icon('fa5s.edit'))
+            self.remove_btn.setIcon(qta.icon('fa5s.minus-square'))
+            self.generate_btn.setIcon(qta.icon('fa5s.qrcode'))
+            self.log_out_btn.setIcon(qta.icon('fa5s.sign-out-alt', color='white'))
+        
+        handle_icons()
     
     def run(self) -> None:
         """

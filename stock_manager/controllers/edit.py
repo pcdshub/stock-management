@@ -50,6 +50,8 @@ class Edit(AbstractController):
     
     @override
     def handle_connections(self) -> None:
+        import qtawesome as qta
+        
         self.search.textChanged.connect(self.filter_table)
         self.table.cellClicked.connect(self._on_cell_clicked)
         self.clear_btn.clicked.connect(self._clear_form)
@@ -57,6 +59,13 @@ class Edit(AbstractController):
         
         for spinner in self._spinners:
             spinner.valueChanged.connect(self._on_spinner_change)
+        
+        self.search_icon.setIcon(qta.icon('fa5s.search'))
+        
+        qta.set_defaults(color='white')
+        
+        self.clear_btn.setIcon(qta.icon('fa5s.backspace'))
+        self.submit_btn.setIcon(qta.icon('fa5s.plus-square'))
     
     @staticmethod
     def _parse_field(text: str) -> int | str | None:

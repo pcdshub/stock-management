@@ -51,11 +51,18 @@ class Add(AbstractController):
     
     @override
     def handle_connections(self) -> None:
+        import qtawesome as qta
+        
         self.clear_btn.clicked.connect(self._clear_form)
         self.submit_btn.clicked.connect(self._submit_form)
         
         for spinner in self._spinners:
             spinner.valueChanged.connect(self._on_spinner_change)
+        
+        qta.set_defaults(color='white')
+        
+        self.clear_btn.setIcon(qta.icon('fa5s.backspace'))
+        self.submit_btn.setIcon(qta.icon('fa5s.plus-square'))
     
     def _on_spinner_change(self, _) -> None:
         """

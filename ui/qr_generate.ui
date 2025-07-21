@@ -28,7 +28,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,2,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetNoConstraint</enum>
        </property>
@@ -52,6 +52,11 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
          <property name="focusPolicy">
           <enum>Qt::ClickFocus</enum>
          </property>
@@ -70,14 +75,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="search_icon">
          <property name="styleSheet">
           <string notr="true">background-color: transparent;</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
-          </iconset>
          </property>
         </widget>
        </item>
@@ -243,11 +243,6 @@
          <property name="text">
           <string>Select</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/folder-tree.svg</normaloff>../assets/icons/folder-tree.svg
-          </iconset>
-         </property>
         </widget>
        </item>
        <item>
@@ -260,11 +255,6 @@
          </property>
          <property name="text">
           <string>Save QR Code</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/download.svg</normaloff>../assets/icons/download.svg
-          </iconset>
          </property>
         </widget>
        </item>
