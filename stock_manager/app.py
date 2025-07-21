@@ -31,7 +31,8 @@ class App(QMainWindow):
         :raises SystemExit: If the main UI fails to load
         """
         
-        from stock_manager import DBUtils, Logger, ExportUtils
+        from stock_manager import DBUtils, Logger, ExportUtils, Login, View, Add, Export, Edit, Remove, QRGenerate, \
+            Finish, ItemScanner
         
         super().__init__()
         
@@ -39,14 +40,22 @@ class App(QMainWindow):
         self.db = DBUtils()
         self.export_utils = ExportUtils(self)
         
-        self.controllers: dict[str, type[stock_manager.AbstractController]] = {
-            page.value.FILE_NAME: page.value.CONTROLLER
-            for page in stock_manager.Pages
-        }
+        self.login = Login(self)
+        self.view = View(self)
+        self.scanner = ItemScanner(self)
+        self.add = Add(self)
+        self.edit = Edit(self)
+        self.remove = Remove(self)
+        self.generate = QRGenerate(self)
+        self.export = Export(self)
+        self.finish = Finish(self)
         
-        for name, cls in self.controllers.items():
-            setattr(self, name, cls(self))
-            self.controllers[name] = getattr(self, name)
+        self.controllers: list[stock_manager.AbstractController] = [
+            self.view, self.scanner,
+            self.add, self.edit, self.remove,
+            self.generate, self.login,
+            self.export, self.finish
+        ]
         
         self.user = ''
         self.all_items: list[Item] = []
@@ -66,9 +75,17 @@ class App(QMainWindow):
             )
             raise SystemExit(1)
         
-        self.buttons: list[QPushButton] = [child for child in self.sideUI.children()]
+        self.buttons: list[QPushButton] = [
+            self.view_btn,
+            self.qr_btn,
+            self.add_btn,
+            self.edit_btn,
+            self.remove_btn,
+            self.generate_btn,
+            self.log_out_btn
+        ]
         
-        for screen in self.controllers.values():
+        for screen in self.controllers:
             self.screens.addWidget(screen)
         
         self.handle_connections()
@@ -83,9 +100,8 @@ class App(QMainWindow):
         button: QPushButton
         controller: stock_manager.AbstractController
         enum: stock_manager.Pages
-        for button, controller, enum in zip(self.buttons[:-1], self.controllers.values(), stock_manager.Pages):
+        for button, controller, enum in zip(self.buttons, self.controllers, stock_manager.Pages):
             if not isinstance(button, QPushButton):
-                self.log_out_btn.clicked.connect(self.login.to_page)
                 continue
             
             button.clicked.connect(controller.to_page)
@@ -176,7 +192,6 @@ class App(QMainWindow):
             
             from stock_manager import SIDEBAR_BUTTON_SIZE
             
-            buttons: list[QPushButton] = self.sideUI.children()[1:]  # exclude QVBox
             idx = self.screens.currentIndex()
             
             active = QFont()
@@ -187,7 +202,7 @@ class App(QMainWindow):
             
             i: int
             button: QPushButton
-            for i, button in enumerate(buttons, start=1):
+            for i, button in enumerate(self.buttons):
                 button.setFont(active if i == idx else inactive)
         
         bold_current_screen_button()
@@ -210,12 +225,12 @@ class App(QMainWindow):
         await asyncio.gather(
                 *(
                     controller.update_table()
-                    for controller in self.controllers.values()
+                    for controller in self.controllers
                     if isinstance(controller, stock_manager.AbstractController) and hasattr(controller, 'table')
                 )
         )
     
-    def toggle_maximize(self):
+    def toggle_maximize(self) -> None:
         """Toggles maximization of the application window."""
         
         if self.isMaximized():
@@ -223,18 +238,18 @@ class App(QMainWindow):
         else:
             self.showMaximized()
     
-    def escape_maximize(self):
+    def escape_maximize(self) -> None:
         """Returns window to windowed state if application is maximized."""
         
         if self.isMaximized():
             self.showNormal()
     
-    def minimize(self):
+    def minimize(self) -> None:
         """Minimizes the application window to the taskbar."""
         
         self.showMinimized()
     
-    def search(self):
+    def search(self) -> None:
         """
         Focuses current page's search bar if one is present.
         
@@ -245,7 +260,7 @@ class App(QMainWindow):
         if not self.user:
             return
         
-        controller = self.controllers[self.current_page.value.FILE_NAME]
+        controller = self.controllers[self.current_page.value.PAGE_INDEX]
         if hasattr(controller, 'search'):
             controller.search.setFocus()
             return
