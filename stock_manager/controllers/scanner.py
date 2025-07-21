@@ -10,6 +10,7 @@ parts of the application.
 from typing import override, TYPE_CHECKING
 
 import cv2
+import qtawesome as qta
 from numpy import ndarray
 from PyQt5.QtWidgets import QMessageBox
 from qasync import asyncSlot
@@ -45,6 +46,10 @@ class ItemScanner(AbstractScanner):
     def handle_connections(self) -> None:
         self.clear_btn.clicked.connect(self._clear_form)
         self.done_btn.clicked.connect(self._finish_form)
+        
+        qta.set_defaults(color='white')
+        self.clear_btn.setIcon(qta.icon('fa5s.backspace'))
+        self.done_btn.setIcon(qta.icon('fa5s.check-square'))
     
     @override
     @asyncSlot()
@@ -176,6 +181,8 @@ class Login(AbstractScanner):
     def handle_connections(self) -> None:
         self.login_btn.clicked.connect(self._login_clicked)
         self.username.returnPressed.connect(self._login_clicked)
+        
+        self.login_btn.setIcon(qta.icon('fa6s.right-to-bracket', color='white'))
     
     @override
     def to_page(self) -> None:

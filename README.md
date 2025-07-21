@@ -59,6 +59,7 @@ tool streamlines inventory tracking, integrates QR code scanning, and connects t
    - typing
    - qasync
    - qrcode
+   - qtawesome
 
 3. **Configure Your Google Sheet:**
     - Create or open a Google Sheets document that will act as your stock database.

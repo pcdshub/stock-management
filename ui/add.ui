@@ -347,11 +347,6 @@
        <property name="text">
         <string>Clear Form</string>
        </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/backspace.svg</normaloff>../assets/icons/backspace.svg
-        </iconset>
-       </property>
       </widget>
      </item>
      <item>
@@ -369,11 +364,6 @@
        </property>
        <property name="text">
         <string>Submit Item</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/add.svg</normaloff>../assets/icons/add.svg
-        </iconset>
        </property>
       </widget>
      </item>

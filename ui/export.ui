@@ -32,11 +32,6 @@
        <property name="text">
         <string>Back</string>
        </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/arrow-left.svg</normaloff>../assets/icons/arrow-left.svg
-        </iconset>
-       </property>
       </widget>
      </item>
      <item>
@@ -121,11 +116,6 @@
          <property name="text">
           <string>Select</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/folder-tree.svg</normaloff>../assets/icons/folder-tree.svg
-          </iconset>
-         </property>
         </widget>
        </item>
        <item row="0" column="3">
@@ -178,26 +168,16 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="file_icon">
          <property name="styleSheet">
           <string notr="true">background-color: transparent;</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/file.svg</normaloff>../assets/icons/file.svg
-          </iconset>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="folder_icon">
          <property name="styleSheet">
           <string notr="true">background-color: transparent;</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/folder.svg</normaloff>../assets/icons/folder.svg
-          </iconset>
          </property>
         </widget>
        </item>
@@ -242,11 +222,6 @@
        </property>
        <property name="text">
         <string>Export</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/download.svg</normaloff>../assets/icons/download.svg
-        </iconset>
        </property>
       </widget>
      </item>

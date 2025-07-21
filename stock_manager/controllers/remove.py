@@ -38,8 +38,12 @@ class Remove(AbstractController):
     
     @override
     def handle_connections(self) -> None:
+        import qtawesome as qta
+        
         self.search.textChanged.connect(self.filter_table)
         self.table.cellClicked.connect(self._on_cell_clicked)
+        
+        self.search_icon.setIcon(qta.icon('fa5s.search'))
     
     def _on_cell_clicked(self, row: int, _) -> None:
         """

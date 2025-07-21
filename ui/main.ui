@@ -105,11 +105,6 @@
          <property name="text">
           <string>View</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/grid.svg</normaloff>../assets/icons/grid.svg
-          </iconset>
-         </property>
         </widget>
        </item>
        <item>
@@ -127,11 +122,6 @@
          </property>
          <property name="text">
           <string>QR Scan</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/video.svg</normaloff>../assets/icons/video.svg
-          </iconset>
          </property>
         </widget>
        </item>
@@ -151,11 +141,6 @@
          <property name="text">
           <string>Add</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/add.svg</normaloff>../assets/icons/add.svg
-          </iconset>
-         </property>
         </widget>
        </item>
        <item>
@@ -173,11 +158,6 @@
          </property>
          <property name="text">
           <string>Edit</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/edit.svg</normaloff>../assets/icons/edit.svg
-          </iconset>
          </property>
         </widget>
        </item>
@@ -197,11 +177,6 @@
          <property name="text">
           <string>Remove</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/remove.svg</normaloff>../assets/icons/remove.svg
-          </iconset>
-         </property>
         </widget>
        </item>
        <item>
@@ -220,11 +195,6 @@
          <property name="text">
           <string>Generate QR</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/qr-code.svg</normaloff>../assets/icons/qr-code.svg
-          </iconset>
-         </property>
         </widget>
        </item>
        <item>
@@ -242,11 +212,6 @@
          </property>
          <property name="text">
           <string>Log Out</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>../assets/icons/log-out-white.svg</normaloff>../assets/icons/log-out-white.svg
-          </iconset>
          </property>
         </widget>
        </item>
@@ -283,11 +248,6 @@
    <addaction name="menuWindow_Options"/>
   </widget>
   <action name="actionToggle_Maximize">
-   <property name="icon">
-    <iconset>
-     <normaloff>../assets/icons/maximize.svg</normaloff>../assets/icons/maximize.svg
-    </iconset>
-   </property>
    <property name="text">
     <string>Toggle Maximize</string>
    </property>
@@ -296,11 +256,6 @@
    </property>
   </action>
   <action name="actionEscape_Maximize">
-   <property name="icon">
-    <iconset>
-     <normaloff>../assets/icons/unmaximize.svg</normaloff>../assets/icons/unmaximize.svg
-    </iconset>
-   </property>
    <property name="text">
     <string>Escape Maximize</string>
    </property>
@@ -309,11 +264,6 @@
    </property>
   </action>
   <action name="actionMinimize">
-   <property name="icon">
-    <iconset>
-     <normaloff>../assets/icons/minimize.svg</normaloff>../assets/icons/minimize.svg
-    </iconset>
-   </property>
    <property name="text">
     <string>Minimize</string>
    </property>
@@ -322,11 +272,6 @@
    </property>
   </action>
   <action name="actionSearch">
-   <property name="icon">
-    <iconset>
-     <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
-    </iconset>
-   </property>
    <property name="text">
     <string>Search</string>
    </property>
@@ -335,11 +280,6 @@
    </property>
   </action>
   <action name="actionLog_Out">
-   <property name="icon">
-    <iconset>
-     <normaloff>../assets/icons/log-out-black.svg</normaloff>../assets/icons/log-out-black.svg
-    </iconset>
-   </property>
    <property name="text">
     <string>Log Out</string>
    </property>
@@ -348,11 +288,6 @@
    </property>
   </action>
   <action name="actionClose_Application">
-   <property name="icon">
-    <iconset>
-     <normaloff>../assets/icons/off.svg</normaloff>../assets/icons/off.svg
-    </iconset>
-   </property>
    <property name="text">
     <string>Close Application</string>
    </property>

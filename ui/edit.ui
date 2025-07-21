@@ -50,6 +50,11 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::ClickFocus</enum>
        </property>
@@ -68,14 +73,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="search_icon">
        <property name="styleSheet">
         <string notr="true">background-color: transparent;</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/magnifying-glass.svg</normaloff>../assets/icons/magnifying-glass.svg
-        </iconset>
        </property>
       </widget>
      </item>
@@ -311,11 +311,6 @@
        <property name="text">
         <string>Clear Form</string>
        </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/backspace.svg</normaloff>../assets/icons/backspace.svg
-        </iconset>
-       </property>
       </widget>
      </item>
      <item>
@@ -328,11 +323,6 @@
        </property>
        <property name="text">
         <string>Submit Change</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../assets/icons/edit.svg</normaloff>../assets/icons/edit.svg
-        </iconset>
        </property>
       </widget>
      </item>

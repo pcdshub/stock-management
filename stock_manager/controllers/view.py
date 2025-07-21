@@ -34,5 +34,10 @@ class View(AbstractController):
     
     @override
     def handle_connections(self) -> None:
+        import qtawesome as qta
+        
         self.search.textChanged.connect(self.filter_table)
         self.export_btn.clicked.connect(lambda: self.app.export.to_page())  # keep as lambda because of connect()
+        
+        self.export_btn.setIcon(qta.icon('fa5s.file-export', color='white'))
+        self.search_icon.setIcon(qta.icon('fa5s.search'))

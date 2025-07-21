@@ -223,11 +223,6 @@
                 <property name="text">
                  <string>Login</string>
                 </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>../assets/icons/log-in.svg</normaloff>../assets/icons/log-in.svg
-                 </iconset>
-                </property>
                </widget>
               </item>
               <item>
