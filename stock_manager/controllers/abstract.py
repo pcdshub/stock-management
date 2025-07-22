@@ -12,14 +12,15 @@ from pathlib import Path
 from typing import override, TYPE_CHECKING
 
 from numpy import ndarray
-from PyQt5.QtCore import pyqtSignal, QThread
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QPushButton, QTableWidgetItem, QWidget
+from PyQt5.QtCore import pyqtSignal, QSortFilterProxyModel, Qt, QThread
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QMessageBox, QPushButton, QWidget
 from PyQt5.uic import loadUi
 
 import stock_manager
 
 if TYPE_CHECKING:
-    from stock_manager import App, Item
+    from stock_manager import App
 
 
 class CombinedMeta(type(QWidget), ABCMeta):
@@ -72,43 +73,11 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         """
         pass
     
-    def filter_table(self, text: str) -> None:
-        """
-        Filter the rows of a dynamically found QTableWidget to show only those matching the search text.
-        Only works if child controller has a QTableWidget object called 'table'.
-        
-        :param text: Search string to filter rows by. Only rows that contain this text will be shown.
-        """
-        
-        if not hasattr(self, 'table'):
-            QMessageBox.warning(
-                    self,
-                    'No Table Found',
-                    'No Table Object Found In Controller, '
-                    'Make Sure This Method Is Being Called In A Controller '
-                    'That Has A Table Object Called "Table".'
-            )
-            return
-        
-        if text == '':
-            for row in range(self.table.rowCount()):
-                self.table.setRowHidden(row, False)
-            return
-        
-        for row in range(self.table.rowCount()):
-            match = False
-            for col in range(self.table.columnCount()):
-                item = self.table.item(row, col)
-                if item and text.lower() in item.text().lower():
-                    match = True
-                    break
-            
-            self.table.setRowHidden(row, not match)
-    
     async def update_table(self) -> None:
         """
         Initializes the table widget with all inventory data from the database.
-        Only works if child controller has a QTableWidget object called 'table'.
+        Only works if child controller has a QTableView object called 'table'
+        and a QLineEdit named 'search'.
         """
         
         if not hasattr(self, 'table'):
@@ -122,13 +91,29 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             return
         
         all_data = self.app.all_items
-        self.table.setRowCount(len(all_data))
+        source_model = QStandardItemModel()
+        proxy_model = QSortFilterProxyModel()
         
-        row_num: int
-        item: 'Item'
-        for row_num, item in enumerate(all_data):
-            for col_num in range(len(item)):
-                self.table.setItem(row_num, col_num, QTableWidgetItem(str(item[col_num])))
+        source_model.setHorizontalHeaderLabels(self.database.get_headers() + ['Stock Status'])
+        for item in all_data:
+            items = [QStandardItem(str(value)) for value in item]
+            source_model.appendRow(items)
+        
+        proxy_model.setSourceModel(source_model)
+        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        proxy_model.setFilterKeyColumn(-1)
+        
+        self.table.setModel(proxy_model)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setDropIndicatorShown(False)
+        self.table.setDragDropOverwriteMode(False)
+        self.table.setAlternatingRowColors(True)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.setWordWrap(True)
+        self.table.setCornerButtonEnabled(False)
+        
+        self.search.textChanged.connect(proxy_model.setFilterFixedString)
     
     def to_page(self) -> None:
         """Navigate to this controller's page in the stacked widget."""

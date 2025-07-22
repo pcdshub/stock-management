@@ -58,9 +58,27 @@ class DBUtils:
             )
             raise SystemExit(1)
     
+    def get_headers(self) -> list[str]:
+        """
+        Retrieves the headers of the 'Parts' worksheet of the 'Stock Management Sheet'.
+        
+        :return: A list of strings containing the headers of the worksheet
+        """
+        
+        try:
+            return self._client.worksheet('Parts').row_values(1)
+        except Exception as e:
+            print(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
+            self._log.error_log(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
+            QMessageBox.critical(
+                    None,
+                    'Header Fetching Error',
+                    f'Failed To Fetch Sheet Headers From {self._file_name}.'
+            )
+    
     def get_all_data(self) -> list[dict[str, int | float | str]]:
         """
-        Retrieves all records from the first worksheet of the 'Stock Management Sheet'.
+        Retrieves all records from the 'Parts' worksheet of the 'Stock Management Sheet'.
         
         :return: List of dictionaries, each representing a row from the sheet.
         :raises SystemExit: If user chooses to close application after fetching data from Google Sheets fails.
@@ -85,7 +103,8 @@ class DBUtils:
     
     def get_all_users(self) -> set[str]:  # TODO: possibly make user objects out of data
         """
-        Retrieves a set of all users from the database.
+        Retrieves all records from the 'Users' worksheet of the 'Stock Management Sheet'
+        as a set.
         
         :return: A set of strings representing all the usernames in the database
         :raises SystemExit: If user fetch from database fails

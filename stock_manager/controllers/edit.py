@@ -7,6 +7,7 @@ including updating item details, validating user input, and saving changes to th
 
 from typing import override, TYPE_CHECKING
 
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 import stock_manager
@@ -52,8 +53,7 @@ class Edit(AbstractController):
     def handle_connections(self) -> None:
         import qtawesome as qta
         
-        self.search.textChanged.connect(self.filter_table)
-        self.table.cellClicked.connect(self._on_cell_clicked)
+        self.table.clicked.connect(self._on_cell_clicked)
         self.clear_btn.clicked.connect(self._clear_form)
         self.submit_btn.clicked.connect(self._submit_form)
         
@@ -82,19 +82,20 @@ class Edit(AbstractController):
             return int(text)
         return text
     
-    def _on_cell_clicked(self, row: int, _) -> None:
+    def _on_cell_clicked(self, index: QModelIndex) -> None:
         """
         Populate the edit form fields with data from the selected item when a table row is clicked.
         
-        :param row: The index of the clicked table row.
-        :param _: The column index (unused).
+        :param index: The index of the clicked table cell as a `QModelIndex`.
         """
         
+        row = index.row()
+        
+        self._selected_item = item = self.app.all_items[row]
+        self._total = item.total
+        self._excess = item.excess
+        
         try:
-            self._selected_item = item = self.app.all_items[row]
-            self._total = item.total
-            self._excess = item.excess
-            
             self.part_num.setText(str(item.part_num))
             self.manufacturer.setText(item.manufacturer)
             self.desc.setText(item.description)

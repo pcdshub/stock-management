@@ -3,6 +3,7 @@
 from typing import override, TYPE_CHECKING
 
 import numpy
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qrcode.image.base import BaseImage
@@ -118,8 +119,7 @@ class QRGenerate(AbstractExporter):
     def handle_connections(self) -> None:
         import qtawesome as qta
         
-        self.search.textChanged.connect(self.filter_table)
-        self.table.cellClicked.connect(self._on_cell_clicked)
+        self.table.clicked.connect(self._on_cell_clicked)
         self.location_btn.clicked.connect(lambda: self.get_directory(self.location_btn))
         self.save_btn.clicked.connect(self.export)
         
@@ -148,17 +148,18 @@ class QRGenerate(AbstractExporter):
                     'Failed To Download QR Code'
             )
     
-    def _on_cell_clicked(self, row: int, _) -> None:
+    def _on_cell_clicked(self, index: QModelIndex) -> None:
         """
         Generates and displays a QR code corresponding
         to the selected table item's part number.
         
-        :param row: The index of the clicked table row.
-        :param _: The column index (unused).
+        :param index: The index of the clicked table cell as a `QModelIndex`.
         """
         
+        row = index.row()
+        item = self.app.all_items[row]
+        
         try:
-            item = self.app.all_items[row]
             self._selected_qr = self.app.export_utils.create_code(item.part_num)
         except Exception as e:
             print(f'Failed To Get Selected Item QR Code: {e}')

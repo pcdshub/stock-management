@@ -7,6 +7,7 @@ Includes search filtering and confirmation dialogs for safe item removal.
 
 from typing import override, TYPE_CHECKING
 
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QMessageBox
 
 import stock_manager
@@ -40,20 +41,19 @@ class Remove(AbstractController):
     def handle_connections(self) -> None:
         import qtawesome as qta
         
-        self.search.textChanged.connect(self.filter_table)
-        self.table.cellClicked.connect(self._on_cell_clicked)
+        self.table.clicked.connect(self._on_cell_clicked)
         
         self.search_icon.setIcon(qta.icon('fa5s.search'))
     
-    def _on_cell_clicked(self, row: int, _) -> None:
+    def _on_cell_clicked(self, index: QModelIndex) -> None:
         """
         Confirms and deletes item after user confirmation
         when a table row is clicked.
         
-        :param row: The index of the clicked table row.
-        :param _: The column index (unused).
+        :param index: The index of the clicked table cell as a `QModelIndex`.
         """
         
+        row = index.row()
         selected_item = self.app.all_items[row]
         
         response = QMessageBox.warning(
