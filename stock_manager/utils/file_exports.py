@@ -1,3 +1,11 @@
+"""
+Export utilities for Stock Management Application.
+
+Provides ExportUtils for managing different types of
+data exportation for various application features.
+"""
+
+import logging
 import os
 from typing import TYPE_CHECKING
 
@@ -19,6 +27,7 @@ class ExportUtils:
         """
         
         self.instance = instance
+        self.logger = logging.getLogger()
     
     @staticmethod
     def _get_valid_name(ext: str, path: str) -> str:
@@ -70,7 +79,7 @@ class ExportUtils:
                     f.write(line[:-1] + '\n')
         except FileExistsError as e:
             print(f'That File Already Exists: {e}')
-            self.instance.log.error_log(f'File Already Exists Error: {e}')
+            self.logger.error(f'File Already Exists Error: {e}')
             QMessageBox.critical(
                     self.instance,
                     'File Exists Error',
@@ -79,7 +88,7 @@ class ExportUtils:
         except Exception as e:
             export_type = export_type.upper()
             print(f'Failed To Export Data To {export_type}: {e}')
-            self.instance.log.error_log(f'Failed To Export Data To {export_type}: {e}')
+            self.logger.error(f'Failed To Export Data To {export_type}: {e}')
             QMessageBox.critical(
                     self.instance,
                     f'{export_type} Export Error',
@@ -102,7 +111,7 @@ class ExportUtils:
             return qr.make_image()
         except Exception as e:
             print(f'Failed To Convert {part_num} To QR Image: {e}')
-            self.instance.log.error_log(f'Failed To Convert {part_num} To QR Image: {e}')
+            self.logger.error(f'Failed To Convert {part_num} To QR Image: {e}')
             QMessageBox.critical(
                     self.instance,
                     'QR Code Conversion Error',
@@ -121,7 +130,7 @@ class ExportUtils:
             qr_code.save(self._get_valid_name('png', path))
         except Exception as e:
             print(f'Failed To Export Image: {e}')
-            self.instance.log.error_log(f'Failed To Export To Image: {e}')
+            self.logger.error(f'Failed To Export To Image: {e}')
             QMessageBox.critical(
                     self.instance,
                     'QR Code Export Error',

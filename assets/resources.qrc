@@ -2,29 +2,4 @@
   <qresource prefix="images">
     <file>images/slac_logo.jpg</file>
   </qresource>
-  <qresource prefix="icons">
-    <file>icons/add.svg</file>
-    <file>icons/arrow-left.svg</file>
-    <file>icons/backspace.svg</file>
-    <file>icons/check.svg</file>
-    <file>icons/download.svg</file>
-    <file>icons/edit.svg</file>
-    <file>icons/export.svg</file>
-    <file>icons/file.svg</file>
-    <file>icons/folder.svg</file>
-    <file>icons/folder-tree.svg</file>
-    <file>icons/grid.svg</file>
-    <file>icons/log-in.svg</file>
-    <file>icons/log-out-black.svg</file>
-    <file>icons/log-out-white.svg</file>
-    <file>icons/magnifying-glass.svg</file>
-    <file>icons/maximize.svg</file>
-    <file>icons/minimize.svg</file>
-    <file>icons/off.svg</file>
-    <file>icons/qr-code.svg</file>
-    <file>icons/remove.svg</file>
-    <file>icons/trash.svg</file>
-    <file>icons/unmaximize.svg</file>
-    <file>icons/video.svg</file>
-  </qresource>
 </RCC>

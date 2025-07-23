@@ -36,7 +36,7 @@ class App(QMainWindow):
         
         super().__init__()
         
-        self.log = Logger()
+        self.logger = Logger()
         self.db = DBUtils()
         self.export_utils = ExportUtils(self)
         
@@ -67,7 +67,7 @@ class App(QMainWindow):
             loadUi(str(ui_path), self)
         except Exception as e:
             print(f'Failed To Load Main UI File: {e}')
-            self.log.error_log(f'Failed To Load Main UI File: {e}')
+            self.logger.error_log(f'Failed To Load Main UI File: {e}')
             QMessageBox.critical(
                     self,
                     'UI Failure',
@@ -147,7 +147,7 @@ class App(QMainWindow):
         and begins any asynchronous loading.
         """
         
-        self.log.info_log('App Started')
+        self.logger.info_log('App Started')
         self.login.to_page()
         self._on_page_changed()
         self._async_load()
@@ -183,7 +183,7 @@ class App(QMainWindow):
             await self.update_tables()
         except Exception as e:
             print(f'Error Loading Data Asynchronously: {e}')
-            self.log.error_log(f'Could not load data from database: {e}')
+            self.logger.error_log(f'Could not load data from database: {e}')
             response = QMessageBox.critical(
                     self,
                     'Data Load Failure',
@@ -204,7 +204,7 @@ class App(QMainWindow):
                 self.scanner.stop_video()
             except Exception as e:
                 print(f'Failed To Stop QR Scanner: {e}')
-                self.log.error_log(f'Failed To Stop QR Scanner: {e}')
+                self.logger.error_log(f'Failed To Stop QR Scanner: {e}')
                 QMessageBox.critical(
                         self,
                         'QR Scanner Error',
@@ -235,7 +235,7 @@ class App(QMainWindow):
     def closeEvent(self, event: QCloseEvent) -> None:
         """Handle the application close event and log exit."""
         
-        self.log.info_log('App Exited\n')
+        self.logger.info_log('App Exited\n')
         super().closeEvent(event)
     
     @asyncSlot()

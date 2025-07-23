@@ -7,6 +7,7 @@ application. Each abstract class provides required methods, common functionality
 or reusable connection logic for concrete page controllers.
 """
 
+import logging
 from abc import ABC, ABCMeta, abstractmethod
 from pathlib import Path
 from typing import override, TYPE_CHECKING
@@ -47,7 +48,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         super(AbstractController, self).__init__()
         
         self.app = app
-        self.logger = app.log
+        self.logger = logging.getLogger()
         self.database = app.db
         self.PAGE_NAME: stock_manager.Pages | None = None
         
@@ -56,7 +57,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             loadUi(str(ui_path), self)
         except Exception as e:
             print(f'Failed To Load {file_name}.ui File: {e}')
-            self.logger.error_log(f'Failed To Load {file_name}.ui File: {e}')
+            self.logger.error(f'Failed To Load {file_name}.ui File: {e}')
             QMessageBox.critical(
                     self,
                     f'{file_name}.ui Failure',
@@ -132,7 +133,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             )
         except Exception as e:
             print(f'Page Title Update Error: {e}')
-            self.logger.warning_log(f'Error Updating Window Title With Current Page Title: {e}')
+            self.logger.warning(f'Error Updating Window Title With Current Page Title: {e}')
             self.setWindowTitle('SLAC Inventory Management Application' + username)
 
 
@@ -154,7 +155,7 @@ class AbstractScanner(AbstractController):
         """
         
         super().__init__(file_name, app)
-        self.camera_thread = self._CameraThread(self)
+        self.camera_thread = self._CameraThread()
     
     @override
     def to_page(self) -> None:
@@ -164,7 +165,7 @@ class AbstractScanner(AbstractController):
             self.start_video()
         except Exception as e:
             print(f'Failed To Start QR Scanner: {e}')
-            self.logger.error_log(f'Failed To Start QR Scanner: {e}')
+            self.logger.error(f'Failed To Start QR Scanner: {e}')
             QMessageBox.critical(
                     self,
                     'QR Scanner Error',
@@ -188,7 +189,7 @@ class AbstractScanner(AbstractController):
             self.camera_thread.start()
         except Exception as e:
             print(f'Error Starting Camera Thread: {e}')
-            self.logger.error_log(f'Error Starting Camera Thread: {e}')
+            self.logger.error(f'Error Starting Camera Thread: {e}')
             QMessageBox.critical(
                     self,
                     'Camera Failure',
@@ -223,7 +224,7 @@ class AbstractScanner(AbstractController):
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         except Exception as e:
             print(f'Failed To Convert Frame Color: {e}')
-            self.logger.warning_log(f'Failed To Convert Frame Color: {e}')
+            self.logger.warning(f'Failed To Convert Frame Color: {e}')
             QMessageBox.warning(
                     self,
                     'Color Conversion Error',
@@ -239,7 +240,7 @@ class AbstractScanner(AbstractController):
             self.video_lbl.setPixmap(QPixmap.fromImage(q_img))
         except Exception as e:
             print(f'Failed To Update Video Label: {e}')
-            self.logger.error_log(f'Failed To Update Video Label: {e}')
+            self.logger.error(f'Failed To Update Video Label: {e}')
             QMessageBox.critical(
                     self,
                     'Video Label Failure',
@@ -268,17 +269,16 @@ class AbstractScanner(AbstractController):
         
         frame_ready = pyqtSignal(object)
         
-        def __init__(self, outer_instance: AbstractController, parent=None):
+        def __init__(self, parent=None):
             """
             Initialize the camera thread.
             
-            :param outer_instance: Reference to the outer controller to access logging.
             :param parent: Parent Qt object.
             """
             
             super().__init__(parent)
             self.running = False
-            self._logger = outer_instance.logger
+            self._logger = logging.getLogger()
         
         @override
         def run(self) -> None:
@@ -296,7 +296,7 @@ class AbstractScanner(AbstractController):
             self.running = True
             cap = VideoCapture(0)
             if not cap.isOpened():
-                self._logger.error_log('Could Not Access Camera')
+                self._logger.error('Could Not Access Camera')
                 print('Could Not Access Camera')
                 return
             
@@ -307,7 +307,7 @@ class AbstractScanner(AbstractController):
                     continue
                 
                 print('Failed To Read Frame From Camera')
-                self._logger.error_log('Failed To Read Frame From Camera')
+                self._logger.error('Failed To Read Frame From Camera')
             cap.release()
         
         def stop(self) -> None:
@@ -355,7 +355,7 @@ class AbstractExporter(AbstractController):
                 button.setText(f'...{response.split("/")[-1]}' if len(response) > 6 else response)
         except Exception as e:
             print(f'Directory Selection Failure: {e}')
-            self.logger.error_log(f'Directory Selection Failure: {e}')
+            self.logger.error(f'Directory Selection Failure: {e}')
             response = QMessageBox.critical(
                     self,
                     'Directory Selection Failure',
