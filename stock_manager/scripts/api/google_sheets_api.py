@@ -1,5 +1,5 @@
 import gspread
-from gspread import Spreadsheet, Worksheet
+from gspread import Client, Spreadsheet, Worksheet
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -7,10 +7,13 @@ def main():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
     
     credentials = ServiceAccountCredentials.from_json_keyfile_name('../../../assets/gs_credentials.json')
-    client: Spreadsheet = gspread.authorize(credentials).open('Stock Management Sheet')
+    client: Client = gspread.authorize(credentials)
+    # client.del_spreadsheet('Stock Management Sheet')
+    client: Spreadsheet = client.open('Common Stock')
     sheet = client.worksheet('Users')
+    read_sheet(sheet)
     # create_sheet(client)
-    update_sheet(sheet)
+    # update_sheet(sheet)
 
 
 # read_sheet(sheet)
