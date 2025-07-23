@@ -30,8 +30,6 @@ class DBUtils:
         :raises SystemExit: If the database fails to load
         """
         
-        from .logger import Logger
-        
         base_dir = Path(__file__).resolve().parent.parent.parent
         credentials_path = os.path.join(base_dir, 'assets', 'gs_credentials.json')
         
@@ -49,8 +47,7 @@ class DBUtils:
                     str(credentials_path),
                     scope
             )
-            self._file_name = 'Stock Management Sheet'
-            self._client: Spreadsheet = gspread.authorize(credentials).open(self._file_name)
+            self._client: Spreadsheet = gspread.authorize(credentials).open(stock_manager.GS_FILE_NAME)
         except Exception as e:
             print(f'Failed To Connect To Database: {e}')
             self._log.error(f'Failed To Connect To Database: {e}')
@@ -169,7 +166,7 @@ class DBUtils:
                             continue
                     except Exception as e:
                         print(f'Error Editing "{item.part_num}" In Database: {e}')
-                        self._log.error_log(f'Error Editing "{item.part_num}" In Database: {e}')
+                        self._log.error(f'Error Editing "{item.part_num}" In Database: {e}')
                         QMessageBox.critical(
                                 None,
                                 'Database Edit Item Error',
@@ -190,7 +187,7 @@ class DBUtils:
                             continue
                     except Exception as e:
                         print(f'Error Deleting "{item.part_num}" From Database: {e}')
-                        self._log.error_log(f'Error Deleting "{item.part_num}" From Database: {e}')
+                        self._log.error(f'Error Deleting "{item.part_num}" From Database: {e}')
                         QMessageBox.critical(
                                 None,
                                 'Database Delete Item Error',

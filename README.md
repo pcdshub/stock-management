@@ -63,6 +63,7 @@ tool streamlines inventory tracking, integrates QR code scanning, and connects t
 
 3. **Configure Your Google Sheet:**
     - Create or open a Google Sheets document that will act as your stock database.
+    - Name the file and change `contants.py` -> `GS_FILE_NAME` to match the file name.
     - Make sure your sheet includes two separate tabs (worksheets):
         - One named "Parts" — this should store all inventory items, quantities, and related details.
         - One named "Users" — this should store usernames for access control, logging, or tracking who checks out stock.

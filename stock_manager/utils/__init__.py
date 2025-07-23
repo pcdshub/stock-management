@@ -20,5 +20,6 @@ __all__ = [
     'DatabaseUpdateType',
     'total_equation',
     'excess_equation',
-    'SIDEBAR_BUTTON_SIZE'
+    'SIDEBAR_BUTTON_SIZE',
+    'GS_FILE_NAME'
 ]

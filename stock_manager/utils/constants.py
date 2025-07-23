@@ -33,3 +33,4 @@ def excess_equation(total: int, b750_minimum: int, b757_minimum: int) -> int:
 
 
 SIDEBAR_BUTTON_SIZE = 14
+GS_FILE_NAME = 'Common Stock'
