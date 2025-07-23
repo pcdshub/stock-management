@@ -4,6 +4,7 @@ Database utilities for Stock Management Application.
 Provides DBUtils for connecting to and getting/setting data from/to Google Sheets.
 """
 
+import logging
 import os.path
 from pathlib import Path
 from typing import Iterable, TYPE_CHECKING
@@ -12,6 +13,8 @@ import gspread
 from gspread import Cell, Spreadsheet, Worksheet
 from oauth2client.service_account import ServiceAccountCredentials
 from PyQt5.QtWidgets import QMessageBox
+
+import stock_manager
 
 if TYPE_CHECKING:
     from stock_manager import Item, DatabaseUpdateType
@@ -39,18 +42,18 @@ class DBUtils:
             'https://www.googleapis.com/auth/drive'
         ]
         
+        self._log = logging.getLogger()
+        
         try:
             credentials: ServiceAccountCredentials = ServiceAccountCredentials.from_json_keyfile_name(
                     str(credentials_path),
                     scope
             )
-            
-            self._log = Logger()
             self._file_name = 'Stock Management Sheet'
             self._client: Spreadsheet = gspread.authorize(credentials).open(self._file_name)
         except Exception as e:
             print(f'Failed To Connect To Database: {e}')
-            Logger().error_log(f'Failed To Connect To Database: {e}')
+            self._log.error(f'Failed To Connect To Database: {e}')
             QMessageBox.critical(
                     None,
                     'Database Connection Failure',
@@ -69,7 +72,7 @@ class DBUtils:
             return self._client.worksheet('Parts').row_values(1)
         except Exception as e:
             print(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
-            self._log.error_log(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
+            self._log.error(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
             QMessageBox.critical(
                     None,
                     'Header Fetching Error',
@@ -88,7 +91,7 @@ class DBUtils:
             return self._client.worksheet('Parts').get_all_records()
         except Exception as e:
             print(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
-            self._log.error_log(f'Failed To Fetch All Data From {self._file_name}: {e}')
+            self._log.error(f'Failed To Fetch All Data From {self._file_name}: {e}')
             response = QMessageBox.critical(
                     None,
                     'Data Fetching Error',
@@ -117,7 +120,7 @@ class DBUtils:
             }
         except Exception as e:
             print(f'Failed To Get All Users From {self._file_name}: {e}')
-            self._log.error_log(f'Failed To Get All Users From {self._file_name}: {e}')
+            self._log.error(f'Failed To Get All Users From {self._file_name}: {e}')
             QMessageBox.critical(
                     None,
                     'User Fetch Error',

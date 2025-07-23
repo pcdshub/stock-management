@@ -81,7 +81,7 @@ class Export(AbstractExporter):
                     )
         except Exception as e:
             print(f'Export Failed: {e}')
-            self.logger.error_log(f'Export Failed: {e}')
+            self.logger.error(f'Export Failed: {e}')
             response = QMessageBox.critical(
                     self,
                     'Export Failure',
@@ -141,7 +141,7 @@ class QRGenerate(AbstractExporter):
             self.app.export_utils.save_code(self._selected_qr, self.path)
         except Exception as e:
             print(f'Failed To Save QR Code To File: {e}')
-            self.logger.error_log(f'Failed To Save QR Code To File: {e}')
+            self.logger.error(f'Failed To Save QR Code To File: {e}')
             QMessageBox.critical(
                     self,
                     'QR Code Download Failure',
@@ -163,7 +163,7 @@ class QRGenerate(AbstractExporter):
             self._selected_qr = self.app.export_utils.create_code(item.part_num)
         except Exception as e:
             print(f'Failed To Get Selected Item QR Code: {e}')
-            self.logger.error_log(f'Failed To Get Selected Item QR Code: {e}')
+            self.logger.error(f'Failed To Get Selected Item QR Code: {e}')
             QMessageBox.critical(
                     self,
                     'Item QR Code Creation Failure',
@@ -180,7 +180,7 @@ class QRGenerate(AbstractExporter):
             self.qr_lbl.setPixmap(QPixmap.fromImage(q_img))
         except Exception as e:
             print(f'Failed To Update QR Label: {e}')
-            self.logger.error_log(f'Failed To Update QR Label: {e}')
+            self.logger.error(f'Failed To Update QR Label: {e}')
             QMessageBox.critical(
                     self,
                     'QR Label Failure',

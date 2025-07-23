@@ -65,17 +65,17 @@ class ItemScanner(AbstractScanner):
         if not data or data in [item.part_num for item in self._items]:
             return
         
-        self.logger.info_log(f'{self.app.user} Scanned Item QR Code: {data}')
+        self.logger.info(f'{self.app.user} Scanned Item QR Code: {data}')
         
         for item in self.app.all_items:
             if data == item.part_num:
                 self._items.append(item)
-                self.logger.info_log(f'{self.app.user} Added {data} To Items List')
+                self.logger.info(f'{self.app.user} Added {data} To Items List')
                 self.items_list.append(f'<ul><li>{data}</li></ul>')
                 return
         
         print(f'Item QR Code Not Recognized: "{data}"')
-        self.logger.info_log(f'Item QR Code Not Recognized: "{data}"')
+        self.logger.info(f'Item QR Code Not Recognized: "{data}"')
         QMessageBox.information(
                 self,
                 'Unknown QR Code',
@@ -85,7 +85,7 @@ class ItemScanner(AbstractScanner):
     def _clear_form(self) -> None:
         """Clears all fields in the scanner UI form and resets the scanned item list."""
         
-        self.logger.info_log(f'{self.app.user} Cleared Items List')
+        self.logger.info(f'{self.app.user} Cleared Items List')
         self._items.clear()
         self.items_list.clear()
     
@@ -143,7 +143,7 @@ class ItemScanner(AbstractScanner):
             self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, self._items)
         except Exception as e:
             print(f'Item(s) Could Not Be Subtracted From Database: {e}')
-            self.logger.error_log(f'Item(s) Could Not Be Subtracted From Database: {e}')
+            self.logger.error(f'Item(s) Could Not Be Subtracted From Database: {e}')
             self.app.finish.set_text('An Error Occurred, Item(s) Could Not Be Subtracted From Database.')
         else:
             length = len(self._items)
@@ -151,7 +151,7 @@ class ItemScanner(AbstractScanner):
                     f'{"1 item has" if length == 1 else f"{length} items have"} '
                     f'successfully been subtracted from database.'
             )
-            self.logger.info_log(f'{self.app.user} Checked Out Items: {string_items}')
+            self.logger.info(f'{self.app.user} Checked Out Items: {string_items}')
             self._clear_form()
         finally:
             self.app.finish.to_page()
@@ -192,7 +192,7 @@ class Login(AbstractScanner):
         user = self.app.user
         if user:
             print(f'User Logged Out As: {user}')
-            self.logger.info_log(f'User Logged Out As: {user}')
+            self.logger.info(f'User Logged Out As: {user}')
             self.app.user = ''
         super().to_page()
     
@@ -209,14 +209,14 @@ class Login(AbstractScanner):
         if not data or self.app.user:
             return
         
-        self.logger.info_log(f'QR Code Scanned: {data}')
+        self.logger.info(f'QR Code Scanned: {data}')
         
         if data in self._users_list:
             self._finish_login(data)
             return
         
         print(f'QR Code Not Recognized: "{data}"')
-        self.logger.info_log(f'QR Code Not Recognized: "{data}"')
+        self.logger.info(f'QR Code Not Recognized: "{data}"')
         QMessageBox.information(
                 self,
                 'Unknown QR Code',
@@ -241,7 +241,7 @@ class Login(AbstractScanner):
             return
         
         print(f'Username Not Recognized: "{text}"')
-        self.logger.info_log(f'Username Not Recognized: "{text}"')
+        self.logger.info(f'Username Not Recognized: "{text}"')
         QMessageBox.information(
                 self,
                 'Unknown Username Entered',
@@ -261,7 +261,7 @@ class Login(AbstractScanner):
         
         self.app.user = username
         print(f'User Logged In As: {username}')
-        self.logger.info_log(f'User Logged In As: {username}')
+        self.logger.info(f'User Logged In As: {username}')
         self.app.view.to_page()
         self.stop_video()
         self.username.clear()
