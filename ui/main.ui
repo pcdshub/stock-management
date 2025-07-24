@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="windowModality">
-   <enum>Qt::NonModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,15 +22,28 @@
     <height>500</height>
    </size>
   </property>
-  <property name="windowTitle">
-   <string>main</string>
-  </property>
   <property name="windowIcon">
    <iconset>
     <normaloff>../assets/images/slac_logo.jpg</normaloff>../assets/images/slac_logo.jpg</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">QPushButton, QComboBox {
+    background-color: rgb(170, 0, 0);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    }
+
+    QPushButton:hover, QComboBox:hover {
+    background-color: rgb(160, 0, 0);
+    color: grey;
+    }
+
+    QPushButton:pressed, QComboBox:pressed {
+    background-color: rgb(120, 0, 0);
+    }
+   </string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -52,14 +62,29 @@
        <string notr="true">#sideUI {
         background-color: rgb(170, 0, 0);
         }
-        [cssClass=&quot;active&quot;] {
-        font-weight: bold;
-        }
+
         QPushButton {
-        border-radius: 15;
+        border: 2px solid black;
+        border-radius: 12px;
+        background: qlineargradient(
+        x1:0, y1:0, x2:1, y2:1,
+        stop:0 rgba(255, 255, 255, 0.2),
+        stop:1 rgba(0, 0, 0, 0.2)
+        );
+        color: white;
+        padding: 12px 24px;
         }
+
         QPushButton:hover {
+        padding-top: 8px;
+        padding-bottom: 16px;
         color: grey;
+        }
+
+        QPushButton:pressed {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        color: darkgrey;
         }
        </string>
       </property>
@@ -67,7 +92,7 @@
        <item>
         <widget class="QPushButton" name="view_btn">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -85,7 +110,7 @@
        <item>
         <widget class="QPushButton" name="qr_btn">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -103,7 +128,7 @@
        <item>
         <widget class="QPushButton" name="add_btn">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -121,7 +146,7 @@
        <item>
         <widget class="QPushButton" name="edit_btn">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -139,7 +164,7 @@
        <item>
         <widget class="QPushButton" name="remove_btn">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -155,9 +180,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="exit_btn">
+        <widget class="QPushButton" name="generate_btn">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -168,7 +193,25 @@
           </font>
          </property>
          <property name="text">
-          <string>Exit</string>
+          <string>Generate QR</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="log_out_btn">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Log Out</string>
          </property>
         </widget>
        </item>
@@ -180,7 +223,81 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1280</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuWindow_Options">
+    <property name="title">
+     <string>Shortcuts</string>
+    </property>
+    <addaction name="actionToggle_Maximize"/>
+    <addaction name="actionEscape_Maximize"/>
+    <addaction name="actionMinimize"/>
+    <addaction name="separator"/>
+    <addaction name="actionSearch"/>
+    <addaction name="separator"/>
+    <addaction name="actionLog_Out"/>
+    <addaction name="actionClose_Application"/>
+   </widget>
+   <addaction name="menuWindow_Options"/>
+  </widget>
+  <action name="actionToggle_Maximize">
+   <property name="text">
+    <string>Toggle Maximize</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
+  <action name="actionEscape_Maximize">
+   <property name="text">
+    <string>Escape Maximize</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionMinimize">
+   <property name="text">
+    <string>Minimize</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="text">
+    <string>Search</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionLog_Out">
+   <property name="text">
+    <string>Log Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionClose_Application">
+   <property name="text">
+    <string>Close Application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../assets/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

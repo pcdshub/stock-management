@@ -26,7 +26,7 @@
     <enum>QLayout::SetMaximumSize</enum>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
      </property>
@@ -50,6 +50,14 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
        <property name="styleSheet">
         <string notr="true">border: 1px solid black;
            border-radius: 12px;
@@ -64,87 +72,17 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="search_icon">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent;</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
-    <widget class="QTableWidget" name="table">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="showGrid">
-      <bool>true</bool>
-     </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <column>
-      <property name="text">
-       <string>Part #</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Manufacturer</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Description</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Total</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>B750 Stock</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>B757 Stock</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Minimum</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Excess</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Sallie's Min</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Stock Status</string>
-      </property>
-     </column>
-    </widget>
+    <widget class="QTableView" name="table"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="3,1">
@@ -180,6 +118,9 @@
          </item>
          <item>
           <widget class="QLineEdit" name="manufacturer">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
            <property name="placeholderText">
             <string>Manufacturer...</string>
            </property>
@@ -193,6 +134,12 @@
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="tabChangesFocus">
+          <bool>true</bool>
          </property>
          <property name="placeholderText">
           <string>Part Description...</string>
