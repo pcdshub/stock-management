@@ -15,12 +15,14 @@ requirements:
     - setuptools
   run:
     - python >=3.9
-    - pyqt6
+    - pyqt5
     - opencv
     - numpy
     - pathlib
     - typing
     - qasync
+    - qrcode
+    - qtawesome
 
 test:
   imports:

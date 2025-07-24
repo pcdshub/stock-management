@@ -12,36 +12,39 @@ import stock_manager
 from .abstract import AbstractController
 
 if TYPE_CHECKING:
-	from stock_manager import App
+    from stock_manager import App
 
 
 class Finish(AbstractController):
-	"""
-	Controller for the 'Finish' screen in the SLAC-LCLS Stock Management application.
-	
-	Handles a completion screen and provides navigation back to `view.ui` and `view.py`.
-	"""
-	
-	def __init__(self, app: 'App'):
-		"""
-		Initialize the Finish screen controller.
-		
-		:param app: The main application instance.
-		"""
-		
-		page = stock_manager.Pages.FINISHED
-		super().__init__(page.value.FILE_NAME, app)
-		self.PAGE_NAME = page
-		self.handle_connections()
-	
-	@override
-	def handle_connections(self) -> None:
-		self.pushButton.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
-	
-	def set_text(self, title_txt: str) -> None:
-		"""
-		Set the text label on the Finish screen.
-		
-		:param title_txt: Text to display in the label.
-		"""
-		self.label.setText(title_txt)
+    """
+    Controller for the 'Finish' screen in the SLAC-LCLS Stock Management application.
+    
+    Handles a completion screen and provides navigation back to `view.ui` and `view.py`.
+    """
+    
+    def __init__(self, app: 'App'):
+        """
+        Initialize the Finish screen controller.
+        
+        :param app: The main application instance.
+        """
+        
+        page = stock_manager.Pages.FINISHED
+        super().__init__(page.value.FILE_NAME, app)
+        self.PAGE_NAME = page
+        self.handle_connections()
+    
+    @override
+    def handle_connections(self) -> None:
+        import qtawesome as qta
+        
+        self.pushButton.clicked.connect(lambda: self.app.view.to_page())  # keep as lambda because of connect()
+        self.pushButton.setIcon(qta.icon('fa5s.table', color='white'))
+    
+    def set_text(self, title_txt: str) -> None:
+        """
+        Set the text label on the Finish screen.
+        
+        :param title_txt: Text to display in the label.
+        """
+        self.label.setText(title_txt)

@@ -1,4 +1,4 @@
-PyQt6
+PyQt5
 cv2
 numpy
 gspread
@@ -6,3 +6,5 @@ oauth2client
 pathlib
 typing
 qasync
+qrcode
+qtawesome
