@@ -106,13 +106,16 @@ class Add(AbstractController):
         for spinner in self._spinners:
             spinner.setValue(0)
     
-    def _submit_form(self) -> None:
+    def _submit_form(self) -> bool:
         """
         Validate the form and submit a new stock item.
         
         Checks that all required text fields are filled and at least one
         spinner has a value. Adds the item to the database, updates tables,
         and clears the form.
+        
+        :return: `True` if form is chosen to be submitted or not submitted
+        successfully, `False` if any issues occur.
         """
         
         def empty_fields_check() -> bool:
@@ -145,7 +148,7 @@ class Add(AbstractController):
                     'Please Fill Out All Text Fields And '
                     'At Least One Spinner Before Submitting Form'
             )
-            return
+            return False
         
         new_item = stock_manager.Item(
                 self.part_num.text(),
@@ -166,7 +169,7 @@ class Add(AbstractController):
                     f'"{new_item.part_num}" Already Exists In The Database, '
                     'Please Make A New Item That Does Not Already Exist.'
             )
-            return
+            return False
         
         response = QMessageBox.information(
                 self,
@@ -178,7 +181,7 @@ class Add(AbstractController):
         )
         
         if response == QMessageBox.No:
-            return
+            return True
         
         self.app.all_items.append(new_item)
         self.logger.info(f'{self.app.user} Added Item To Database: {new_item.part_num}')
@@ -188,3 +191,5 @@ class Add(AbstractController):
         
         self.app.finish.set_text(f'Successfully Added {new_item.part_num} To The Database')
         self.app.finish.to_page()
+        
+        return True

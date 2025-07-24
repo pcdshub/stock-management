@@ -130,12 +130,13 @@ class DBUtils:
             self,
             update_type: 'DatabaseUpdateType',
             changelist: Iterable['Item'] | 'Item'
-    ) -> None:
+    ) -> bool:
         """
         Update the database with the latest changes
         
         :param update_type: The type of database update as a `DatabaseUpdateType` enum (e.g. `ADD`, `EDIT`, `REMOVE`)
         :param changelist: An iterable list of items to repeat the same process or a single item
+        :return: `True` if process completed successfully, `False` if otherwise
         """
         
         from stock_manager import DatabaseUpdateType
@@ -157,6 +158,7 @@ class DBUtils:
                                 'Database Add Item Error',
                                 f'Error Adding "{item.part_num}" To Database.'
                         )
+                        return False
                 case DatabaseUpdateType.EDIT:
                     try:
                         cell: Cell | None = sheet.find(item.part_num)
@@ -172,6 +174,7 @@ class DBUtils:
                                 'Database Edit Item Error',
                                 f'Error Editing "{item.part_num}" In Database.'
                         )
+                        return False
                     else:
                         QMessageBox.warning(
                                 None,
@@ -193,6 +196,7 @@ class DBUtils:
                                 'Database Delete Item Error',
                                 f'Error Deleting "{item.part_num}" From Database.'
                         )
+                        return False
                     else:
                         QMessageBox.warning(
                                 None,
@@ -207,3 +211,6 @@ class DBUtils:
                             f'Unknown Database Update Type: "{unknown}", '
                             'Only Use stock_manager.DatabaseUpdateType Enums When Updating Database'
                     )
+                    return False
+        
+        return True

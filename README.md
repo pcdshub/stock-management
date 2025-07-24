@@ -60,6 +60,8 @@ tool streamlines inventory tracking, integrates QR code scanning, and connects t
    - qasync
    - qrcode
    - qtawesome
+   - pytest
+   - pytest-qt
 
 3. **Configure Your Google Sheet:**
     - Create or open a Google Sheets document that will act as your stock database.

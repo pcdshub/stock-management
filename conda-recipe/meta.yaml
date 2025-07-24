@@ -23,6 +23,8 @@ requirements:
     - qasync
     - qrcode
     - qtawesome
+    - pytest
+    - pytest-qt
 
 test:
   imports:

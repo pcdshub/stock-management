@@ -53,17 +53,25 @@ class ItemScanner(AbstractScanner):
     
     @override
     @asyncSlot()
-    async def check_for_qr(self, frame: ndarray) -> None:
+    async def check_for_qr(self, frame: ndarray) -> bool:
         """
         Scans the current frame for an item QR code, adding it to an
         internal list to be used when submitting a form and updating the UI.
         
         :param frame: Current video frame as a numpy ndarray.
+        :return: True if the QR code scanned is successfully added to the
+        scanned items list or is already in the scanned items list, False
+        if no QR code is detected or if the scanned QR code is not recognized
+        in the database.
         """
         
         data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
-        if not data or data in [item.part_num for item in self._items]:
-            return
+        
+        if not data:
+            return False
+        
+        if data in [item.part_num for item in self._items]:
+            return True
         
         self.logger.info(f'{self.app.user} Scanned Item QR Code: {data}')
         
@@ -72,7 +80,7 @@ class ItemScanner(AbstractScanner):
                 self._items.append(item)
                 self.logger.info(f'{self.app.user} Added {data} To Items List')
                 self.items_list.append(f'<ul><li>{data}</li></ul>')
-                return
+                return True
         
         print(f'Item QR Code Not Recognized: "{data}"')
         self.logger.info(f'Item QR Code Not Recognized: "{data}"')
@@ -81,6 +89,7 @@ class ItemScanner(AbstractScanner):
                 'Unknown QR Code',
                 'QR Code Not Recognized In Database'
         )
+        return False
     
     def _clear_form(self) -> None:
         """Clears all fields in the scanner UI form and resets the scanned item list."""
@@ -198,22 +207,25 @@ class Login(AbstractScanner):
     
     @override
     @asyncSlot()
-    async def check_for_qr(self, frame: ndarray) -> None:
+    async def check_for_qr(self, frame: ndarray) -> bool:
         """
         Scans the current frame for a user QR code, logging them in if valid.
         
         :param frame: Current video frame as a numpy ndarray.
+        :return: True if the QR code scanned is valid and the user can
+        be logged in, False if no QR code is detected or if the scanned
+        QR code is not recognized in the database.
         """
         
         data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
         if not data or self.app.user:
-            return
+            return False
         
         self.logger.info(f'QR Code Scanned: {data}')
         
         if data in self._users_list:
             self._finish_login(data)
-            return
+            return True
         
         print(f'QR Code Not Recognized: "{data}"')
         self.logger.info(f'QR Code Not Recognized: "{data}"')
@@ -222,6 +234,7 @@ class Login(AbstractScanner):
                 'Unknown QR Code',
                 'QR Code Not Recognized In Database'
         )
+        return False
     
     def _login_clicked(self) -> None:
         """Checks if the user entered a valid username and logs them in if valid."""

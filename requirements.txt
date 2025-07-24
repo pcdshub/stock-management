@@ -8,3 +8,5 @@ typing
 qasync
 qrcode
 qtawesome
+pytest
+pytest-qt

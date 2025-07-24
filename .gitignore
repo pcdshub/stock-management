@@ -15,3 +15,6 @@ ui_*.py
 app.log
 TODO.txt
 thoughts.txt
+*_export*
+!/test/assets/test_image*
+!/test/assets/txt_export.txt

@@ -74,11 +74,14 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         """
         pass
     
-    async def update_table(self) -> None:
+    async def update_table(self) -> bool:
         """
         Initializes the table widget with all inventory data from the database.
         Only works if child controller has a QTableView object called 'table'
         and a QLineEdit named 'search'.
+        
+        :return: `True` if table is updated successfully or
+        object does not have a table, `False` if a failure occurs.
         """
         
         if not hasattr(self, 'table'):
@@ -89,7 +92,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
                     'Make Sure This Method Is Being Called In A Controller '
                     'That Has A Table Object Called "Table".'
             )
-            return
+            return True
         
         all_data = self.app.all_items
         source_model = QStandardItemModel()
@@ -100,21 +103,32 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             items = [QStandardItem(str(value)) for value in item]
             source_model.appendRow(items)
         
-        proxy_model.setSourceModel(source_model)
-        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        proxy_model.setFilterKeyColumn(-1)
-        
-        self.table.setModel(proxy_model)
-        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setDropIndicatorShown(False)
-        self.table.setDragDropOverwriteMode(False)
-        self.table.setAlternatingRowColors(True)
-        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.table.setWordWrap(True)
-        self.table.setCornerButtonEnabled(False)
-        
-        self.search.textChanged.connect(proxy_model.setFilterFixedString)
+        try:
+            proxy_model.setSourceModel(source_model)
+            proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+            proxy_model.setFilterKeyColumn(-1)
+            
+            self.table.setModel(proxy_model)
+            self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.table.setDropIndicatorShown(False)
+            self.table.setDragDropOverwriteMode(False)
+            self.table.setAlternatingRowColors(True)
+            self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+            self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.table.setWordWrap(True)
+            self.table.setCornerButtonEnabled(False)
+            
+            self.search.textChanged.connect(proxy_model.setFilterFixedString)
+            return True
+        except Exception as e:
+            print(f'Error Updating Table: {e}')
+            self.logger.error(f'Error Updating Table: {e}')
+            QMessageBox.warning(
+                    self,
+                    'Table Update Error',
+                    'Failed To Update Table, Please Try Again.'
+            )
+            return False
     
     def to_page(self) -> None:
         """Navigate to this controller's page in the stacked widget."""
@@ -174,19 +188,20 @@ class AbstractScanner(AbstractController):
         finally:
             super().to_page()
     
-    def start_video(self) -> None:
+    def start_video(self) -> bool:
         """
         Start the camera thread and begin capturing video frames.
 
         Connects the thread’s signal to the frame processor.
+        
+        :return: `True` if camera is started successfully, `False` if otherwise.
         """
         
-        if self.camera_thread.running:
-            return
-        
         try:
-            self.camera_thread.frame_ready.connect(self.process_frame)
-            self.camera_thread.start()
+            if not self.camera_thread.running:
+                self.camera_thread.frame_ready.connect(self.process_frame)
+                self.camera_thread.start()
+            return True
         except Exception as e:
             print(f'Error Starting Camera Thread: {e}')
             self.logger.error(f'Error Starting Camera Thread: {e}')
@@ -195,18 +210,32 @@ class AbstractScanner(AbstractController):
                     'Camera Failure',
                     'Failed To Start Camera'
             )
+            return False
     
-    def stop_video(self) -> None:
+    def stop_video(self) -> bool:
         """
         Stop the camera thread and release resources.
 
         Ensures the camera thread is properly stopped when
         leaving the scanner page.
+        
+        :return: `True` if camera is stopped successfully, `False` if otherwise.
         """
         
-        if self.camera_thread.running:
-            self.camera_thread.stop()
-            self.camera_thread.wait()
+        try:
+            if self.camera_thread.running:
+                self.camera_thread.stop()
+                self.camera_thread.wait()
+            return True
+        except Exception as e:
+            print(f'Error Stopping Camera Thread: {e}')
+            self.logger.error(f'Error Stopping Camera Thread: {e}')
+            QMessageBox.critical(
+                    self,
+                    'Camera Failure',
+                    'Failed To Stop Camera'
+            )
+            return False
     
     def process_frame(self, frame: ndarray) -> None:
         """
@@ -305,9 +334,7 @@ class AbstractScanner(AbstractController):
                 if worked:
                     self.frame_ready.emit(frame)
                     continue
-                
-                print('Failed To Read Frame From Camera')
-                self._logger.error('Failed To Read Frame From Camera')
+            
             cap.release()
         
         def stop(self) -> None:
@@ -335,7 +362,7 @@ class AbstractExporter(AbstractController):
         super().__init__(file_name, app)
         self.path = str(Path(__file__).resolve().parent.parent.parent / 'exports')
     
-    def get_directory(self, button: QPushButton = None) -> None:
+    def get_directory(self, button: QPushButton) -> None:
         """
         Open a dialog to select the export directory and update the UI.
         
@@ -365,7 +392,7 @@ class AbstractExporter(AbstractController):
             )
             
             if response == QMessageBox.Retry:
-                self.get_directory()
+                self.get_directory(button)
     
     @abstractmethod
     def export(self) -> None:

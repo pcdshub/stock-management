@@ -56,12 +56,13 @@ class ExportUtils:
         pass  # TODO: add pdf generation
     
     @asyncSlot()
-    async def sv_export(self, export_type: str, path: str) -> None:
+    async def sv_export(self, export_type: str, path: str) -> bool:
         """
         Asynchronously exports current data to a delimited text file (CSV, TSV, PSV).
         
         :param export_type: The file extension as the value (str) of an ExportType enum.
         :param path: The directory to create file in.
+        :return: `True` if file is created and written to successfully, `False` if otherwise
         """
         
         delimiter = {
@@ -70,6 +71,10 @@ class ExportUtils:
             'psv': '|'
         }.get(export_type)
         
+        if not delimiter:
+            print(f'Cannot Call sv_export() With Type: "{export_type}"')
+            return False
+        
         try:
             with open(self._get_valid_name(export_type, path), 'x') as f:
                 for i, item in enumerate(self.instance.all_items):
@@ -77,6 +82,7 @@ class ExportUtils:
                     for var in item:
                         line += (str(var) if var else '') + delimiter
                     f.write(line[:-1] + '\n')
+            return True
         except FileExistsError as e:
             print(f'That File Already Exists: {e}')
             self.logger.error(f'File Already Exists Error: {e}')
@@ -85,6 +91,7 @@ class ExportUtils:
                     'File Exists Error',
                     'That File Already Exists, Try Changing File Types'
             )
+            return False
         except Exception as e:
             export_type = export_type.upper()
             print(f'Failed To Export Data To {export_type}: {e}')
@@ -94,6 +101,7 @@ class ExportUtils:
                     f'{export_type} Export Error',
                     f'Failed To Export Data To {export_type}, Try Changing File Types'
             )
+            return False
     
     def create_code(self, part_num: str) -> BaseImage:
         """
@@ -118,16 +126,18 @@ class ExportUtils:
                     f'Failed To Convert {part_num} To QR Image'
             )
     
-    def save_code(self, qr_code: BaseImage, path: str) -> None:
+    def save_code(self, qr_code: BaseImage, path: str) -> bool:
         """
         Save a QR code image to a specified file path in `.png` format.
         
         :param qr_code: The QR code image to save.
         :param path: The desired file path for saving the image.
+        :return: `True` if QR code is saved successfully, `False` if otherwise.
         """
         
         try:
             qr_code.save(self._get_valid_name('png', path))
+            return True
         except Exception as e:
             print(f'Failed To Export Image: {e}')
             self.logger.error(f'Failed To Export To Image: {e}')
@@ -136,3 +146,4 @@ class ExportUtils:
                     'QR Code Export Error',
                     'Failed To Export QR Image'
             )
+            return False
