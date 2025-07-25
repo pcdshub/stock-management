@@ -5,18 +5,25 @@ Initializes the Qt Application and launches the main application window.
 """
 
 import asyncio
+import sys
 
 from PyQt5.QtWidgets import QApplication
 from qasync import QEventLoop
 
 from stock_manager import App
+from .cli import build_commands, entry_point
 
 
 def main():
     """Start the Qt application and show the main window."""
     
+    args = build_commands()
+    
+    if not entry_point(args):
+        return
+    
     # try:
-    app = QApplication([])  # TODO: if command line arguments are used, swap [] for sys.argv
+    app = QApplication(sys.argv)
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
     window = App()
