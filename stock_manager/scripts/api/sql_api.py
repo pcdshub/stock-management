@@ -20,7 +20,7 @@ cursor: MySQLCursorAbstract = db.cursor()
 #     print(result)
 
 
-def init_database():
+def init_items_database():
     def fetch_gs_rows() -> list[dict[str, int | float | str]]:
         from oauth2client.service_account import ServiceAccountCredentials
         from gspread import Client
@@ -64,4 +64,30 @@ def init_database():
     cursor.executemany(sql, parse_values())
     db.commit()
 
-# init_database()
+
+def init_users_database():
+    def fetch_gs_rows() -> list[dict[str, str]]:
+        from oauth2client.service_account import ServiceAccountCredentials
+        from gspread import Client
+        import gspread
+        from gspread import Spreadsheet
+        
+        credentials = ServiceAccountCredentials.from_json_keyfile_name('../../../assets/gs_credentials.json')
+        client: Client = gspread.authorize(credentials)
+        client: Spreadsheet = client.open('Common Stock')
+        sheet = client.worksheet('Users')
+        records: list[dict[str, str]] = sheet.get_all_records()
+        return records
+    
+    sql = 'insert into users (username) value (%s);'
+    items: list[str] = []
+    for row in fetch_gs_rows():
+        item = list(row.values())[0]
+        if item and isinstance(item, str):
+            items.append(item)
+    cursor.executemany(sql, [(item,) for item in items])
+    db.commit()
+
+
+# init_items_database()
+init_users_database()
