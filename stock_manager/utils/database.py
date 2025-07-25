@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Iterable, TYPE_CHECKING
 
 import gspread
+import mysql.connector
 from gspread import Cell, Spreadsheet, Worksheet
+from mysql.connector.abstracts import MySQLConnectionAbstract, MySQLCursorAbstract
 from oauth2client.service_account import ServiceAccountCredentials
 from PyQt5.QtWidgets import QMessageBox
 
@@ -48,6 +50,14 @@ class DBUtils:
                     scope
             )
             self._client: Spreadsheet = gspread.authorize(credentials).open(stock_manager.GS_FILE_NAME)
+            
+            self._db: MySQLConnectionAbstract = mysql.connector.connect(
+                    host='localhost',
+                    user='root',
+                    password='password',
+                    database='common_stock'
+            )
+            self._cursor: MySQLCursorAbstract = self._db.cursor(dictionary=True)
         except Exception as e:
             print(f'Failed To Connect To Database: {e}')
             self._log.error(f'Failed To Connect To Database: {e}')
@@ -68,15 +78,15 @@ class DBUtils:
         try:
             return self._client.worksheet('Parts').row_values(1)
         except Exception as e:
-            print(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
-            self._log.error(f'Failed To Fetch Sheet Headers From {self._file_name} Database: {e}')
+            print(f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME} Database: {e}')
+            self._log.error(f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME} Database: {e}')
             QMessageBox.critical(
                     None,
                     'Header Fetching Error',
-                    f'Failed To Fetch Sheet Headers From {self._file_name}.'
+                    f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME}.'
             )
     
-    def get_all_data(self) -> list[dict[str, int | float | str]]:
+    def get_all_data(self) -> list[dict[str, int | float | str | None]]:
         """
         Retrieves all records from the 'Parts' worksheet of the 'Stock Management Sheet'.
         
@@ -85,14 +95,21 @@ class DBUtils:
         """
         
         try:
-            return self._client.worksheet('Parts').get_all_records()
+            sql = ('select part_num, manufacturer, description, total, '
+                   'stock_b750, stock_b757, minimum, excess, minimum_sallie, '
+                   'stock_status from inventory_items;')
+            self._cursor.execute(sql)
+            results: list[dict[str, int | str | None]] = self._cursor.fetchall()
+            return results
+            
+            # return self._client.worksheet('Parts').get_all_records()
         except Exception as e:
-            print(f'Failed To Fetch All Data From {self._file_name} Database: {e}')
-            self._log.error(f'Failed To Fetch All Data From {self._file_name}: {e}')
+            print(f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME} Database: {e}')
+            self._log.error(f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME}: {e}')
             response = QMessageBox.critical(
                     None,
                     'Data Fetching Error',
-                    f'Failed To Fetch All Data From {self._file_name}.\n\n'
+                    f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME}.\n\n'
                     'Continue To Application?',
                     QMessageBox.Yes,
                     QMessageBox.Close
@@ -101,7 +118,7 @@ class DBUtils:
             if response == QMessageBox.Close:
                 raise SystemExit(1)
     
-    def get_all_users(self) -> set[str]:  # TODO: possibly make user objects out of data
+    def get_all_users(self) -> set[str]:
         """
         Retrieves all records from the 'Users' worksheet of the 'Stock Management Sheet'
         as a set.
@@ -111,13 +128,17 @@ class DBUtils:
         """
         
         try:
-            return {
-                str(user)
-                for user in self._client.worksheet('Users').col_values(1)
-            }
+            self._cursor.execute('select * from users;')
+            results: list[dict[str, str]] = self._cursor.fetchall()
+            return {next(iter(result.values())) for result in results}
+            
+            # return {
+            #     str(user)
+            #     for user in self._client.worksheet('Users').col_values(1)
+            # }
         except Exception as e:
-            print(f'Failed To Get All Users From {self._file_name}: {e}')
-            self._log.error(f'Failed To Get All Users From {self._file_name}: {e}')
+            print(f'Failed To Get All Users From {stock_manager.GS_FILE_NAME}: {e}')
+            self._log.error(f'Failed To Get All Users From {stock_manager.GS_FILE_NAME}: {e}')
             QMessageBox.critical(
                     None,
                     'User Fetch Error',
@@ -132,7 +153,7 @@ class DBUtils:
             changelist: Iterable['Item'] | 'Item'
     ) -> bool:
         """
-        Update the database with the latest changes
+        Update both the Google Sheet and SQL database with the latest changes.
         
         :param update_type: The type of database update as a `DatabaseUpdateType` enum (e.g. `ADD`, `EDIT`, `REMOVE`)
         :param changelist: An iterable list of items to repeat the same process or a single item
@@ -146,13 +167,20 @@ class DBUtils:
             changelist = [changelist]
         
         for item in changelist:
+            vals: list[str | int | None] = [value for value in item]
             match update_type:
                 case DatabaseUpdateType.ADD:
                     try:
+                        sql = ('insert into inventory_items '
+                               '(part_num, manufacturer, description, '
+                               'total, stock_b750, stock_b757, minimum, '
+                               'excess, minimum_sallie, stock_status) '
+                               'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);')
+                        
                         sheet.append_row([value for value in item])
                     except Exception as e:
                         print(f'Error Adding "{item.part_num}" To Database: {e}')
-                        self._log.error_log(f'Error Adding "{item.part_num}" To Database: {e}')
+                        self._log.error(f'Error Adding "{item.part_num}" To Database: {e}')
                         QMessageBox.critical(
                                 None,
                                 'Database Add Item Error',
@@ -161,11 +189,16 @@ class DBUtils:
                         return False
                 case DatabaseUpdateType.EDIT:
                     try:
+                        sql = ('update inventory_items '
+                               'set manufacturer = %s, description = %s, total = %s, '
+                               'stock_b750 = %s, stock_b757 = %s, minimum = %s, excess = %s, '
+                               'minimum_sallie = %s, stock_status = %s where part_num = %s;')
+                        vals = vals[1:] + [item.part_num]
+                        
                         cell: Cell | None = sheet.find(item.part_num)
                         if cell:
                             for i, value in enumerate(item):
                                 sheet.update_cell(cell.row, i + 1, value)
-                            continue
                     except Exception as e:
                         print(f'Error Editing "{item.part_num}" In Database: {e}')
                         self._log.error(f'Error Editing "{item.part_num}" In Database: {e}')
@@ -175,19 +208,17 @@ class DBUtils:
                                 f'Error Editing "{item.part_num}" In Database.'
                         )
                         return False
-                    else:
-                        QMessageBox.warning(
-                                None,
-                                'Database Update Item Warning',
-                                f'Cannot Update Item: "{item.part_num}" '
-                                f'Because It Does Not Exist In Database'
-                        )
                 case DatabaseUpdateType.REMOVE:
                     try:
+                        sql = ('delete from inventory_items '
+                               'where part_num = %s and manufacturer = %s and '
+                               'description = %s and total = %s and stock_b750 = %s and '
+                               'stock_b757 = %s and minimum = %s and excess = %s and '
+                               'minimum_sallie = %s and stock_status = %s;')
+                        
                         cell: Cell | None = sheet.find(item.part_num)
                         if cell:
                             sheet.delete_rows(cell.row)
-                            continue
                     except Exception as e:
                         print(f'Error Deleting "{item.part_num}" From Database: {e}')
                         self._log.error(f'Error Deleting "{item.part_num}" From Database: {e}')
@@ -197,20 +228,17 @@ class DBUtils:
                                 f'Error Deleting "{item.part_num}" From Database.'
                         )
                         return False
-                    else:
-                        QMessageBox.warning(
-                                None,
-                                'Database Delete Item Warning',
-                                f'Cannot Delete Item: "{item.part_num}" '
-                                f'Because It Does Not Exist In Database'
-                        )
                 case _ as unknown:
+                    print(f'Unknown Database Update Type: "{unknown}"')
                     QMessageBox.critical(
                             None,
                             'Unknown Database Update Type',
                             f'Unknown Database Update Type: "{unknown}", '
-                            'Only Use stock_manager.DatabaseUpdateType Enums When Updating Database'
+                            'Only Use stock_manager.DatabaseUpdateType Enums When Updating The Database.'
                     )
                     return False
+            
+            self._cursor.execute(sql, vals)
         
+        self._db.commit()
         return True

@@ -10,3 +10,4 @@ qrcode
 qtawesome
 pytest
 pytest-qt
+mysql

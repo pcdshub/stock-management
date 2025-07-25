@@ -25,6 +25,7 @@ requirements:
     - qtawesome
     - pytest
     - pytest-qt
+    - mysql
 
 test:
   imports:

@@ -2,8 +2,9 @@
 
 # SLAC-LCLS Stock Management
 
-An application for managing inventory and stock for the SLAC National Accelerator Laboratory's LCLS division. This 
-tool streamlines inventory tracking, integrates QR code scanning, and connects to Google Sheets for lightweight, cloud-based data storage.
+An application for managing inventory and stock for the SLAC National Accelerator Laboratory's LCLS division. This
+tool streamlines inventory tracking, integrates QR code scanning, and connects to Google Sheets for lightweight,
+cloud-based data storage.
 
 ---
 
@@ -35,7 +36,8 @@ tool streamlines inventory tracking, integrates QR code scanning, and connects t
 
 - Python 3.10 or newer
 - [pip](https://pip.pypa.io/en/stable/) (Python package manager)
-- Google Cloud service account with access to [Google Sheets API](https://developers.google.com/sheets/api/quickstart/python)
+- Google Cloud service account with access
+  to [Google Sheets API](https://developers.google.com/sheets/api/quickstart/python)
 
 ### Installation
 
@@ -50,28 +52,30 @@ tool streamlines inventory tracking, integrates QR code scanning, and connects t
    pip install -r requirements.txt
    ```
    Main dependencies include:
-    - PyQt5
-   - opencv-python
-   - numpy
-   - gspread
-   - oauth2client
-   - pathlib
-   - typing
-   - qasync
-   - qrcode
-   - qtawesome
-   - pytest
-   - pytest-qt
+	- PyQt5
+	- opencv-python
+	- numpy
+	- gspread
+	- oauth2client
+	- pathlib
+	- typing
+	- qasync
+	- qrcode
+	- qtawesome
+	- pytest
+	- pytest-qt
+	- mysql
 
 3. **Configure Your Google Sheet:**
-    - Create or open a Google Sheets document that will act as your stock database.
-    - Name the file and change `contants.py` -> `GS_FILE_NAME` to match the file name.
-    - Make sure your sheet includes two separate tabs (worksheets):
-        - One named "Parts" — this should store all inventory items, quantities, and related details.
-        - One named "Users" — this should store usernames for access control, logging, or tracking who checks out stock.
-   - Follow [these instructions](https://gspread.readthedocs.io/en/latest/oauth2.html) to create a Google Cloud service account and download the `gs_credentials.json` key.
-   - Share your Google Sheet (e.g., "Stock Management Sheet") with the service account email in your credentials file.
-   - Place `gs_credentials.json` in the `assets/` directory.
+	- Create or open a Google Sheets document that will act as your stock database.
+	- Name the file and change `contants.py` -> `GS_FILE_NAME` to match the file name.
+	- Make sure your sheet includes two separate tabs (worksheets):
+		- One named "Parts" — this should store all inventory items, quantities, and related details.
+		- One named "Users" — this should store usernames for access control, logging, or tracking who checks out stock.
+	- Follow [these instructions](https://gspread.readthedocs.io/en/latest/oauth2.html) to create a Google Cloud service
+	  account and download the `gs_credentials.json` key.
+	- Share your Google Sheet (e.g., "Stock Management Sheet") with the service account email in your credentials file.
+	- Place `gs_credentials.json` in the `assets/` directory.
 
 4. **Run the application:**
    ```bash
@@ -147,6 +151,14 @@ stock-management/
 │   └── ...
 │
 ├── exports/                # Default Exports Location
+│   └── ...
+│
+├── dumps/                  # Default SQL Backup Dumps Location
+│   ├── inventory/          # Inventory Database Dumps
+│   │   └── ...
+│   │
+│   ├── users/              # User Database Dumps
+│   │   └── ...
 │   └── ...
 │
 ├── setup.py
