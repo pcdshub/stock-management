@@ -242,3 +242,30 @@ class DBUtils:
         
         self._db.commit()
         return True
+    
+    def add_notification(self, part_num: str) -> bool:
+        """
+        Adds a notification entry to the Google Sheet Database In The `"Notifications"` tab.
+        
+        :param part_num: the item part number to be displayed in the notifications database
+        :return: `True` if database entry is added successfully, `False` if otherwise.
+        """
+        
+        try:
+            sheet: Worksheet = self._client.worksheet('Notifications')
+            cell: Cell | None = sheet.find(part_num)
+            if cell:
+                print(part_num, 'Already In Notifications Database')
+                return True
+            
+            sheet.append_row([part_num])
+            return True
+        except Exception as e:
+            print(f'Failed To Add Notification To Notifications Database: {e}')
+            self._log.error(f'Failed To Add Notification To Notifications Database: {e}')
+            QMessageBox.critical(
+                    None,
+                    'Database Notification Add Error',
+                    'Error Adding Notification To Notification Database'
+            )
+            return False
