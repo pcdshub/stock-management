@@ -37,6 +37,13 @@ class TestDatabase:
                         stock_manager.StockStatus.OUT_OF_STOCK.value
                 )]
         )
+    
+    def test_database_notification(self, database):
+        assert database.add_notification('test')
+    
+    def test_already_existing_notif(self, database):
+        database.add_notification('test')
+        assert database.add_notification('test')
 
 
 class TestLogger:
@@ -88,3 +95,7 @@ class TestExports:
     def test_save_qr_code(self, exports: ExportUtils):
         result: bool = exports.save_code(exports.create_code('test part'), './assets')
         assert result is True
+
+
+def test_email_sending():
+    assert stock_manager.send_email('Test Email', MagicMock())

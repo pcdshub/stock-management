@@ -222,3 +222,22 @@ class Edit(AbstractController):
         self.app.update_tables()
         self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
         self._clear_form()
+        
+        if new_item.stock_b750 + new_item.stock_b757 <= 0:
+            from datetime import datetime
+            msg = ('Hello,\n\n'
+                   
+                   'This is an automatic notification detailing that '
+                   'the following item has reached a total stock of 0:\n'
+                   f'\tItem: {new_item.part_num}\n'
+                   f'\tDescription: {new_item.description}\n'
+                   f'\tExcess Count: {new_item.excess} ({new_item.stock_status})\n'
+                   f'\tDate/Time: {datetime.now()}\n\n'
+                   
+                   'Please take any necessary action to reorder or restock.\n\n'
+                   
+                   'Best regards,\n'
+                   'Stock Management System')
+            
+            self.database.add_notification(new_item.part_num)
+            # stock_manager.send_email(msg, self)
