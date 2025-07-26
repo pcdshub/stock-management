@@ -86,7 +86,7 @@ class DBUtils:
                     f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME}.'
             )
     
-    def get_all_data(self) -> list[dict[str, int | float | str | None]]:
+    def get_all_data(self) -> list[dict[str, int | str | None]]:
         """
         Retrieves all records from the 'Parts' worksheet of the 'Stock Management Sheet'.
         

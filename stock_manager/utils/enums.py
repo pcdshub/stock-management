@@ -9,9 +9,6 @@ class Pages(Enum):
         FILE_NAME: str
         PAGE_INDEX: int
     
-    # TODO: Possibly add admin boolean
-    #  to only display certain pages
-    
     VIEW = _PageDetails('View', 'view', 0)
     SCAN = _PageDetails('QR Scanner', 'scanner', 1)
     ADD = _PageDetails('Add', 'add', 2)

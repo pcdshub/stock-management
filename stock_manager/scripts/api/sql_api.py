@@ -41,16 +41,16 @@ def init_items_database():
            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);')
     
     def parse_values() -> list[list[int | str | None]]:
-        vals: list[list[int | float | str]] = [
+        vals: list[list[int | float | str | None]] = [
             [value for value in record.values()]
             for record in fetch_gs_rows()
         ]
         
         i: int
-        items: list[int | float | str]
+        items: list[int | float | str | None]
         for i, items in enumerate(vals):
             j: int
-            val: int | float | str
+            val: int | float | str | None
             for j, val in enumerate(items):
                 if not val or val == '':
                     match j:

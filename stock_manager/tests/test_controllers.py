@@ -23,11 +23,11 @@ class TestAllControllers:
     def controller(self, request) -> AbstractController:
         return request.param(MagicMock())
     
-    def test_basic(self, qtbot: QtBot, controller: AbstractController):
+    def test_basic(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
     
     @pytest.mark.asyncio
-    async def test_update_table(self, qtbot: QtBot, controller: AbstractController):
+    async def test_update_table(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
         
         if not hasattr(controller, 'table'):
@@ -35,7 +35,7 @@ class TestAllControllers:
         
         assert await controller.update_table() is True
     
-    def test_to_page(self, qtbot: QtBot, controller: AbstractController):
+    def test_to_page(self, qtbot: QtBot, controller):
         if isinstance(controller, AbstractScanner):
             pytest.skip('AbstractScanners Raise No Errors But Lots Of Warnings When Switching Pages')
         qtbot.addWidget(controller)
@@ -52,7 +52,7 @@ class TestScanners:
         scanner_controller.database = DBUtils()
         return scanner_controller
     
-    def test_video(self, qtbot: QtBot, scanner: AbstractScanner):
+    def test_video(self, qtbot: QtBot, scanner):
         qtbot.addWidget(scanner)
         try:
             scanner.start_video()
@@ -64,7 +64,7 @@ class TestScanners:
             print(f'Error: {e}')
             assert False
     
-    def test_qr_checking(self, qtbot: QtBot, scanner: AbstractScanner, file_name: str):
+    def test_qr_checking(self, qtbot: QtBot, scanner, file_name: str):
         from numpy import ndarray
         
         qtbot.addWidget(scanner)
@@ -94,7 +94,7 @@ class TestAdd:
     def test_spinner_change(
             self,
             qtbot: QtBot,
-            controller: Add,
+            controller,
             add_clicks: int,
             sub_clicks: int,
             expected_result: int
@@ -109,7 +109,7 @@ class TestAdd:
         
         assert controller._total == total and controller._excess == excess == expected_result
     
-    def test_clear_form(self, qtbot: QtBot, controller: Add):
+    def test_clear_form(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
         
         for field in controller._text_fields:
@@ -146,7 +146,7 @@ class TestAdd:
             self,
             qtbot: QtBot,
             monkeypatch: MonkeyPatch,
-            controller: Add,
+            controller,
             part_num: str,
             manufacturer: str,
             desc: str,

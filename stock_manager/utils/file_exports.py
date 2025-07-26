@@ -7,7 +7,7 @@ data exportation for various application features.
 
 import logging
 import os
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 import qrcode
 from PyQt5.QtWidgets import QMessageBox
@@ -56,7 +56,11 @@ class ExportUtils:
         pass  # TODO: add pdf generation
     
     @asyncSlot()
-    async def sv_export(self, export_type: str, path: str) -> bool:
+    async def sv_export(
+            self,
+            export_type: Literal['csv', 'tsv', 'psv'],
+            path: str
+    ) -> bool:
         """
         Asynchronously exports current data to a delimited text file (CSV, TSV, PSV).
         

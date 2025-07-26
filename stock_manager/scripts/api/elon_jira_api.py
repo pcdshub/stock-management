@@ -8,31 +8,31 @@ import requests
 from todoist_api_python.api_async import TodoistAPIAsync  # Use the async version of the API
 
 # Ensure config.json exists
-CONFIG_FILE = "config.json"
+CONFIG_FILE = 'config.json'
 if not os.path.exists(CONFIG_FILE):
-    with open(CONFIG_FILE, "w") as config_file:
+    with open(CONFIG_FILE, 'w') as config_file:
         json.dump(
                 {
-                    "server_url": "",
-                    "api_token": "",
-                    "todoist_api_token": "",
-                    "debug": False
+                    'server_url': '',
+                    'api_token': '',
+                    'todoist_api_token': '',
+                    'debug': False
                 }, config_file
         )
     logging.warning(
-            f"{CONFIG_FILE} not found. Created an empty config file. Please populate it with the required values."
+            f'{CONFIG_FILE} not found. Created an empty config file. Please populate it with the required values.'
     )
 
 # Load configuration from config.json
-with open(CONFIG_FILE, "r") as config_file:
+with open(CONFIG_FILE, 'r') as config_file:
     config = json.load(config_file)
 
-JIRA_SERVER_URL = config["server_url"]
-JIRA_API_TOKEN = config["api_token"]
-TODOIST_API_TOKEN = config["todoist_api_token"]
+JIRA_SERVER_URL = config['server_url']
+JIRA_API_TOKEN = config['api_token']
+TODOIST_API_TOKEN = config['todoist_api_token']
 
 # Configure logging
-DEBUG_MODE = config.get("debug", False)  # Enable debug mode based on config
+DEBUG_MODE = config.get('debug", False)  # Enable debug mode based on config
 logging.basicConfig(
         level=logging.DEBUG if DEBUG_MODE else logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s"

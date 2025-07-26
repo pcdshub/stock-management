@@ -22,7 +22,7 @@ class Item:
     :var minimum: Minimum required stock for B750.
     :var excess: The amount of stock above minimum levels.
     :var minimum_sallie: Minimum required stock for B757.
-    :var stock_status: The current state of the stock item represented as a StockStatus enum.
+    :var stock_status: The current state of the stock item represented as the value of a StockStatus enum.
     """
     
     part_num: str | None
@@ -77,6 +77,9 @@ class Item:
     
     def _calc_stock_status(self):
         from stock_manager.utils import StockStatus
+        
+        if not self.excess:
+            return
         
         if self.excess > 1:
             self.stock_status = StockStatus.IN_STOCK.value

@@ -6,9 +6,9 @@ qr = qrcode.QRCode(
         border=4,
 )
 
-qr.add_data("BK9000")
+qr.add_data('BK9000')
 qr.make()
 
 img = qr.make_image()
 
-img.save("../assets/qr_code.png")
+img.save('../assets/qr_code.png')
