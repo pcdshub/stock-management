@@ -73,26 +73,26 @@ class TestExports:
                 ('txt', './assets/txt_export2.txt')
             ]
     )
-    def test_valid_name(self, exports: ExportUtils, file_type: str, expected_path: str):
+    def test_valid_name(self, exports, file_type: str, expected_path: str):
         new_path: str = exports._get_valid_name(file_type, './assets')
         assert new_path == expected_path
     
-    def test_pdf_export(self, exports: ExportUtils):
+    def test_pdf_export(self, exports):
         pass
     
     @pytest.mark.asyncio
     @pytest.mark.parametrize('export_type', ['csv', 'tsv', 'psv'])
-    async def test_sv_export(self, exports: ExportUtils, export_type: str):
+    async def test_sv_export(self, exports, export_type: str):
         assert await exports.sv_export(export_type, './assets')
     
     @pytest.mark.asyncio
-    async def test_sv_export_fail(self, exports: ExportUtils):
+    async def test_sv_export_fail(self, exports):
         assert await exports.sv_export('txt', './assets') is False
     
-    def test_make_qr_code(self, exports: ExportUtils):
+    def test_make_qr_code(self, exports):
         assert isinstance(exports.create_code('test part'), qrcode.image.base.BaseImage)
     
-    def test_save_qr_code(self, exports: ExportUtils):
+    def test_save_qr_code(self, exports):
         result: bool = exports.save_code(exports.create_code('test part'), './assets')
         assert result is True
 

@@ -12,20 +12,20 @@ class TableExample(QWidget):
         layout = QVBoxLayout(self)
         
         self.filter_input = QLineEdit()
-        self.filter_input.setPlaceholderText("Filter table...")
+        self.filter_input.setPlaceholderText('Filter table...')
         layout.addWidget(self.filter_input)
         
         self.table_view = QTableView()
         layout.addWidget(self.table_view)
         
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(["Name", "Age", "Country"])
+        self.model.setHorizontalHeaderLabels(['Name', 'Age', 'Country'])
         
         data = [
-            ["Alice", "30", "USA"],
-            ["Bob", "25", "Canada"],
-            ["Charlie", "35", "UK"],
-            ["David", "40", "USA"],
+            ['Alice', '30', 'USA'],
+            ['Bob', '25', 'Canada'],
+            ['Charlie', '35', 'UK'],
+            ['David', '40', 'USA'],
         ]
         
         for row in data:
@@ -43,12 +43,12 @@ class TableExample(QWidget):
         self.table_view.setSortingEnabled(True)
         self.table_view.sortByColumn(0, Qt.AscendingOrder)
         
-        self.setWindowTitle("QTableView Example")
+        self.setWindowTitle('QTableView Example')
         self.resize(500, 300)
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
+if __name__ == '__main__':
+    app = QApplication([])
     window = TableExample()
     window.show()
     sys.exit(app.exec_())
