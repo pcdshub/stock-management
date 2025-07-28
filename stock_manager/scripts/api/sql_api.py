@@ -58,7 +58,7 @@ def init_items_database():
                             vals[i][j] = None
                         case 3 | 4 | 5 | 6 | 7 | 8:
                             vals[i][j] = 0
-            print(f'Parsed: {items}')
+            print('Parsed:', items)
         return vals
     
     cursor.executemany(sql, parse_values())

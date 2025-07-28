@@ -66,7 +66,7 @@ class App(QMainWindow):
             ui_path: Path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
             loadUi(str(ui_path), self)
         except Exception as e:
-            print(f'Failed To Load Main UI File: {e}')
+            print('[x] Failed To Load Main UI File:', e)
             self.logger.error_log(f'Failed To Load Main UI File: {e}')
             QMessageBox.critical(
                     self,
@@ -166,7 +166,7 @@ class App(QMainWindow):
             self.all_items = self.db.create_all_items(self.db.get_all_data_gs())
             await self.update_tables()
         except Exception as e:
-            print(f'Error Loading Data Asynchronously: {e}')
+            print('[x] Error Loading Data Asynchronously:', e)
             self.logger.error_log(f'Could not load data from database: {e}')
             response = QMessageBox.critical(
                     self,
@@ -187,7 +187,7 @@ class App(QMainWindow):
             try:
                 self.scanner.stop_video()
             except Exception as e:
-                print(f'Failed To Stop QR Scanner: {e}')
+                print('[x] Failed To Stop QR Scanner:', e)
                 self.logger.error_log(f'Failed To Stop QR Scanner: {e}')
                 QMessageBox.critical(
                         self,

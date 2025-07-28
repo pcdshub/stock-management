@@ -56,7 +56,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / f'{file_name}.ui'
             loadUi(str(ui_path), self)
         except Exception as e:
-            print(f'Failed To Load {file_name}.ui File: {e}')
+            print(f'[x] Failed To Load {file_name}.ui File: {e}')
             self.logger.error(f'Failed To Load {file_name}.ui File: {e}')
             QMessageBox.critical(
                     self,
@@ -121,7 +121,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
             self.search.textChanged.connect(proxy_model.setFilterFixedString)
             return True
         except Exception as e:
-            print(f'Error Updating Table: {e}')
+            print('[!] Error Updating Table:', e)
             self.logger.error(f'Error Updating Table: {e}')
             QMessageBox.warning(
                     self,
@@ -146,7 +146,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
                     self.PAGE_NAME.value.PAGE_TITLE + ' | SLAC Inventory Management Application' + username
             )
         except Exception as e:
-            print(f'Page Title Update Error: {e}')
+            print('[!] Page Title Update Error:', e)
             self.logger.warning(f'Error Updating Window Title With Current Page Title: {e}')
             self.setWindowTitle('SLAC Inventory Management Application' + username)
 
@@ -178,7 +178,7 @@ class AbstractScanner(AbstractController):
         try:
             self.start_video()
         except Exception as e:
-            print(f'Failed To Start QR Scanner: {e}')
+            print('[x] Failed To Start QR Scanner:', e)
             self.logger.error(f'Failed To Start QR Scanner: {e}')
             QMessageBox.critical(
                     self,
@@ -203,7 +203,7 @@ class AbstractScanner(AbstractController):
                 self.camera_thread.start()
             return True
         except Exception as e:
-            print(f'Error Starting Camera Thread: {e}')
+            print('[x] Error Starting Camera Thread:', e)
             self.logger.error(f'Error Starting Camera Thread: {e}')
             QMessageBox.critical(
                     self,
@@ -228,7 +228,7 @@ class AbstractScanner(AbstractController):
                 self.camera_thread.wait()
             return True
         except Exception as e:
-            print(f'Error Stopping Camera Thread: {e}')
+            print('[x] Error Stopping Camera Thread:', e)
             self.logger.error(f'Error Stopping Camera Thread: {e}')
             QMessageBox.critical(
                     self,
@@ -252,7 +252,7 @@ class AbstractScanner(AbstractController):
             import cv2
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         except Exception as e:
-            print(f'Failed To Convert Frame Color: {e}')
+            print('[!] Failed To Convert Frame Color:', e)
             self.logger.warning(f'Failed To Convert Frame Color: {e}')
             QMessageBox.warning(
                     self,
@@ -268,7 +268,7 @@ class AbstractScanner(AbstractController):
             q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
             self.video_lbl.setPixmap(QPixmap.fromImage(q_img))
         except Exception as e:
-            print(f'Failed To Update Video Label: {e}')
+            print('[x] Failed To Update Video Label:', e)
             self.logger.error(f'Failed To Update Video Label: {e}')
             QMessageBox.critical(
                     self,
@@ -325,8 +325,8 @@ class AbstractScanner(AbstractController):
             self.running = True
             cap = VideoCapture(0)
             if not cap.isOpened():
+                print('[x] Could Not Access Camera')
                 self._logger.error('Could Not Access Camera')
-                print('Could Not Access Camera')
                 return
             
             while self.running:
@@ -381,7 +381,7 @@ class AbstractExporter(AbstractController):
             if button:
                 button.setText(f'...{response.split("/")[-1]}' if len(response) > 6 else response)
         except Exception as e:
-            print(f'Directory Selection Failure: {e}')
+            print('[x] Directory Selection Failure:', e)
             self.logger.error(f'Directory Selection Failure: {e}')
             response = QMessageBox.critical(
                     self,

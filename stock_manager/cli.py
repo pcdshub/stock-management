@@ -58,16 +58,18 @@ def build_commands() -> argparse.Namespace:
 
 def entry_point(args) -> bool:
     if args.run:
-        print('Starting Application...')
+        print('[+] Starting Application...')
         return True
     elif args.version:
         from stock_manager import __version__
-        print(f'Version: {__version__}')
+        print('[*] Version:', __version__)
         return False
     elif args.test:
         import pytest
         import sys
         import os
+        
+        print('[+] Starting Tests...')
         tests_path = os.path.join(os.path.dirname(__file__), 'tests')
         return_code = pytest.main([tests_path])
         sys.exit(return_code)
@@ -79,12 +81,14 @@ def entry_point(args) -> bool:
         return False
     elif args.export:
         if not args.pos_arg_1 or not args.pos_arg_2:
+            print('[!] Please Enter A Path And Extension When Using Export Command')
             return False
         
         from stock_manager import ExportUtils, DBUtils
         
         path = args.pos_arg_1
         extension = args.pos_arg_2
+        print(f'[+] Exporting Data As .{extension} File...')
         
         utils = ExportUtils()
         db = DBUtils()
@@ -95,8 +99,9 @@ def entry_point(args) -> bool:
                 utils.sv_export(extension, path, all_items)
             case 'pdf':
                 utils.pdf_export()
-            case _ as unknown:
-                print(f'Unknown Export Type: {unknown}')
+            case _:
+                print('[!] Unknown Export Type:', extension)
+                return False
         
         print('[*] Successfully Exported Data To', extension, 'File')
         return False
@@ -129,9 +134,7 @@ def entry_point(args) -> bool:
 def _run_list_items() -> None:
     from stock_manager import DBUtils, StockStatus
     
-    def truncate(text: str, width: int) -> str:
-        return text if len(text) <= width else f'{text[:width - 3]}...'
-    
+    print('[+] Gathering Item Data...')
     widths = [3, 10, 12, 5, 10, 10, 8, 8, 6, 12, 20]
     sum_widths = sum(widths)
     all_data: list[dict[str, int | str | None]] = DBUtils().get_all_data_gs()
@@ -153,6 +156,7 @@ def _run_list_items() -> None:
                     for item, w in zip(row_items, widths)
         )
     
+    print('\n[+] Stock Items Report')
     print(border)
     print(format_row(headers))
     print(format_row(['-' * widths[i] for i in range(len(widths))]))
@@ -187,7 +191,7 @@ def _run_list_items() -> None:
     
     print(border)
     print(
-            f'Total Items: {len(all_data)} | Out Of Stock: {out_of_stock} | '
+            f'[*] Total Items: {len(all_data)} | Out Of Stock: {out_of_stock} | '
             f'Low Stock: {low_stock} | In Stock: {in_stock} | Other: {other}'
     )
 
@@ -195,16 +199,17 @@ def _run_list_items() -> None:
 def _run_list_users() -> None:
     from stock_manager import DBUtils
     
+    print('[+] Gathering User Data...')
     all_users: set[str] = DBUtils().get_all_users_gs()
     border = '=' * 15
     
-    print('\nUsers Report')
+    print('\n[+] Users Report')
     print(border)
     
     i: int
     username: str
     for i, username in enumerate(all_users):
-        print(f'{i + 1}  {username}')
+        print(i + 1, username)
     
     print(border)
-    print(f'Total Users: {len(all_users)}')
+    print('[*] Total Users:', len(all_users))

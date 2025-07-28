@@ -3,7 +3,7 @@ import cv2
 vc = cv2.VideoCapture(0)
 
 if not vc.isOpened():
-    print('[ERROR] Could not access webcam')
+    print('Could not access webcam')
     exit()
 
 rval, frame = vc.read()
