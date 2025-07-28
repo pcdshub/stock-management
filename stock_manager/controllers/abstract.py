@@ -98,7 +98,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         source_model = QStandardItemModel()
         proxy_model = QSortFilterProxyModel()
         
-        source_model.setHorizontalHeaderLabels(self.database.get_headers() + ['Stock Status'])
+        source_model.setHorizontalHeaderLabels(self.database.get_headers())
         for item in all_data:
             items = [QStandardItem(str(value)) for value in item]
             source_model.appendRow(items)
