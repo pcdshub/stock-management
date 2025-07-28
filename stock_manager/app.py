@@ -37,8 +37,8 @@ class App(QMainWindow):
         super().__init__()
         
         self.logger = Logger()
-        self.db = DBUtils(self)
-        self.export_utils = ExportUtils(self)
+        self.db = DBUtils()
+        self.export_utils = ExportUtils()
         
         self.login = Login(self)
         self.view = View(self)
@@ -160,28 +160,10 @@ class App(QMainWindow):
         :raises SystemExit: If the user chooses to close the application after a data load failure.
         """
         
-        def create_all_items(gs_items: list[dict[str, int | float | str]]) -> list[Item]:
-            """
-            Convert a list dictionaries (Google Sheet Columns) to a list of `Item` objects
-            
-            :param gs_items: A list of Google Sheet columns
-            :return: a list of `Item` objects
-            """
-            
-            obj_items: list[Item] = []
-            for item in gs_items:
-                vals: list[int | float | str | None] = [
-                    None if val is None or val == ''
-                    else val
-                    for val in list(item.values())
-                ]
-                obj_items.append(Item(*vals))
-            return obj_items
-        
         try:
             if not self.db.sync_databases():
                 raise Exception('Database Synchronization Error')
-            self.all_items = create_all_items(self.db.get_all_data_gs())
+            self.all_items = self.db.create_all_items(self.db.get_all_data_gs())
             await self.update_tables()
         except Exception as e:
             print(f'Error Loading Data Asynchronously: {e}')
