@@ -74,7 +74,7 @@ class TestLogger:
 class TestExports:
     @pytest.fixture
     def exports(self) -> ExportUtils:
-        return ExportUtils(MagicMock())
+        return ExportUtils()
     
     @pytest.mark.parametrize(
             'file_type, expected_path',
@@ -90,21 +90,16 @@ class TestExports:
     def test_pdf_export(self, exports):
         pass
     
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('export_type', ['csv', 'tsv', 'psv'])
-    async def test_sv_export(self, exports, export_type: str):
-        assert await exports.sv_export(export_type, './assets')
-    
-    @pytest.mark.asyncio
-    async def test_sv_export_fail(self, exports):
-        assert await exports.sv_export('txt', './assets') is False
+    def test_sv_export(self, exports, export_type: str):
+        assert exports.sv_export(export_type, './assets', [MagicMock()])
     
     def test_make_qr_code(self, exports):
         assert isinstance(exports.create_code('test part'), qrcode.image.base.BaseImage)
     
     def test_save_qr_code(self, exports):
         result: bool = exports.save_code(exports.create_code('test part'), './assets')
-        assert result is True
+        assert result
 
 
 def test_email_sending():

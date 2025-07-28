@@ -65,7 +65,7 @@ class Export(AbstractExporter):
                 case ExportTypes.PDF.value:
                     self.app.export_utils.pdf_export()
                 case ExportTypes.CSV.value | ExportTypes.TSV.value | ExportTypes.PSV.value as export_type:
-                    self.app.export_utils.sv_export(export_type, self.path)
+                    self.app.export_utils.sv_export(export_type, self.path, self.app.all_items)
                 case 'Select':
                     QMessageBox.information(
                             self,
@@ -161,6 +161,8 @@ class QRGenerate(AbstractExporter):
         
         try:
             self._selected_qr = self.app.export_utils.create_code(item.part_num)
+            if not self._selected_qr:
+                raise Exception('Error In App.export_utils()')
         except Exception as e:
             print(f'Failed To Get Selected Item QR Code: {e}')
             self.logger.error(f'Failed To Get Selected Item QR Code: {e}')

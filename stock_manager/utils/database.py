@@ -19,13 +19,13 @@ from PyQt5.QtWidgets import QMessageBox
 import stock_manager
 
 if TYPE_CHECKING:
-    from stock_manager import App, Item, DatabaseUpdateType
+    from stock_manager import Item, DatabaseUpdateType
 
 
 class DBUtils:
     """Utility class for interacting with a Google Sheets database."""
     
-    def __init__(self, instance: 'App') -> None:
+    def __init__(self) -> None:
         """
         Initializes the Google Sheets client using credentials from a JSON keyfile.
         
@@ -42,7 +42,6 @@ class DBUtils:
             'https://www.googleapis.com/auth/drive'
         ]
         
-        self._instance = instance
         self._log = logging.getLogger()
         
         try:
@@ -63,7 +62,7 @@ class DBUtils:
             print(f'Failed To Connect To Database: {e}')
             self._log.error(f'Failed To Connect To Database: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Database Connection Failure',
                     'Failed To Connect To Database, Make Sure You Have An Internet Connection'
             )
@@ -141,7 +140,7 @@ class DBUtils:
                 print('Adding Usernames Error:', e)
                 self._log.error(f'Adding Usernames Error: {e}')
                 QMessageBox.critical(
-                        self._instance,
+                        None,
                         'Username Inserting Error',
                         'Error Adding GS Usernames To SQL Database'
                 )
@@ -170,7 +169,7 @@ class DBUtils:
                 print('Deleting Users Error:', e)
                 self._log.error(f'Deleting Users Error: {e}')
                 QMessageBox.critical(
-                        self._instance,
+                        None,
                         'Username Deletion Error',
                         'Error Deleting Username From SQL Database'
                 )
@@ -178,6 +177,27 @@ class DBUtils:
         
         self._db.commit()
         return True
+    
+    @staticmethod
+    def create_all_items(gs_items: list[dict[str, int | str | None]]) -> list['Item']:
+        """
+        Convert a list dictionaries (Google Sheet Columns) to a list of `Item` objects
+        
+        :param gs_items: A list of Google Sheet columns
+        :return: a list of `Item` objects
+        """
+        
+        from stock_manager import Item
+        
+        obj_items: list[Item] = []
+        for item in gs_items:
+            vals: list[int | str | None] = [
+                None if val is None or val == ''
+                else val
+                for val in list(item.values())
+            ]
+            obj_items.append(Item(*vals))
+        return obj_items
     
     def get_headers(self) -> list[str]:
         """
@@ -192,7 +212,7 @@ class DBUtils:
             print(f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME} Database: {e}')
             self._log.error(f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME} Database: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Header Fetching Error',
                     f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME}.'
             )
@@ -211,7 +231,7 @@ class DBUtils:
             print(f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME} Database: {e}')
             self._log.error(f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME}: {e}')
             response = QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Data Fetching Error',
                     f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME}.\n\n'
                     'Continue To Application?',
@@ -243,7 +263,7 @@ class DBUtils:
             print(f'Failed To Fetch All Data From SQL Database: {e}')
             self._log.error(f'Failed To Fetch All Data From SQL Database: {e}')
             response = QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Data Fetching Error',
                     f'Failed To Fetch All Data From SQL Database.\n\n'
                     'Continue To Application?',
@@ -272,7 +292,7 @@ class DBUtils:
             print(f'Failed To Get All Users From {stock_manager.GS_FILE_NAME}: {e}')
             self._log.error(f'Failed To Get All Users From {stock_manager.GS_FILE_NAME}: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'User Fetch Error',
                     f'Failed To Fetch Users From {stock_manager.GS_FILE_NAME}',
                     QMessageBox.Close
@@ -297,7 +317,7 @@ class DBUtils:
             print(f'Failed To Get All Users From SQL Database: {e}')
             self._log.error(f'Failed To Get All Users From SQL Database: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'User Fetch Error',
                     'Failed To Fetch Users From SQL Database',
                     QMessageBox.Close
@@ -326,7 +346,7 @@ class DBUtils:
             print('Unknown Database Update Type:', update_type)
             self._log.error(f'Unknown Database Update Type: {update_type}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Database Update Type Error',
                     f'Unknown Database Update Type: {update_type}'
             )
@@ -373,7 +393,7 @@ class DBUtils:
             print('Error Updating SQL Database:', e)
             self._log.error(f'Error Updating SQL Database: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'SQL Database Update Error',
                     'Failed To Update SQL Database'
             )
@@ -405,7 +425,7 @@ class DBUtils:
             print(f'Error Updating "{item.part_num}" In Google Sheet Database: {e}')
             self._log.error(f'Error Updating "{item.part_num}" In Google Sheet Database: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Google Sheet Database Update Error',
                     'Failed To Update Google Sheet Database'
             )
@@ -432,7 +452,7 @@ class DBUtils:
             print(f'Failed To Add Notification To Notifications Database: {e}')
             self._log.error(f'Failed To Add Notification To Notifications Database: {e}')
             QMessageBox.critical(
-                    self._instance,
+                    None,
                     'Database Notification Add Error',
                     'Error Adding Notification To Notification Database'
             )
