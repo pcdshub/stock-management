@@ -105,7 +105,7 @@ def _run_list_items() -> None:
                     for item, w in zip(row_items, widths)
         )
     
-    all_data: list[dict[str, int | str | None]] = DBUtils().get_all_data()
+    all_data: list[dict[str, int | str | None]] = DBUtils().get_all_data_gs()
     headers = [
         'ID', 'Name', 'Manufacturer', 'Total',
         'B750 Stock', 'B757 Stock', 'B750 Min',
@@ -159,7 +159,7 @@ def _run_list_items() -> None:
 def _run_list_users():
     from stock_manager import DBUtils
     
-    all_users: set[str] = DBUtils().get_all_users()
+    all_users: set[str] = DBUtils().get_all_users_gs()
     border = '=' * 15
     
     print('\nUsers Report')

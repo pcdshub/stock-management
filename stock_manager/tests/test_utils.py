@@ -10,16 +10,25 @@ from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils, Item, Logger
 class TestDatabase:
     @pytest.fixture
     def database(self) -> DBUtils:
-        return DBUtils()
+        return DBUtils(MagicMock())
+    
+    def test_sync_databases(self, database):
+        assert database.sync_databases()
     
     def test_fetch_headers(self, database):
         assert database.get_headers()
     
-    def test_fetch_data(self, database):
-        assert database.get_all_data()
+    def test_fetch_data_gs(self, database):
+        assert database.get_all_data_gs()
     
-    def test_fetch_users(self, database):
-        assert database.get_all_users()
+    def test_fetch_data_sql(self, database):
+        assert database.get_all_data_sql()
+    
+    def test_fetch_users_gs(self, database):
+        assert database.get_all_users_gs()
+    
+    def test_fetch_users_sql(self, database):
+        assert database.get_all_users_sql()
     
     @pytest.mark.parametrize(
             'update_type',

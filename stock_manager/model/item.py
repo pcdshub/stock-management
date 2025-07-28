@@ -49,7 +49,14 @@ class Item:
         """Allows comparing of two objects by checking if all fields are equal in value."""
         if not isinstance(other, Item):
             return False
-        return all(s == o for s, o, in zip(self, other))
+        
+        def soft_equal(a, b):
+            empty = ('', None)
+            if a in empty and b in empty:
+                return True
+            return str(a).strip() == str(b).strip()
+        
+        return all(soft_equal(s, o) for s, o, in zip(self, other))
     
     def __len__(self) -> int:
         """Allows counting the length of the item's total number of field values."""

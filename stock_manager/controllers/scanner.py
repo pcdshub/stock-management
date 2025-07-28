@@ -198,7 +198,7 @@ class Login(AbstractScanner):
         page = stock_manager.Pages.LOGIN
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
-        self._users_list = self.database.get_all_users()
+        self._users_list = self.database.get_all_users_gs()
         self.handle_connections()
     
     @override
