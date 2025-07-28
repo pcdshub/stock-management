@@ -10,7 +10,7 @@ from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils, Item, Logger
 class TestDatabase:
     @pytest.fixture
     def database(self) -> DBUtils:
-        return DBUtils(MagicMock())
+        return DBUtils()
     
     def test_sync_databases(self, database):
         assert database.sync_databases()
@@ -54,6 +54,9 @@ class TestDatabase:
     def test_already_existing_notif(self, database):
         database.add_notification('test')
         assert database.add_notification('test')
+    
+    def test_create_items(self, database):
+        assert database.create_all_items(database.get_all_data_gs())
 
 
 class TestLogger:
