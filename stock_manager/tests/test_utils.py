@@ -40,7 +40,8 @@ class TestDatabase:
     )
     def test_update_database(self, database, update_type: DatabaseUpdateType):
         assert database.update_database(
-                update_type, [Item(
+                update_type,
+                [Item(
                         *['None'] * 3,
                         *[0] * 6,
                         stock_manager.StockStatus.OUT_OF_STOCK.value
@@ -72,7 +73,7 @@ class TestLogger:
 
 class TestExports:
     @pytest.fixture
-    def exports(self):
+    def exports(self) -> ExportUtils:
         return ExportUtils(MagicMock())
     
     @pytest.mark.parametrize(

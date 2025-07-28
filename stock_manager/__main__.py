@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QApplication
 from qasync import QEventLoop
 
 from stock_manager import App
-from .cli import build_commands, entry_point
+from stock_manager.cli import build_commands, entry_point
 
 
 def main():

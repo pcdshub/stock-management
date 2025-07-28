@@ -3,6 +3,16 @@ from enum import auto, Enum
 
 
 class Pages(Enum):
+    """
+    Represents all the pages in the application, each with metadata.
+
+    Each member is an instance of _PageDetails which contains:
+
+    - PAGE_TITLE: The human-readable title of the page.
+    - FILE_NAME: The base filename for the corresponding UI view.
+    - PAGE_INDEX: An integer used to track the page's position/order.
+    """
+    
     @dataclass
     class _PageDetails:
         PAGE_TITLE: str
@@ -21,6 +31,17 @@ class Pages(Enum):
 
 
 class ExportTypes(Enum):
+    """
+    Represents supported export file types.
+    
+    Members:
+    
+    - PDF: Portable Document Format
+    - CSV: Comma-Separated Values
+    - TSV: Tab-Separated Values
+    - PSV: Pipe-Separated Values
+    """
+    
     PDF = 'pdf'
     CSV = 'csv'
     TSV = 'tsv'
@@ -28,12 +49,32 @@ class ExportTypes(Enum):
 
 
 class StockStatus(Enum):
+    """
+    Represents inventory status for an item.
+
+    Members:
+    
+    - IN_STOCK: The item is available in sufficient quantity.
+    - LOW_STOCK: The item is running low and may need to be reordered/restocked.
+    - OUT_OF_STOCK: The item is currently unavailable.
+    """
+    
     IN_STOCK = 'In Stock'
     LOW_STOCK = 'Low Stock'
     OUT_OF_STOCK = 'Out Of Stock'
 
 
 class DatabaseUpdateType(Enum):
+    """
+    Represents the type of database modification being made.
+
+    Members:
+    
+    - ADD: Adding a new entry.
+    - EDIT: Modifying an existing entry.
+    - REMOVE: Deleting an entry.
+    """
+    
     ADD = auto()
     EDIT = auto()
     REMOVE = auto()

@@ -26,8 +26,8 @@ class ExportUtils:
         :param instance: the main instance of `App`, use for access of `log`.
         """
         
-        self.instance = instance
-        self.logger = logging.getLogger()
+        self._instance = instance
+        self._logger = logging.getLogger()
     
     @staticmethod
     def _get_valid_name(ext: str, path: str) -> str:
@@ -81,7 +81,7 @@ class ExportUtils:
         
         try:
             with open(self._get_valid_name(export_type, path), 'x') as f:
-                for i, item in enumerate(self.instance.all_items):
+                for i, item in enumerate(self._instance.all_items):
                     line = ''
                     for var in item:
                         line += (str(var) if var else '') + delimiter
@@ -89,9 +89,9 @@ class ExportUtils:
             return True
         except FileExistsError as e:
             print(f'That File Already Exists: {e}')
-            self.logger.error(f'File Already Exists Error: {e}')
+            self._logger.error(f'File Already Exists Error: {e}')
             QMessageBox.critical(
-                    self.instance,
+                    self._instance,
                     'File Exists Error',
                     'That File Already Exists, Try Changing File Types'
             )
@@ -99,9 +99,9 @@ class ExportUtils:
         except Exception as e:
             export_type = export_type.upper()
             print(f'Failed To Export Data To {export_type}: {e}')
-            self.logger.error(f'Failed To Export Data To {export_type}: {e}')
+            self._logger.error(f'Failed To Export Data To {export_type}: {e}')
             QMessageBox.critical(
-                    self.instance,
+                    self._instance,
                     f'{export_type} Export Error',
                     f'Failed To Export Data To {export_type}, Try Changing File Types'
             )
@@ -123,9 +123,9 @@ class ExportUtils:
             return qr.make_image()
         except Exception as e:
             print(f'Failed To Convert {part_num} To QR Image: {e}')
-            self.logger.error(f'Failed To Convert {part_num} To QR Image: {e}')
+            self._logger.error(f'Failed To Convert {part_num} To QR Image: {e}')
             QMessageBox.critical(
-                    self.instance,
+                    self._instance,
                     'QR Code Conversion Error',
                     f'Failed To Convert {part_num} To QR Image'
             )
@@ -144,9 +144,9 @@ class ExportUtils:
             return True
         except Exception as e:
             print(f'Failed To Export Image: {e}')
-            self.logger.error(f'Failed To Export To Image: {e}')
+            self._logger.error(f'Failed To Export To Image: {e}')
             QMessageBox.critical(
-                    self.instance,
+                    self._instance,
                     'QR Code Export Error',
                     'Failed To Export QR Image'
             )
