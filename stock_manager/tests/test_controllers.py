@@ -61,7 +61,7 @@ class TestScanners:
             print('Timeout, No Errors')
             assert True
         except Exception as e:
-            print(f'Error: {e}')
+            print('Video Testing Error:', e)
             assert False
     
     def test_qr_checking(self, qtbot: QtBot, scanner, file_name: str):

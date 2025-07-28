@@ -72,6 +72,7 @@ class ExportUtils:
         }.get(export_type)
         
         if not delimiter:
+            print(f'[!] Cannot Call sv_export() With Type: "{export_type}"')
             self._logger.warning(f'Cannot Call sv_export() With Type: "{export_type}"')
             return False
         
@@ -84,7 +85,7 @@ class ExportUtils:
                     f.write(line[:-1] + '\n')
             return True
         except FileExistsError as e:
-            print(f'That File Already Exists: {e}')
+            print('[x] That File Already Exists:', e)
             self._logger.error(f'File Already Exists Error: {e}')
             QMessageBox.critical(
                     None,
@@ -94,7 +95,7 @@ class ExportUtils:
             return False
         except Exception as e:
             export_type = export_type.upper()
-            print(f'Failed To Export Data To {export_type}: {e}')
+            print(f'[x] Failed To Export Data To {export_type}: {e}')
             self._logger.error(f'Failed To Export Data To {export_type}: {e}')
             QMessageBox.critical(
                     None,
@@ -118,7 +119,7 @@ class ExportUtils:
             qr.make()
             return qr.make_image()
         except Exception as e:
-            print(f'Failed To Convert {part_num} To QR Image: {e}')
+            print(f'[x] Failed To Convert {part_num} To QR Image: {e}')
             self._logger.error(f'Failed To Convert {part_num} To QR Image: {e}')
             QMessageBox.critical(
                     None,
@@ -140,7 +141,7 @@ class ExportUtils:
             qr_code.save(self._get_valid_name('png', path))
             return True
         except Exception as e:
-            print(f'Failed To Export Image: {e}')
+            print('[x] Failed To Export Image:', e)
             self._logger.error(f'Failed To Export To Image: {e}')
             QMessageBox.critical(
                     None,

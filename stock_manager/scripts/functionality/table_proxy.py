@@ -47,8 +47,7 @@ class TableExample(QWidget):
         self.resize(500, 300)
 
 
-if __name__ == '__main__':
-    app = QApplication([])
-    window = TableExample()
-    window.show()
-    sys.exit(app.exec_())
+app = QApplication([])
+window = TableExample()
+window.show()
+sys.exit(app.exec_())
