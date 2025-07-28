@@ -37,7 +37,7 @@ class App(QMainWindow):
         super().__init__()
         
         self.logger = Logger()
-        self.db = DBUtils()
+        self.db = DBUtils(self)
         self.export_utils = ExportUtils(self)
         
         self.login = Login(self)
@@ -179,7 +179,9 @@ class App(QMainWindow):
             return obj_items
         
         try:
-            self.all_items = create_all_items(self.db.get_all_data())
+            if not self.db.sync_databases():
+                raise Exception('Database Synchronization Error')
+            self.all_items = create_all_items(self.db.get_all_data_gs())
             await self.update_tables()
         except Exception as e:
             print(f'Error Loading Data Asynchronously: {e}')
