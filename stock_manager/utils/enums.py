@@ -1,3 +1,9 @@
+"""
+Module containing application-wide enums.
+
+Defines fixed enum classes and values used throughout the SLAC-LCLS-Stock-Management.
+"""
+
 from dataclasses import dataclass
 from enum import auto, Enum
 

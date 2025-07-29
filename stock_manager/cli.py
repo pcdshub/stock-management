@@ -1,3 +1,9 @@
+"""
+Command Line Interface builder and handler for the Stock Manager Application
+
+Provides a CLI for performing various operations across the application without needing a GUI.
+"""
+
 import argparse
 import os
 import sys
@@ -6,12 +12,18 @@ from typing import Callable
 import pytest
 
 import stock_manager
-from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils, Item
 
 
 def build_commands() -> argparse.Namespace:
+    """
+    Builds and parses command-line arguments for the CLI interface.
+    
+    :return: Parsed command-line arguments including flags and values.
+    """
+    
     parser = argparse.ArgumentParser(description='Common Stock Manager CLI')
     
+    # core arguments
     flags = [
         ('-r', '--run', 'Runs Application GUI, Same As Running "python -m stock_manager"'),
         ('-v', '--version', 'Prints stock_manager\'s git version'),
@@ -33,7 +45,6 @@ def build_commands() -> argparse.Namespace:
         ('-ru', '--remove-user', 'Remove A Specified User From Both Databases After Confirmation Query'),
     ]
     
-    # core arguments
     for short, long, desc in flags:
         parser.add_argument(short, long, action='store_true', help=desc)
     
@@ -49,6 +60,13 @@ def build_commands() -> argparse.Namespace:
 
 
 def entry_point(args) -> bool:
+    """
+    Entry point dispatcher that maps CLI flags to corresponding handler functions.
+    
+    :param args: Parsed command-line arguments.
+    :return: `True` if GUI should be launched, `False` otherwise.
+    """
+    
     command_map: dict[str, Callable[[args], bool]] = {
         'run': _run_app,
         'version': _run_version,
@@ -76,7 +94,15 @@ def entry_point(args) -> bool:
     return True
 
 
-def validate_args(args, expected=0) -> bool:
+def _valid_args(args, expected=0) -> bool:
+    """
+    Validates the number of positional arguments received from the command line.
+    
+    :param args: Parsed arguments containing `values`.
+    :param expected: Expected number of positional arguments, 0 by default.
+    :return: `True` if valid, `False` otherwise.
+    """
+    
     values = args.values or []
     if expected:
         if len(values) < expected or len(values) > expected:
@@ -89,21 +115,43 @@ def validate_args(args, expected=0) -> bool:
 
 
 def _run_app(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -r/--run command --- starts the GUI application.
+    
+    :param args: Empty CLI arguments.
+    :return: `True` if successful, `False` otherwise.
+    """
+    
+    if not _valid_args(args):
         return False
     print('[+] Starting Application...')
     return True
 
 
 def _run_version(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -v/--version command --- prints the application version.
+    
+    :param args: Empty CLI arguments.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args):
         return False
     print('[*] Version:', stock_manager.__version__)
     return False
 
 
 def _run_tests(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -t/--test command --- runs pytest on the tests directory.
+    
+    :param args: Empty CLI arguments.
+    :return: `False` if CLI arguments do not match command,
+    otherwise calls `sys.exit()` with the test return code.
+    """
+    
+    if not _valid_args(args):
         return False
     
     print('[+] Starting Tests...')
@@ -115,7 +163,16 @@ def _run_tests(args) -> bool:
 
 
 def _run_export(args) -> bool:
-    if not validate_args(args, 2):
+    """
+    Handler for the -e/--export command --- exports item data to a specified file format.
+    
+    :param args: CLI arguments with [path, extension] values.
+    :return: `False` always, no further action is needed.
+    """
+    
+    from stock_manager import ExportUtils, DBUtils
+    
+    if not _valid_args(args, 2):
         return False
     
     path = args.values[0]
@@ -140,7 +197,16 @@ def _run_export(args) -> bool:
 
 
 def _run_qr(args) -> bool:
-    if not validate_args(args, 2):
+    """
+    Handler for the -qr/--create-qr command --- generates and saves a QR code for an item.
+    
+    :param args: CLI arguments with [path, part_num] values.
+    :return: `False` always, no further action is needed.
+    """
+    
+    from stock_manager import ExportUtils
+    
+    if not _valid_args(args, 2):
         return False
     
     path = args.values[0]
@@ -155,12 +221,19 @@ def _run_qr(args) -> bool:
     if not utils.save_code(image, path):
         return False
     
-    print('[*] Successfully Exported', part_num, ' QR Code')
+    print('[*] Successfully Exported', part_num, 'QR Code')
     return False
 
 
 def _run_sync_databases(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -s/--sync-databases command --- synchronizes the local and remote databases.
+    
+    :param args: Empty CLI arguments.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args):
         return False
     print('[+] Syncing Databases...')
     stock_manager.DBUtils().sync_databases()
@@ -169,21 +242,42 @@ def _run_sync_databases(args) -> bool:
 
 
 def _run_list_items(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -li/--list-items command --- lists all items in the database.
+    
+    :param args: Empty CLI arguments.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args):
         return False
     _list_items()
     return False
 
 
 def _run_search_items(args) -> bool:
-    if not validate_args(args, 1):
+    """
+    Handler for the -si/--search-items command --- searches items by a given string.
+    
+    :param args: CLI arguments with one search string.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args, 1):
         return False
     _list_items(args.values[0])
     return False
 
 
 def _run_add_item(args) -> bool:
-    if not validate_args(args, 10):
+    """
+    Handler for the -ai/--add-item command --- adds a new item to the database.
+    
+    :param args: CLI arguments with 10 values representing item details in the Google Sheet's order.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args, 10):
         return False
     
     print('[+] Adding Item To Databases...')
@@ -206,7 +300,16 @@ def _run_add_item(args) -> bool:
 
 
 def _run_remove_item(args) -> bool:
-    if not validate_args(args, 1):
+    """
+    Handler for the -ri/--remove-item command --- removes an item by part number.
+    
+    :param args: CLI arguments with one part number.
+    :return: `False` always, no further action is needed.
+    """
+    
+    from stock_manager import DatabaseUpdateType, DBUtils
+    
+    if not _valid_args(args, 1):
         return False
     
     print(f'[+] Removing "{args.values[0]}" From Databases...')
@@ -224,21 +327,44 @@ def _run_remove_item(args) -> bool:
 
 
 def _run_list_users(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -lu/--list-users command --- lists all users in the database.
+    
+    :param args: Empty CLI arguments.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args):
         return False
     _list_users()
     return False
 
 
 def _run_search_user(args) -> bool:
-    if not validate_args(args):
+    """
+    Handler for the -su/--search-users command --- searches users by username substring.
+    
+    :param args: CLI arguments with one username.
+    :return: `False` always, no further action is needed.
+    """
+    
+    if not _valid_args(args, 1):
         return False
     _run_list_users(args.values[0])
     return False
 
 
 def _run_add_user(args) -> bool:
-    if not validate_args(args, 1):
+    """
+    Handler for the -au/--add-user command --- adds a new user to the database.
+    
+    :param args: CLI arguments with one username.
+    :return: `False` always, no further action is needed.
+    """
+    
+    from stock_manager import DatabaseUpdateType, DBUtils
+    
+    if not _valid_args(args, 1):
         return False
     
     print('[+] Adding User To Databases...')
@@ -250,7 +376,16 @@ def _run_add_user(args) -> bool:
 
 
 def _run_remove_user(args) -> bool:
-    if not validate_args(args, 1):
+    """
+    Handler for the -ru/--remove-user command --- removes a user by username.
+    
+    :param args: CLI arguments with one username.
+    :return: `False` always, no further action is needed.
+    """
+    
+    from stock_manager import DatabaseUpdateType, DBUtils
+    
+    if not _valid_args(args, 1):
         return False
     
     print('[+] Removing User From Databases...')
@@ -262,6 +397,12 @@ def _run_remove_user(args) -> bool:
 
 
 def _list_items(search_value='') -> None:
+    """
+    Prints a formatted report of all stock items, optionally filtered by a search value.
+    
+    :param search_value: Optional substring to filter items.
+    """
+    
     from stock_manager import DBUtils, StockStatus
     
     print('[+]', 'Gathering Item Data...' if not search_value else f'Searching For Items With "{search_value}"...')
@@ -338,6 +479,12 @@ def _list_items(search_value='') -> None:
 
 
 def _list_users(search_value='') -> None:
+    """
+    Prints a list of all users in the database, optionally filtered by a substring.
+    
+    :param search_value: Optional username substring to filter users.
+    """
+    
     from stock_manager import DBUtils
     
     print('[+]', 'Gathering User Data...' if not search_value else f'Searching For Usernames With "{search_value}"...')

@@ -79,7 +79,7 @@ class DBUtils:
         
         **This method should only be called once (on app startup).**
         
-        :return: `True` if databases are synchronized successfully, `False` if otherwise.
+        :return: `True` if databases are synchronized successfully, `False` otherwise.
         """
         
         from stock_manager import Item, DatabaseUpdateType
@@ -334,7 +334,7 @@ class DBUtils:
         
         :param update_type: The type of database update as a `DatabaseUpdateType` enum (e.g. `ADD`, `EDIT`, `REMOVE`)
         :param changelist: An iterable list of items to repeat the same process or a single item
-        :return: `True` if process completed successfully, `False` if otherwise
+        :return: `True` if process completed successfully, `False` otherwise
         """
         
         from stock_manager import DatabaseUpdateType
@@ -362,6 +362,14 @@ class DBUtils:
         return True
     
     def _update_items_sql(self, update_type: 'DatabaseUpdateType', item: 'Item') -> bool:
+        """
+        Updates the SQL database for an inventory item based on the specified update type.
+        
+        :param update_type: Type of update operation (ADD, EDIT, REMOVE).
+        :param item: The item object to insert, update, or delete.
+        :return: `True` if the operation was successful, `False` otherwise.
+        """
+        
         from stock_manager import DatabaseUpdateType
         
         vals: list[str | int | None] = [value if not value == '' else None for value in item]
@@ -401,6 +409,14 @@ class DBUtils:
             return False
     
     def _update_items_gs(self, update_type: 'DatabaseUpdateType', item: 'Item') -> bool:
+        """
+        Updates the Google Sheets database for an inventory item.
+        
+        :param update_type: Type of update operation (ADD, EDIT, REMOVE).
+        :param item: The item object to append, update, or delete.
+        :return: `True` if the operation was successful, `False` otherwise.
+        """
+        
         from stock_manager import DatabaseUpdateType
         
         sheet: Worksheet = self._client.worksheet('Parts')
@@ -433,6 +449,14 @@ class DBUtils:
             return False
     
     def update_users_database(self, update_type: 'DatabaseUpdateType', username: str) -> bool:
+        """
+        Updates both SQL and Google Sheets databases for user records.
+        
+        :param update_type: Type of update operation (ADD, REMOVE).
+        :param username: Username to add or remove.
+        :return: `True` if the operation was successful, `False` otherwise.
+        """
+        
         from stock_manager import DatabaseUpdateType
         
         if update_type not in [DatabaseUpdateType.ADD, DatabaseUpdateType.REMOVE]:
@@ -451,6 +475,14 @@ class DBUtils:
         return all([update_gs, update_sql])
     
     def _update_users_sql(self, update_type: 'DatabaseUpdateType', username: str) -> bool:
+        """
+        Updates the SQL database for user records.
+        
+        :param update_type: Type of update operation (ADD, REMOVE).
+        :param username: Username to insert or delete.
+        :return: `True` if the operation was successful, `False` otherwise.
+        """
+        
         from stock_manager import DatabaseUpdateType
         
         sql = ''
@@ -474,6 +506,14 @@ class DBUtils:
             return False
     
     def _update_users_gs(self, update_type: 'DatabaseUpdateType', username: str) -> bool:
+        """
+        Updates the Google Sheets user list by adding or removing a user.
+        
+        :param update_type: Type of update operation (ADD, REMOVE).
+        :param username: Username to append or delete.
+        :return: `True` if the operation was successful, `False` otherwise.
+        """
+        
         from stock_manager import DatabaseUpdateType
         
         sheet: Worksheet = self._client.worksheet('Users')
@@ -500,7 +540,7 @@ class DBUtils:
         Adds a notification entry to the Google Sheet Database In The `"Notifications"` tab.
         
         :param part_num: the item part number to be displayed in the notifications database
-        :return: `True` if database entry is added successfully, `False` if otherwise.
+        :return: `True` if database entry is added successfully, `False` otherwise.
         """
         
         try:
@@ -523,6 +563,13 @@ class DBUtils:
             return False
     
     def find_item(self, part_num: str) -> 'Item':
+        """
+        Searches for an item in the Google Sheets database by its part number.
+        
+        :param part_num: The part number to look up.
+        :return: The matching `Item` object if found, otherwise, `None`.
+        """
+        
         for item in self.get_all_data_gs():
             if item['Part #'] == part_num:
                 return stock_manager.Item(*item.values())
