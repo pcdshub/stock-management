@@ -81,12 +81,12 @@ class TestExports:
     @pytest.mark.parametrize(
             'file_type, expected_path',
             [
-                ('py', './assets/py_export.py'),
-                ('txt', './assets/txt_export2.txt')
+                ('py', './exports/py_export.py'),
+                ('txt', './exports/txt_export2.txt')
             ]
     )
     def test_valid_name(self, exports, file_type: str, expected_path: str):
-        new_path: str = exports._get_valid_name(file_type, './assets')
+        new_path: str = exports._get_valid_name(file_type, './exports')
         assert new_path == expected_path
     
     def test_pdf_export(self, exports):
@@ -94,13 +94,13 @@ class TestExports:
     
     @pytest.mark.parametrize('export_type', ['csv', 'tsv', 'psv'])
     def test_sv_export(self, exports, export_type: str):
-        assert exports.sv_export(export_type, './assets', [MagicMock()])
+        assert exports.sv_export(export_type, './exports', [MagicMock()])
     
     def test_make_qr_code(self, exports):
         assert isinstance(exports.create_code('test part'), qrcode.image.base.BaseImage)
     
     def test_save_qr_code(self, exports):
-        result: bool = exports.save_code(exports.create_code('test part'), './assets')
+        result: bool = exports.save_code(exports.create_code('test part'), './exports')
         assert result
 
 

@@ -64,11 +64,12 @@ class TestScanners:
             print('Video Testing Error:', e)
             assert False
     
-    def test_qr_checking(self, qtbot: QtBot, scanner, file_name: str):
+    @pytest.mark.parametrize('file_num', [1, 2])
+    def test_qr_checking(self, qtbot: QtBot, scanner, file_num: str):
         from numpy import ndarray
         
         qtbot.addWidget(scanner)
-        image: ndarray = cv2.imread('./assets/' + file_name)
+        image: ndarray = cv2.imread(f'./exports/test_image{file_num}.jpeg')
         if not image.any():
             assert False
         scanner.check_for_qr(image)

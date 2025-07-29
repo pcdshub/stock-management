@@ -16,5 +16,5 @@ app.log
 TODO.txt
 thoughts.txt
 *_export*
-!/test/assets/test_image*
-!/test/assets/txt_export.txt
+!/test/exports/test_image*
+!/test/exports/txt_export.txt
