@@ -81,7 +81,7 @@ def entry_point(args) -> bool:
         'remove_item': _run_remove_item,
         
         'list_users': _run_list_users,
-        'search_users': _run_search_user,
+        'search_users': _run_search_users,
         'add_user': _run_add_user,
         'remove_user': _run_remove_user,
     }
@@ -283,6 +283,8 @@ def _run_add_item(args) -> bool:
     print('[+] Adding Item To Databases...')
     
     try:
+        from stock_manager import DBUtils, DatabaseUpdateType, Item
+        
         vals: list[str | int] = [
             value if i not in [3, 4, 5, 6, 7, 8]
             else int(value)
@@ -295,8 +297,8 @@ def _run_add_item(args) -> bool:
         print('[*] Successfully Added', item.part_num, 'To Databases')
     except ValueError as e:
         print('[x] Failed To Add Item To Database:', e)
-    
-    return False
+    finally:
+        return False
 
 
 def _run_remove_item(args) -> bool:
@@ -340,7 +342,7 @@ def _run_list_users(args) -> bool:
     return False
 
 
-def _run_search_user(args) -> bool:
+def _run_search_users(args) -> bool:
     """
     Handler for the -su/--search-users command --- searches users by username substring.
     
@@ -350,7 +352,7 @@ def _run_search_user(args) -> bool:
     
     if not _valid_args(args, 1):
         return False
-    _run_list_users(args.values[0])
+    _list_users(args.values[0])
     return False
 
 
