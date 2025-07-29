@@ -220,7 +220,7 @@ class Edit(AbstractController):
         
         self.logger.info(f'{self.app.user} Edited Database Item: {new_item.part_num}')
         self.app.update_tables()
-        self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
+        self.database.update_items_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
         self._clear_form()
         
         if new_item.stock_b750 + new_item.stock_b757 <= 0:

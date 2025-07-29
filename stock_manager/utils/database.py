@@ -121,11 +121,11 @@ class DBUtils:
                     continue
                 
                 print('[+] Editing Item:', gs_part)
-                if not self._update_sql(DatabaseUpdateType.EDIT, gs_part):
+                if not self._update_items_sql(DatabaseUpdateType.EDIT, gs_part):
                     return False
             else:
                 print('[+] Adding Item:', gs_part)
-                if not self._update_sql(DatabaseUpdateType.ADD, gs_part):
+                if not self._update_items_sql(DatabaseUpdateType.ADD, gs_part):
                     return False
         
         # add new users
@@ -154,7 +154,7 @@ class DBUtils:
             
             item = Item(*list(part_dict.values()))
             print('[+] Removing Item:', item)
-            if not self._update_sql(DatabaseUpdateType.REMOVE, item):
+            if not self._update_items_sql(DatabaseUpdateType.REMOVE, item):
                 return False
         
         # remove SQL users that are not in GS
@@ -324,7 +324,7 @@ class DBUtils:
             )
             raise SystemExit(1)
     
-    def update_database(
+    def update_items_database(
             self,
             update_type: 'DatabaseUpdateType',
             changelist: Iterable['Item'] | 'Item'
@@ -343,24 +343,25 @@ class DBUtils:
             changelist = [changelist]
         
         if update_type not in [DatabaseUpdateType.ADD, DatabaseUpdateType.EDIT, DatabaseUpdateType.REMOVE]:
-            print('[x] Unknown Database Update Type:', update_type)
-            self._log.error(f'Unknown Database Update Type: {update_type}')
+            print('[x] Unknown Items Database Update Type:', update_type)
+            self._log.error(f'Unknown Items Database Update Type: {update_type}')
             QMessageBox.critical(
                     None,
-                    'Database Update Type Error',
-                    f'Unknown Database Update Type: {update_type}'
+                    'Items Database Update Type Error',
+                    f'Unknown Items Database Update Type: {update_type}'
             )
             return False
         
+        item: Item
         for item in changelist:
-            update_gs: bool = self._update_gs(update_type, item)
-            update_sql: bool = self._update_sql(update_type, item)
+            update_gs: bool = self._update_items_gs(update_type, item)
+            update_sql: bool = self._update_items_sql(update_type, item)
             
             if not all([update_gs, update_sql]):
                 return False
         return True
     
-    def _update_sql(self, update_type: 'DatabaseUpdateType', item: 'Item') -> bool:
+    def _update_items_sql(self, update_type: 'DatabaseUpdateType', item: 'Item') -> bool:
         from stock_manager import DatabaseUpdateType
         
         vals: list[str | int | None] = [value if not value == '' else None for value in item]
@@ -390,16 +391,16 @@ class DBUtils:
             self._db.commit()
             return True
         except Exception as e:
-            print('[x] Error Updating SQL Database:', e)
-            self._log.error(f'Error Updating SQL Database: {e}')
+            print('[x] Error Updating Items SQL Database:', e)
+            self._log.error(f'Error Updating Items SQL Database: {e}')
             QMessageBox.critical(
                     None,
-                    'SQL Database Update Error',
-                    'Failed To Update SQL Database'
+                    'Items SQL Database Update Error',
+                    'Failed To Update Items SQL Database'
             )
             return False
     
-    def _update_gs(self, update_type: 'DatabaseUpdateType', item: 'Item') -> bool:
+    def _update_items_gs(self, update_type: 'DatabaseUpdateType', item: 'Item') -> bool:
         from stock_manager import DatabaseUpdateType
         
         sheet: Worksheet = self._client.worksheet('Parts')
@@ -422,12 +423,75 @@ class DBUtils:
                         sheet.delete_rows(cell.row)
             return True
         except Exception as e:
-            print(f'[x] Error Updating "{item.part_num}" In Google Sheet Database: {e}')
-            self._log.error(f'Error Updating "{item.part_num}" In Google Sheet Database: {e}')
+            print(f'[x] Error Updating Item "{item.part_num}" In Google Sheet Database: {e}')
+            self._log.error(f'Error Updating Item "{item.part_num}" In Google Sheet Database: {e}')
             QMessageBox.critical(
                     None,
-                    'Google Sheet Database Update Error',
-                    'Failed To Update Google Sheet Database'
+                    'Google Sheet Item Database Update Error',
+                    'Failed To Update Google Sheet Item Database'
+            )
+            return False
+    
+    def update_users_database(self, update_type: 'DatabaseUpdateType', username: str) -> bool:
+        from stock_manager import DatabaseUpdateType
+        
+        if update_type not in [DatabaseUpdateType.ADD, DatabaseUpdateType.REMOVE]:
+            print('[x] Unknown Users Database Update Type:', update_type)
+            self._log.error(f'Unknown Users Database Update Type: {update_type}')
+            QMessageBox.critical(
+                    None,
+                    'Users Database Update Type Error',
+                    f'Unknown Users Database Update Type: {update_type}'
+            )
+            return False
+        
+        update_gs: bool = self._update_users_gs(update_type, username)
+        update_sql: bool = self._update_users_sql(update_type, username)
+        
+        return all([update_gs, update_sql])
+    
+    def _update_users_sql(self, update_type: 'DatabaseUpdateType', username: str) -> bool:
+        from stock_manager import DatabaseUpdateType
+        
+        sql = ''
+        if update_type == DatabaseUpdateType.ADD:
+            sql = 'insert into users (username) value (%s);'
+        elif update_type == DatabaseUpdateType.REMOVE:
+            sql = 'delete from users where username = %s;'
+        
+        try:
+            self._cursor.execute(sql, [username])
+            self._db.commit()
+            return True
+        except Exception as e:
+            print('[x] Error Updating Users SQL Database:', e)
+            self._log.error(f'Error Updating Users SQL Database: {e}')
+            QMessageBox.critical(
+                    None,
+                    'Users SQL Database Update Error',
+                    'Failed To Update Users SQL Database'
+            )
+            return False
+    
+    def _update_users_gs(self, update_type: 'DatabaseUpdateType', username: str) -> bool:
+        from stock_manager import DatabaseUpdateType
+        
+        sheet: Worksheet = self._client.worksheet('Users')
+        try:
+            if update_type == DatabaseUpdateType.ADD:
+                sheet.append_row([username])
+            elif update_type == DatabaseUpdateType.REMOVE:
+                cell: Cell | None = sheet.find(username)
+                if cell:
+                    sheet.delete_rows(cell.row)
+            return True
+        except Exception as e:
+            print(f'[x] Error Updating "{username}" In Google Sheet User Database: {e}')
+            self._log.error(f'Error Updating "{username}" In Google Sheet User Database: {e}')
+            QMessageBox.critical(
+                    None,
+                    'Google Sheet User Database Update Error',
+                    'Failed To Update Google Sheet User Database'
             )
             return False
     
@@ -457,3 +521,8 @@ class DBUtils:
                     'Error Adding Notification To Notification Database'
             )
             return False
+    
+    def find_item(self, part_num: str) -> 'Item':
+        for item in self.get_all_data_gs():
+            if item['Part #'] == part_num:
+                return stock_manager.Item(*item.values())
