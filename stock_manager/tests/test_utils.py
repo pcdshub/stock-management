@@ -39,9 +39,8 @@ class TestDatabase:
             ]
     )
     def test_update_database(self, database, update_type: DatabaseUpdateType):
-        assert database.update_database(
-                update_type,
-                [Item(
+        assert database.update_items_database(
+                update_type, [Item(
                         *['None'] * 3,
                         *[0] * 6,
                         stock_manager.StockStatus.OUT_OF_STOCK.value

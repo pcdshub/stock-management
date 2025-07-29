@@ -32,7 +32,7 @@ JIRA_API_TOKEN = config['api_token']
 TODOIST_API_TOKEN = config['todoist_api_token']
 
 # Configure logging
-DEBUG_MODE = config.get('debug", False)  # Enable debug mode based on config
+DEBUG_MODE = config.get('debug', False)  # Enable debug mode based on config
 logging.basicConfig(
         level=logging.DEBUG if DEBUG_MODE else logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s"
