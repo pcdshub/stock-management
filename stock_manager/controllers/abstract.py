@@ -194,7 +194,7 @@ class AbstractScanner(AbstractController):
 
         Connects the thread’s signal to the frame processor.
         
-        :return: `True` if camera is started successfully, `False` if otherwise.
+        :return: `True` if camera is started successfully, `False` otherwise.
         """
         
         try:
@@ -219,7 +219,7 @@ class AbstractScanner(AbstractController):
         Ensures the camera thread is properly stopped when
         leaving the scanner page.
         
-        :return: `True` if camera is stopped successfully, `False` if otherwise.
+        :return: `True` if camera is stopped successfully, `False` otherwise.
         """
         
         try:

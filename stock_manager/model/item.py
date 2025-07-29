@@ -46,7 +46,11 @@ class Item:
     
     @override
     def __eq__(self, other: object) -> bool:
-        """Allows comparing of two objects by checking if all fields are equal in value."""
+        """
+        Allows comparing of two objects by checking if all fields are equal in value.
+        
+        Comparing `''` and `None` returns `True`.
+        """
         if not isinstance(other, Item):
             return False
         

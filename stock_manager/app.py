@@ -1,6 +1,4 @@
-"""
-Instantiate and run the App class to start the SLAC Inventory Management application.
-"""
+"""Instantiate and run the App class to start the SLAC Inventory Management application."""
 
 import asyncio
 from pathlib import Path
@@ -219,6 +217,7 @@ class App(QMainWindow):
     def closeEvent(self, event: QCloseEvent) -> None:
         """Handle the application close event and log exit."""
         
+        print('[+] Exiting Application')
         self.logger.info_log('App Exited\n')
         super().closeEvent(event)
     

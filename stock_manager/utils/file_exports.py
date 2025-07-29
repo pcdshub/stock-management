@@ -62,7 +62,7 @@ class ExportUtils:
         :param export_type: The file extension as the value (str) of an ExportType enum.
         :param path: The directory to create file in.
         :param all_items: All items from database to be exported
-        :return: `True` if file is created and written to successfully, `False` if otherwise
+        :return: `True` if file is created and written to successfully, `False` otherwise
         """
         
         delimiter = {
@@ -134,7 +134,7 @@ class ExportUtils:
         
         :param qr_code: The QR code image to save.
         :param path: The desired file path for saving the image.
-        :return: `True` if QR code is saved successfully, `False` if otherwise.
+        :return: `True` if QR code is saved successfully, `False` otherwise.
         """
         
         try:
