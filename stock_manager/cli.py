@@ -43,6 +43,7 @@ def build_commands() -> argparse.Namespace:
         ('-su', '--search-users', 'Searches For A Specified Username In All Usernames'),
         ('-au', '--add-user', 'Add A User With Specified Username To Both Databases'),
         ('-ru', '--remove-user', 'Remove A Specified User From Both Databases After Confirmation Query'),
+        ('-ei', '--edit', 'Edit A Specified Item With At Least One Field Name And New Value')
     ]
     
     for short, long, desc in flags:
@@ -79,6 +80,7 @@ def entry_point(args) -> bool:
         'search_items': _run_search_items,
         'add_item': _run_add_item,
         'remove_item': _run_remove_item,
+        'edit': _run_edit_item,
         
         'list_users': _run_list_users,
         'search_users': _run_search_users,
@@ -280,7 +282,7 @@ def _run_add_item(args) -> bool:
     if not _valid_args(args, 10):
         return False
     
-    print('[+] Adding Item To Databases...')
+    print(f'[+] Adding "{args.values[0]}" To Databases...')
     
     try:
         from stock_manager import DBUtils, DatabaseUpdateType, Item
@@ -292,11 +294,15 @@ def _run_add_item(args) -> bool:
         ]
         item = Item(*vals)
         
-        DBUtils().update_items_database(DatabaseUpdateType.ADD, item)
+        utils = DBUtils()
+        if utils.find_item(item.part_num):
+            raise Exception(f'"{item.part_num}" Already In Items Database.')
         
-        print('[*] Successfully Added', item.part_num, 'To Databases')
-    except ValueError as e:
-        print('[x] Failed To Add Item To Database:', e)
+        utils.update_items_database(DatabaseUpdateType.ADD, item)
+        
+        print(f'[*] Successfully Added "{item.part_num}" To Items Databases')
+    except Exception as e:
+        print('[x] Failed To Add Item To Items Database:', e)
     finally:
         return False
 
@@ -325,6 +331,43 @@ def _run_remove_item(args) -> bool:
     utils.update_items_database(DatabaseUpdateType.REMOVE, item)
     
     print('[*] Successfully Removed', item.part_num, 'From Databases')
+    return False
+
+
+def _run_edit_item(args) -> bool:
+    """
+    
+    
+    :param args: CLI arguments with one part number.
+    :return: `False` always, no further action is needed.
+    """
+    
+    from stock_manager import DBUtils, DatabaseUpdateType
+    
+    if len(args.values) < 2:
+        print(f'[!] Expected One Item And At Least One Value, Got {len(args.values)}: {args.values}')
+        return False
+    
+    print('[+] Editing', args.values[0], 'In Database...')
+    
+    utils = DBUtils()
+    item = utils.find_item(args.values[0])
+    if not item:
+        print(f'[x] Could Not Locate "{args.values[0]}" In Databases')
+        return False
+    
+    change_vals_dict: dict[str, str] = {}
+    value: str
+    for value in args.values[1:]:
+        split_arg: list[str, str] = value.split('=')
+        change_vals_dict[split_arg[0]] = split_arg[1]
+    
+    for key, value in change_vals_dict.items():
+        item[key] = value
+    
+    utils.update_items_database(DatabaseUpdateType.EDIT, item)
+    
+    print('[*] Successfully Updated', item.part_num, 'Values')
     return False
 
 
@@ -371,9 +414,15 @@ def _run_add_user(args) -> bool:
     
     print('[+] Adding User To Databases...')
     
-    DBUtils().update_users_database(DatabaseUpdateType.ADD, args.values[0])
+    utils = DBUtils()
+    username_arg = args.values[0]
+    if username_arg not in utils.get_all_users_gs():
+        print(f'[!] "{username_arg}" Already In Users Database')
+        return False
     
-    print('[*] Successfully Added', args.values[0], 'To Databases')
+    utils.update_users_database(DatabaseUpdateType.ADD, username_arg)
+    
+    print(f'[*] Successfully Added "{username_arg}" To Users Databases')
     return False
 
 
