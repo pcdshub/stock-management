@@ -41,7 +41,11 @@ class Item:
     
     @override
     def __hash__(self) -> int:
-        """Allows hashing of an Item object, allows Item objects to be put into sets"""
+        """
+        Allows hashing of an Item object, allows Item objects to be put into sets
+        
+        :return: hashed value of all values in `Item` object.
+        """
         return hash((value for value in self))
     
     @override
@@ -50,6 +54,9 @@ class Item:
         Allows comparing of two objects by checking if all fields are equal in value.
         
         Comparing `''` and `None` returns `True`.
+        
+        :param other: object to compare values to.
+        :return: `True` if objects are equal in all values, `False` if otherwise or type mismatch.
         """
         if not isinstance(other, Item):
             return False
@@ -63,15 +70,41 @@ class Item:
         return all(soft_equal(s, o) for s, o, in zip(self, other))
     
     def __len__(self) -> int:
-        """Allows counting the length of the item's total number of field values."""
+        """
+        Allows counting the length of the item's total number of field values.
+        
+        :return: number of values in `Item` object.
+        """
         return len(self.__dict__)
     
     def __getitem__(self, idx: int) -> str | int | None:
-        """Allows indexed access to the item's field values."""
+        """
+        Allows indexed access to the item's field values.
+        
+        :param idx: index at which to check value.
+        :return: the field's value.
+        """
         return [value for value in self.__dict__.values()][idx]
     
+    def __setitem__(self, idx: str, value: str | int | None) -> None:
+        """
+        Allows the setting of `Item` objects as `obj[str] = val`.
+        
+        :param idx: index at which to change the value.
+        :param value: a new value to change to at the specified index.
+        """
+        
+        if hasattr(self, idx):
+            setattr(self, idx, value)
+            return
+        raise NameError(f'Unknown Field: {idx}')
+    
     def __iter__(self) -> Generator[str | int | None]:
-        """Allows iteration access to the item's field values."""
+        """
+        Allows iteration access to the item's field values.
+        
+        :return: A `Generator` of `Item` values to iterate through.
+        """
         return (value for value in self.__dict__.values())
     
     def update_stats(self) -> None:
@@ -86,7 +119,12 @@ class Item:
         
         self._calc_stock_status()
     
-    def _calc_stock_status(self):
+    def _calc_stock_status(self) -> None:
+        """
+        Sets the value of `self.stock_status` to the
+        string value of a `StockStatus` enum based on `self.excess`.
+        """
+        
         from stock_manager.utils import StockStatus
         
         if not self.excess:

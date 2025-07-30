@@ -14,7 +14,7 @@ from stock_manager import App
 from stock_manager.cli import build_commands, entry_point
 
 
-def main():
+def main() -> None:
     """Start the Qt application and show the main window."""
     
     args = build_commands()

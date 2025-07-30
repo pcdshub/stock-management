@@ -562,7 +562,7 @@ class DBUtils:
             )
             return False
     
-    def find_item(self, part_num: str) -> 'Item':
+    def find_item(self, part_num: str) -> 'Item | None':
         """
         Searches for an item in the Google Sheets database by its part number.
         
@@ -573,3 +573,4 @@ class DBUtils:
         for item in self.get_all_data_gs():
             if item['Part #'] == part_num:
                 return stock_manager.Item(*item.values())
+        return None
