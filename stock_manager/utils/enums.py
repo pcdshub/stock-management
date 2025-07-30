@@ -84,3 +84,19 @@ class DatabaseUpdateType(Enum):
     ADD = auto()
     EDIT = auto()
     REMOVE = auto()
+
+
+class Hutches(Enum):
+    """Represents hutches at SLAC."""
+    
+    CXI = 'CXI (Coherent X-ray Imaging)',
+    MEC = 'MEC (Matter in Extreme Conditions)',
+    MFX = 'MFX (Macromolecular Femto-Second Crystallography)',
+    QRIXS = 'qRIXS',
+    TMO = 'TMO (Time-resolved AMO)',
+    TXI = 'TXI (Tender X-ray Instrument)',
+    XCS = 'XCS (X-ray Correlation Spectroscopy)',
+    XPP = 'XPP (X-ray Pump Probe)',
+    MEV_UED = 'MeV-UED (Megaelectronvolt Ultrafast Electron Diffraction)',
+    LCLS_II_HE = 'LCLS-II-HE Instruments',
+    DXS = 'DXS (Dynamic X-ray Scattering)',
