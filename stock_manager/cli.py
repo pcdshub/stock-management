@@ -31,7 +31,7 @@ def build_commands() -> argparse.Namespace:
     flags = [
         ('-r', '--run', 'Runs Application GUI, Same As Running "python -m stock_manager"'),
         ('-v', '--version', 'Prints stock_manager\'s git version'),
-        ('-t', '--test', r'Runs All Tests Located In stock_manager\tests Using PyTest'),
+        ('-t', '--test', 'Runs All Tests Located In stock_manager/tests/ Using PyTest'),
         ('-e', '--export', 'Exports All Item Data To A Specified File Type And Location '
                            '(Used With Path And Extension Arguments)'),
         ('-qr', '--create-qr', 'Generates A QR Code Of A Specified Item And Stores It As A '
@@ -299,7 +299,7 @@ def _run_add_item(args) -> bool:
         
         utils = DBUtils()
         if utils.find_item(item.part_num):
-            raise Exception(f'"{item.part_num}" Already In Items Database.')
+            raise Exception(f'"{item.part_num}" Already In Items Databases.')
         
         utils.update_items_database(DatabaseUpdateType.ADD, item)
         
@@ -339,7 +339,8 @@ def _run_remove_item(args) -> bool:
 
 def _run_edit_item(args) -> bool:
     """
-    
+    Handler for the -ei/--edit command --- edits an item by specified part number
+    and field specified changes.
     
     :param args: CLI arguments with one part number.
     :return: `False` always, no further action is needed.
@@ -419,7 +420,7 @@ def _run_add_user(args) -> bool:
     
     utils = DBUtils()
     username_arg = args.values[0]
-    if username_arg not in utils.get_all_users_gs():
+    if username_arg in utils.get_all_users_gs():
         logger.warning(f'"{username_arg}" Already In Users Databases')
         return False
     
@@ -459,32 +460,19 @@ def _list_items(search_value='') -> None:
     
     from stock_manager import DBUtils, StockStatus
     
-    widths = [3, 10, 12, 5, 10, 10, 8, 8, 6, 12, 20]
-    sum_widths = sum(widths)
     logger.info('Gathering Item Data...' if not search_value else f'Searching For Items With "{search_value}"...')
+    
     all_data: list[dict[str, int | str | None]] = DBUtils().get_all_data_gs()
     headers = [
-        'ID', 'Name', 'Manufacturer', 'Total',
+        '#', 'Name', 'Manufacturer', 'Total',
         'B750 Stock', 'B757 Stock', 'B750 Min',
         'B757 Min', 'Excess', 'Status', 'Description'
     ]
-    border = '=' * (sum_widths + 2 * len(widths))
-    
-    def truncate(text: str, width: int) -> str:
-        return text if len(text) <= width else f'{text[:width - 3]}...'
-    
-    def format_row(row_items: list[str]):
-        return '  '.join(
-                truncate(
-                        str(item), w
-                ).ljust(w)
-                    for item, w in zip(row_items, widths)
-        )
+    table = PrettyTable(headers)
+    table._max_width = {'Name': 14, 'Description': 80}
+    table.align['Description'] = 'l'
     
     print('\n[+] Stock Items Report')
-    print(border)
-    print(format_row(headers))
-    print(format_row(['-' * widths[i] for i in range(len(widths))]))
     
     i: int
     data: dict[str, int | str | None]
@@ -523,9 +511,9 @@ def _list_items(search_value='') -> None:
             case _:
                 other += 1
         total += 1
-        print(format_row(row))
+        table.add_row(row)
     
-    print(border)
+    print(table)
     print(
             '[*] Total Items:', total, '| Out Of Stock:', out_of_stock,
             '| Low Stock:', low_stock, '| In Stock:', in_stock, '| Other:', other
@@ -543,10 +531,9 @@ def _list_users(search_value='') -> None:
     
     logger.info('Gathering User Data...' if not search_value else f'Searching For Usernames With "{search_value}"...')
     all_users: set[str] = DBUtils().get_all_users_gs()
-    border = '=' * 16
+    table = PrettyTable(['#', 'Username'])
     
     print('\n[+] Users Report')
-    print(border)
     
     i: int
     username: str
@@ -555,7 +542,7 @@ def _list_users(search_value='') -> None:
         if search_value and search_value.lower() not in username.lower():
             continue
         total += 1
-        print(i + 1, username)
+        table.add_row([i + 1, username])
     
-    print(border)
+    print(table)
     print('[*] Total Users:', total)
