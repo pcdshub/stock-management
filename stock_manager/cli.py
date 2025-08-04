@@ -518,6 +518,7 @@ def _list_items(search_value='') -> None:
             '[*] Total Items:', total, '| Out Of Stock:', out_of_stock,
             '| Low Stock:', low_stock, '| In Stock:', in_stock, '| Other:', other
     )
+    logger.info('Successfully Printed Items')
 
 
 def _list_users(search_value='') -> None:
@@ -546,3 +547,4 @@ def _list_users(search_value='') -> None:
     
     print(table)
     print('[*] Total Users:', total)
+    logger.info('Successfully Printed Users')
