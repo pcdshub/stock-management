@@ -82,9 +82,8 @@ class ItemScanner(AbstractScanner):
                 self.items_list.append(f'<ul><li>{data}</li></ul>')
                 return True
         
-        print(f'[*] Item QR Code Not Recognized: "{data}"')
-        self.logger.info(f'Item QR Code Not Recognized: "{data}"')
-        QMessageBox.information(
+        self.logger.warning(f'Item QR Code Not Recognized: "{data}"')
+        QMessageBox.warning(
                 self,
                 'Unknown QR Code',
                 'QR Code Not Recognized In Database'
@@ -133,8 +132,8 @@ class ItemScanner(AbstractScanner):
                     elif self.b757_btn.isChecked():
                         item.stock_b757 -= 1
                     else:
-                        print('[!] Neither Radio Button Is Selected')
-                        QMessageBox.information(
+                        self.logger.warning('Neither Radio Button Is Selected')
+                        QMessageBox.warning(
                                 self,
                                 'Radio Button Error',
                                 'Neither Radio Button Is Selected, '
@@ -166,7 +165,6 @@ class ItemScanner(AbstractScanner):
             self.app.update_tables()
             self.database.update_items_database(stock_manager.DatabaseUpdateType.EDIT, self._items)
         except Exception as e:
-            print('[x] Item(s) Could Not Be Subtracted From Database:', e)
             self.logger.error(f'Item(s) Could Not Be Subtracted From Database: {e}')
             self.app.finish.set_text('An Error Occurred, Item(s) Could Not Be Subtracted From Database.')
         else:
@@ -215,7 +213,6 @@ class Login(AbstractScanner):
         self.app.sideUI.hide()
         user = self.app.user
         if user:
-            print('[*] User Logged Out As:', user)
             self.logger.info(f'User Logged Out As: {user}')
             self.app.user = ''
         super().to_page()
@@ -242,9 +239,8 @@ class Login(AbstractScanner):
             self._finish_login(data)
             return True
         
-        print(f'[!] QR Code Not Recognized: "{data}"')
-        self.logger.info(f'QR Code Not Recognized: "{data}"')
-        QMessageBox.information(
+        self.logger.warning(f'QR Code Not Recognized: "{data}"')
+        QMessageBox.warning(
                 self,
                 'Unknown QR Code',
                 'QR Code Not Recognized In Database'
@@ -268,9 +264,8 @@ class Login(AbstractScanner):
             self._finish_login(text)
             return
         
-        print(f'[!] Username Not Recognized: "{text}"')
-        self.logger.info(f'Username Not Recognized: "{text}"')
-        QMessageBox.information(
+        self.logger.warning(f'Username Not Recognized: "{text}"')
+        QMessageBox.warning(
                 self,
                 'Unknown Username Entered',
                 'Entered Username Not Recognized In Database'
@@ -288,7 +283,6 @@ class Login(AbstractScanner):
         """
         
         self.app.user = username
-        print('[*] User Logged In As:', username)
         self.logger.info(f'User Logged In As: {username}')
         self.app.view.to_page()
         self.stop_video()

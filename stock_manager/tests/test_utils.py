@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import MagicMock
 
 import pytest
@@ -59,18 +60,16 @@ class TestDatabase:
 
 
 class TestLogger:
-    @pytest.fixture
-    def logger(self) -> Logger:
-        return Logger()
+    Logger()
     
-    def test_info_log(self, logger):
-        assert logger.info_log('') is None
+    def test_info_log(self):
+        assert logging.getLogger().info('Test Info Log') is None
     
-    def test_warning_log(self, logger):
-        assert logger.warning_log('') is None
+    def test_warning_log(self):
+        assert logging.getLogger().warning('Test Warning Log') is None
     
-    def test_error_log(self, logger):
-        assert logger.error_log('') is None
+    def test_error_log(self):
+        assert logging.getLogger().error('Test Error Log') is None
 
 
 class TestExports:

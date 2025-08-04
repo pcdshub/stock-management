@@ -73,14 +73,13 @@ class Export(AbstractExporter):
                             'Please Select A File Type Before Exporting'
                     )
                 case _ as unknown:
-                    print(f'[!] Unknown Export Type: "{unknown}"')
+                    self.logger.warning(f'Unknown Export Type: "{unknown}"')
                     QMessageBox.warning(
                             self,
                             'Selection Error',
                             'Please Select A Valid File Type To Export'
                     )
         except Exception as e:
-            print('[x] Export Failed:', e)
             self.logger.error(f'Export Failed: {e}')
             response = QMessageBox.critical(
                     self,
@@ -140,7 +139,6 @@ class QRGenerate(AbstractExporter):
         try:
             self.app.export_utils.save_code(self._selected_qr, self.path)
         except Exception as e:
-            print('[x] Failed To Save QR Code To File:', e)
             self.logger.error(f'Failed To Save QR Code To File: {e}')
             QMessageBox.critical(
                     self,
@@ -164,7 +162,6 @@ class QRGenerate(AbstractExporter):
             if not self._selected_qr:
                 raise Exception('Error In App.export_utils()')
         except Exception as e:
-            print('[x] Failed To Get Selected Item QR Code:', e)
             self.logger.error(f'Failed To Get Selected Item QR Code: {e}')
             QMessageBox.critical(
                     self,
@@ -181,7 +178,6 @@ class QRGenerate(AbstractExporter):
             q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
             self.qr_lbl.setPixmap(QPixmap.fromImage(q_img))
         except Exception as e:
-            print('[x] Failed To Update QR Label:', e)
             self.logger.error(f'Failed To Update QR Label: {e}')
             QMessageBox.critical(
                     self,

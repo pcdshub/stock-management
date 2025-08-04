@@ -1,6 +1,7 @@
 """Instantiate and run the App class to start the SLAC Inventory Management application."""
 
 import asyncio
+import logging
 from pathlib import Path
 from typing import override
 
@@ -34,7 +35,7 @@ class App(QMainWindow):
         
         super().__init__()
         
-        self.logger = Logger()
+        self.logger = logging.getLogger()
         self.db = DBUtils()
         self.export_utils = ExportUtils()
         
@@ -64,8 +65,7 @@ class App(QMainWindow):
             ui_path: Path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
             loadUi(str(ui_path), self)
         except Exception as e:
-            print('[x] Failed To Load Main UI File:', e)
-            self.logger.error_log(f'Failed To Load Main UI File: {e}')
+            self.logger.error(f'Failed To Load Main UI File: {e}')
             QMessageBox.critical(
                     self,
                     'UI Failure',
@@ -145,7 +145,7 @@ class App(QMainWindow):
         and begins any asynchronous loading.
         """
         
-        self.logger.info_log('App Started')
+        self.logger.info('App Started')
         self.login.to_page()
         self._on_page_changed()
         self._async_load()
@@ -164,8 +164,7 @@ class App(QMainWindow):
             self.all_items = self.db.create_all_items(self.db.get_all_data_gs())
             await self.update_tables()
         except Exception as e:
-            print('[x] Error Loading Data Asynchronously:', e)
-            self.logger.error_log(f'Could not load data from database: {e}')
+            self.logger.error(f'Error Loading Data Asynchronously: {e}')
             response = QMessageBox.critical(
                     self,
                     'Data Load Failure',
@@ -185,8 +184,7 @@ class App(QMainWindow):
             try:
                 self.scanner.stop_video()
             except Exception as e:
-                print('[x] Failed To Stop QR Scanner:', e)
-                self.logger.error_log(f'Failed To Stop QR Scanner: {e}')
+                self.logger.error(f'Failed To Stop QR Scanner: {e}')
                 QMessageBox.critical(
                         self,
                         'QR Scanner Error',
@@ -217,8 +215,7 @@ class App(QMainWindow):
     def closeEvent(self, event: QCloseEvent) -> None:
         """Handle the application close event and log exit."""
         
-        print('[+] Exiting Application')
-        self.logger.info_log('App Exited\n')
+        self.logger.info('App Exited\n')
         super().closeEvent(event)
     
     @asyncSlot()

@@ -1,51 +1,36 @@
 """
 Logger utility for Stock Management Application.
 
-Provides static methods for logging messages to a file with different severity levels.
+Initializes static logger for logging messages to a file with different severity levels.
+
+Logger can be used by referencing `logging.getLogger()` after `Logger()` is run.
 """
 
-import logging as log
+import logging
+import sys
 
 
 class Logger:
     """
-    Logger utility for writing informational, warning, and error logs to a file.
+    Logger utility for writing informational, warning, and error logs to a file and the console.
     """
     
     def __init__(self):
         """
         Configures the logging module to write logs to 'app.log' with timestamps and severity levels.
+        
+        Also prints messages to the console with severity levels.
         """
-        log.basicConfig(
-                filename='app.log',
-                level=log.INFO,
+        
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+        
+        logging.basicConfig(
+                level=logging.INFO,
                 format='%(asctime)s [%(levelname)s] %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S'
+                datefmt='%Y-%m-%d %H:%M:%S',
+                handlers=[
+                    logging.FileHandler('app.log'),
+                    handler
+                ]
         )
-    
-    @staticmethod
-    def info_log(msg: str) -> None:
-        """
-        Logs an informational message to the app log.
-        
-        :param msg: Message to be logged.
-        """
-        log.info(msg)
-    
-    @staticmethod
-    def warning_log(msg: str) -> None:
-        """
-        Logs a warning message to the app log.
-        
-        :param msg: Message to be logged.
-        """
-        log.warning(msg)
-    
-    @staticmethod
-    def error_log(msg: str) -> None:
-        """
-        Logs an error message to the app log.
-        
-        :param msg: Message to be logged.
-        """
-        log.error(msg)

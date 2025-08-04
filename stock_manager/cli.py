@@ -5,13 +5,17 @@ Provides a CLI for performing various operations across the application without 
 """
 
 import argparse
+import logging
 import os
 import sys
 from typing import Callable
 
 import pytest
+from prettytable import PrettyTable
 
 import stock_manager
+
+logger = logging.getLogger()
 
 
 def build_commands() -> argparse.Namespace:
@@ -92,7 +96,7 @@ def entry_point(args) -> bool:
         if getattr(args, cmd, False):
             return handler(args)
     
-    print('[+] Starting Application UI...')
+    logger.info('Starting Application UI...')
     return True
 
 
@@ -108,10 +112,10 @@ def _valid_args(args, expected=0) -> bool:
     values = args.values or []
     if expected:
         if len(values) < expected or len(values) > expected:
-            print(f'[!] Expected {expected} values, got {len(values)}: {values}')
+            logger.warning(f'Expected {expected} values, got {len(values)}: {values}')
             return False
     elif values:
-        print(f'[!] No Values Expected, Got {len(values)}: {values}')
+        logger.warning(f'No Values Expected, Got {len(values)}: {values}')
         return False
     return True
 
@@ -126,7 +130,6 @@ def _run_app(args) -> bool:
     
     if not _valid_args(args):
         return False
-    print('[+] Starting Application...')
     return True
 
 
@@ -140,7 +143,7 @@ def _run_version(args) -> bool:
     
     if not _valid_args(args):
         return False
-    print('[*] Version:', stock_manager.__version__)
+    logger.info(f'Version: {stock_manager.__version__}')
     return False
 
 
@@ -156,7 +159,7 @@ def _run_tests(args) -> bool:
     if not _valid_args(args):
         return False
     
-    print('[+] Starting Tests...')
+    logger.info('Starting Tests...')
     
     tests_path = os.path.join(os.path.dirname(__file__), 'tests')
     return_code = pytest.main([tests_path])
@@ -179,7 +182,7 @@ def _run_export(args) -> bool:
     
     path = args.values[0]
     extension = args.values[1]
-    print(f'[+] Exporting Data As .{extension} File...')
+    logger.info(f'Exporting Data As .{extension} File...')
     
     utils = ExportUtils()
     db = DBUtils()
@@ -191,10 +194,10 @@ def _run_export(args) -> bool:
         case 'pdf':
             utils.pdf_export()
         case _:
-            print('[!] Unknown Export Type:', extension)
+            logger.warning(f'Unknown Export Type: {extension}')
             return False
     
-    print('[*] Successfully Exported Data To', extension, 'File')
+    logger.info(f'Successfully Exported Data To .{extension} File')
     return False
 
 
@@ -213,7 +216,7 @@ def _run_qr(args) -> bool:
     
     path = args.values[0]
     part_num = args.values[1]
-    print('[+] Exporting', part_num, 'QR Code As .PNG...')
+    logger.info(f'Exporting {part_num} QR Code As .PNG...')
     utils = ExportUtils()
     
     image = utils.create_code(part_num)
@@ -223,7 +226,7 @@ def _run_qr(args) -> bool:
     if not utils.save_code(image, path):
         return False
     
-    print('[*] Successfully Exported', part_num, 'QR Code')
+    logger.info(f'Successfully Exported {part_num} QR Code')
     return False
 
 
@@ -237,9 +240,9 @@ def _run_sync_databases(args) -> bool:
     
     if not _valid_args(args):
         return False
-    print('[+] Syncing Databases...')
+    logger.info('Syncing Databases...')
     stock_manager.DBUtils().sync_databases()
-    print('[*] Successfully Synchronized Databases')
+    logger.info('Successfully Synchronized Databases')
     return False
 
 
@@ -282,7 +285,7 @@ def _run_add_item(args) -> bool:
     if not _valid_args(args, 10):
         return False
     
-    print(f'[+] Adding "{args.values[0]}" To Databases...')
+    logger.info(f'Adding "{args.values[0]}" To Databases...')
     
     try:
         from stock_manager import DBUtils, DatabaseUpdateType, Item
@@ -300,9 +303,9 @@ def _run_add_item(args) -> bool:
         
         utils.update_items_database(DatabaseUpdateType.ADD, item)
         
-        print(f'[*] Successfully Added "{item.part_num}" To Items Databases')
+        logger.info(f'Successfully Added "{item.part_num}" To Items Databases')
     except Exception as e:
-        print('[x] Failed To Add Item To Items Database:', e)
+        logger.error(f'Failed To Add Item To Items Database: {e}')
     finally:
         return False
 
@@ -320,17 +323,17 @@ def _run_remove_item(args) -> bool:
     if not _valid_args(args, 1):
         return False
     
-    print(f'[+] Removing "{args.values[0]}" From Databases...')
+    logger.info(f'Removing "{args.values[0]}" From Databases...')
     
     utils = DBUtils()
     item = utils.find_item(args.values[0])
     if not item:
-        print(f'[x] Could Not Locate "{args.values[0]}" In Databases')
+        logger.error(f'Could Not Locate "{args.values[0]}" In Databases')
         return False
     
     utils.update_items_database(DatabaseUpdateType.REMOVE, item)
     
-    print('[*] Successfully Removed', item.part_num, 'From Databases')
+    logger.info(f'Successfully Removed {item.part_num} From Databases')
     return False
 
 
@@ -345,15 +348,15 @@ def _run_edit_item(args) -> bool:
     from stock_manager import DBUtils, DatabaseUpdateType
     
     if len(args.values) < 2:
-        print(f'[!] Expected One Item And At Least One Value, Got {len(args.values)}: {args.values}')
+        logger.warning(f'Expected One Item And At Least One Value, Got {len(args.values)}: {args.values}')
         return False
     
-    print('[+] Editing', args.values[0], 'In Database...')
+    logger.info(f'Editing {args.values[0]} In Databases...')
     
     utils = DBUtils()
     item = utils.find_item(args.values[0])
     if not item:
-        print(f'[x] Could Not Locate "{args.values[0]}" In Databases')
+        logger.error(f'Could Not Locate "{args.values[0]}" In Databases')
         return False
     
     change_vals_dict: dict[str, str] = {}
@@ -367,7 +370,7 @@ def _run_edit_item(args) -> bool:
     
     utils.update_items_database(DatabaseUpdateType.EDIT, item)
     
-    print('[*] Successfully Updated', item.part_num, 'Values')
+    logger.info(f'Successfully Updated {item.part_num}\'s Values In Databases')
     return False
 
 
@@ -412,17 +415,17 @@ def _run_add_user(args) -> bool:
     if not _valid_args(args, 1):
         return False
     
-    print('[+] Adding User To Databases...')
+    logger.info('Adding User To Databases...')
     
     utils = DBUtils()
     username_arg = args.values[0]
     if username_arg not in utils.get_all_users_gs():
-        print(f'[!] "{username_arg}" Already In Users Database')
+        logger.warning(f'"{username_arg}" Already In Users Databases')
         return False
     
     utils.update_users_database(DatabaseUpdateType.ADD, username_arg)
     
-    print(f'[*] Successfully Added "{username_arg}" To Users Databases')
+    logger.info(f'Successfully Added "{username_arg}" To Users Databases')
     return False
 
 
@@ -439,11 +442,11 @@ def _run_remove_user(args) -> bool:
     if not _valid_args(args, 1):
         return False
     
-    print('[+] Removing User From Databases...')
+    logger.info('Removing User From Databases...')
     
     DBUtils().update_users_database(DatabaseUpdateType.REMOVE, args.values[0])
     
-    print('[*] Successfully Removed', args.values[0], 'From Databases')
+    logger.info(f'Successfully Removed {args.values[0]} From Databases')
     return False
 
 
@@ -456,9 +459,9 @@ def _list_items(search_value='') -> None:
     
     from stock_manager import DBUtils, StockStatus
     
-    print('[+]', 'Gathering Item Data...' if not search_value else f'Searching For Items With "{search_value}"...')
     widths = [3, 10, 12, 5, 10, 10, 8, 8, 6, 12, 20]
     sum_widths = sum(widths)
+    logger.info('Gathering Item Data...' if not search_value else f'Searching For Items With "{search_value}"...')
     all_data: list[dict[str, int | str | None]] = DBUtils().get_all_data_gs()
     headers = [
         'ID', 'Name', 'Manufacturer', 'Total',
@@ -538,7 +541,7 @@ def _list_users(search_value='') -> None:
     
     from stock_manager import DBUtils
     
-    print('[+]', 'Gathering User Data...' if not search_value else f'Searching For Usernames With "{search_value}"...')
+    logger.info('Gathering User Data...' if not search_value else f'Searching For Usernames With "{search_value}"...')
     all_users: set[str] = DBUtils().get_all_users_gs()
     border = '=' * 16
     

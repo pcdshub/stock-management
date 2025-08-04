@@ -106,7 +106,6 @@ class Edit(AbstractController):
             self.min_750_spinner.setValue(item.minimum if item.minimum is not None else 0)
             self.min_757_spinner.setValue(item.minimum_sallie if item.minimum_sallie is not None else 0)
         except Exception as e:
-            print('[x] Failed To Populate Fields:', e)
             self.logger.error(f'Failed To Populate Fields: {e}')
             QMessageBox.critical(
                     self,
@@ -135,7 +134,6 @@ class Edit(AbstractController):
             self.total_lbl.setText('Total: ' + str(self._total))
             self.excess_lbl.setText('Excess: ' + str(self._excess))
         except Exception as e:
-            print('[x] Spinner Change Error:', e)
             self.logger.error(f'Spinner Change Error: {e}')
             QMessageBox.critical(
                     self,

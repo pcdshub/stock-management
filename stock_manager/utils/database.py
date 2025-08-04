@@ -59,7 +59,6 @@ class DBUtils:
             )
             self._cursor: MySQLCursorAbstract = self._db.cursor(dictionary=True)
         except Exception as e:
-            print('[x] Failed To Connect To Database:', e)
             self._log.error(f'Failed To Connect To Database: {e}')
             QMessageBox.critical(
                     None,
@@ -120,11 +119,11 @@ class DBUtils:
                 if gs_part == sql_part:
                     continue
                 
-                print('[+] Editing Item:', gs_part)
+                self._log.info(f'Editing Item: {gs_part}')
                 if not self._update_items_sql(DatabaseUpdateType.EDIT, gs_part):
                     return False
             else:
-                print('[+] Adding Item:', gs_part)
+                self._log.info(f'Adding Item: {gs_part}')
                 if not self._update_items_sql(DatabaseUpdateType.ADD, gs_part):
                     return False
         
@@ -133,11 +132,10 @@ class DBUtils:
             if username in all_users_sql:
                 continue
             
-            print('[+] Adding Username:', username)
+            self._log.info(f'Adding Username: {username}')
             try:
                 self._cursor.execute('insert into users (username) value (%s);', [username])
             except Exception as e:
-                print('[+] Adding Usernames Error:', e)
                 self._log.error(f'Adding Usernames Error: {e}')
                 QMessageBox.critical(
                         None,
@@ -153,7 +151,7 @@ class DBUtils:
                 continue
             
             item = Item(*list(part_dict.values()))
-            print('[+] Removing Item:', item)
+            self._log.info(f'Removing Item: {item}')
             if not self._update_items_sql(DatabaseUpdateType.REMOVE, item):
                 return False
         
@@ -162,11 +160,10 @@ class DBUtils:
             if username in all_users_gs:
                 continue
             
-            print('[+] Removing Username:', username)
+            self._log.info(f'Removing Username: {username}')
             try:
                 self._cursor.execute('delete from users where username = %s;', [username])
             except Exception as e:
-                print('[x] Deleting Users Error:', e)
                 self._log.error(f'Deleting Users Error: {e}')
                 QMessageBox.critical(
                         None,
@@ -209,7 +206,6 @@ class DBUtils:
         try:
             return self._client.worksheet('Parts').row_values(1)
         except Exception as e:
-            print(f'[x] Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME} Database: {e}')
             self._log.error(f'Failed To Fetch Sheet Headers From {stock_manager.GS_FILE_NAME} Database: {e}')
             QMessageBox.critical(
                     None,
@@ -228,8 +224,7 @@ class DBUtils:
         try:
             return self._client.worksheet('Parts').get_all_records()
         except Exception as e:
-            print(f'[x] Failed To Fetch All Data From {stock_manager.GS_FILE_NAME} Database: {e}')
-            self._log.error(f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME}: {e}')
+            self._log.error(f'Failed To Fetch All Data From {stock_manager.GS_FILE_NAME} Database: {e}')
             response = QMessageBox.critical(
                     None,
                     'Data Fetching Error',
@@ -260,7 +255,6 @@ class DBUtils:
             self._cursor.execute(sql)
             return self._cursor.fetchall()
         except Exception as e:
-            print('[x] Failed To Fetch All Data From SQL Database:', e)
             self._log.error(f'Failed To Fetch All Data From SQL Database: {e}')
             response = QMessageBox.critical(
                     None,
@@ -289,7 +283,6 @@ class DBUtils:
                 for user in self._client.worksheet('Users').col_values(1)
             }
         except Exception as e:
-            print(f'[x] Failed To Get All Users From {stock_manager.GS_FILE_NAME}: {e}')
             self._log.error(f'Failed To Get All Users From {stock_manager.GS_FILE_NAME}: {e}')
             QMessageBox.critical(
                     None,
@@ -314,7 +307,6 @@ class DBUtils:
             results: list[dict[str, str]] = self._cursor.fetchall()
             return {next(iter(result.values())) for result in results}
         except Exception as e:
-            print('[x] Failed To Get All Users From SQL Database:', e)
             self._log.error(f'Failed To Get All Users From SQL Database: {e}')
             QMessageBox.critical(
                     None,
@@ -343,7 +335,6 @@ class DBUtils:
             changelist = [changelist]
         
         if update_type not in [DatabaseUpdateType.ADD, DatabaseUpdateType.EDIT, DatabaseUpdateType.REMOVE]:
-            print('[x] Unknown Items Database Update Type:', update_type)
             self._log.error(f'Unknown Items Database Update Type: {update_type}')
             QMessageBox.critical(
                     None,
@@ -399,7 +390,6 @@ class DBUtils:
             self._db.commit()
             return True
         except Exception as e:
-            print('[x] Error Updating Items SQL Database:', e)
             self._log.error(f'Error Updating Items SQL Database: {e}')
             QMessageBox.critical(
                     None,
@@ -439,7 +429,6 @@ class DBUtils:
                         sheet.delete_rows(cell.row)
             return True
         except Exception as e:
-            print(f'[x] Error Updating Item "{item.part_num}" In Google Sheet Database: {e}')
             self._log.error(f'Error Updating Item "{item.part_num}" In Google Sheet Database: {e}')
             QMessageBox.critical(
                     None,
@@ -460,7 +449,6 @@ class DBUtils:
         from stock_manager import DatabaseUpdateType
         
         if update_type not in [DatabaseUpdateType.ADD, DatabaseUpdateType.REMOVE]:
-            print('[x] Unknown Users Database Update Type:', update_type)
             self._log.error(f'Unknown Users Database Update Type: {update_type}')
             QMessageBox.critical(
                     None,
@@ -496,7 +484,6 @@ class DBUtils:
             self._db.commit()
             return True
         except Exception as e:
-            print('[x] Error Updating Users SQL Database:', e)
             self._log.error(f'Error Updating Users SQL Database: {e}')
             QMessageBox.critical(
                     None,
@@ -526,7 +513,6 @@ class DBUtils:
                     sheet.delete_rows(cell.row)
             return True
         except Exception as e:
-            print(f'[x] Error Updating "{username}" In Google Sheet User Database: {e}')
             self._log.error(f'Error Updating "{username}" In Google Sheet User Database: {e}')
             QMessageBox.critical(
                     None,
@@ -547,13 +533,12 @@ class DBUtils:
             sheet: Worksheet = self._client.worksheet('Notifications')
             cell: Cell | None = sheet.find(part_num)
             if cell:
-                print('[*]', part_num, 'Already In Notifications Database')
+                self._log.warning(f'{part_num} Already In Notifications Database')
                 return True
             
             sheet.append_row([part_num])
             return True
         except Exception as e:
-            print('[x] Failed To Add Notification To Notifications Database:', e)
             self._log.error(f'Failed To Add Notification To Notifications Database: {e}')
             QMessageBox.critical(
                     None,

@@ -85,7 +85,6 @@ class Add(AbstractController):
             self.total_lbl.setText('Total: ' + str(self._total))
             self.excess_lbl.setText('Excess: ' + str(self._excess))
         except Exception as e:
-            print('[x] Spinner Change Error:', e)
             self.logger.error(f'Spinner Change Error: {e}')
             QMessageBox.critical(
                     self,
