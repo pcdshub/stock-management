@@ -13,7 +13,7 @@ from qasync import QEventLoop
 
 import stock_manager
 from stock_manager import App
-from stock_manager.cli import build_commands, entry_point
+from stock_manager.cli import build_commands
 
 
 def main() -> None:
@@ -36,7 +36,8 @@ def main() -> None:
     
     args = build_commands()
     
-    if not entry_point(args):
+    if hasattr(args, 'func'):
+        args.func(args)
         return
     
     try:
