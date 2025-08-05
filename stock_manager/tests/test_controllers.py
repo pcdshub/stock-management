@@ -11,7 +11,7 @@ from stock_manager import AbstractController, AbstractScanner, Add, Edit, Export
     QRGenerate, Remove, View
 
 
-class TestAllControllers:
+class TestControllers:
     @pytest.fixture(
             params=[
                 Add, Edit, Export,
@@ -23,17 +23,17 @@ class TestAllControllers:
     def controller(self, request) -> AbstractController:
         return request.param(MagicMock())
     
+    @pytest.fixture(params=[Edit, QRGenerate, Remove, View])
+    def table_controller(self, request) -> AbstractController:
+        return request.param(MagicMock())
+        
     def test_basic(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
     
     @pytest.mark.asyncio
-    async def test_update_table(self, qtbot: QtBot, controller):
-        qtbot.addWidget(controller)
-        
-        if not hasattr(controller, 'table'):
-            pytest.skip(f'{controller.__class__.__name__} Has No Table')
-        
-        assert await controller.update_table() is True
+    async def test_update_table(self, qtbot: QtBot, table_controller):
+        qtbot.addWidget(table_controller)
+        assert await table_controller.update_table()
     
     def test_to_page(self, qtbot: QtBot, controller):
         if isinstance(controller, AbstractScanner):
@@ -73,10 +73,6 @@ class TestScanners:
         if not image.any():
             assert False
         scanner.check_for_qr(image)
-
-
-class TestExporters:
-    pass
 
 
 class TestAdd:

@@ -104,4 +104,4 @@ class TestExports:
 
 
 def test_email_sending():
-    assert stock_manager.send_email('Test Email', MagicMock())
+    assert stock_manager.send_email('Test Email')
