@@ -1,4 +1,5 @@
-PyQt5
+# main requirements
+pyqt5
 cv2
 numpy
 gspread
@@ -8,6 +9,9 @@ typing
 qasync
 qrcode
 qtawesome
+mysql
+prettytable
+
+# testing requirements
 pytest
 pytest-qt
-mysql
