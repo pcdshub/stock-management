@@ -1,5 +1,4 @@
 import logging
-import sys
 
 import pytest
 
@@ -7,116 +6,119 @@ from stock_manager.__main__ import main
 
 
 def test_help(monkeypatch):
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', '--help'])
+    monkeypatch.setattr('sys.argv', ['stock_manager', '--help'])
     with pytest.raises(SystemExit):
         main()
 
 
-@pytest.mark.parametrize(
-        'version_command', ['-v', '--version']
-)
-def test_version(monkeypatch, caplog, version_command):
+@pytest.mark.parametrize('version_command', ['-v', '--version'])
+def test_version(monkeypatch, capsys, version_command: str):
+    import stock_manager
+    
+    monkeypatch.setattr('sys.argv', ['stock_manager', version_command])
+    with pytest.raises(SystemExit):
+        main()
+    
+    captured = capsys.readouterr()
+    assert captured.out.strip() == stock_manager.__version__
+
+
+def test_sync(monkeypatch, caplog):
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', version_command])
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'sync'])
     main()
-    assert 'Version: ' in caplog.text
+    assert 'Successfully Synchronized Databases' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
 
 
 @pytest.mark.parametrize(
-        'version_command', ['-s', '--sync-databases']
-)
-def test_version(monkeypatch, caplog, version_command):
-    caplog.set_level(logging.INFO)
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', version_command])
-    main()
-    assert 'Successfully Synchronized Databases' in caplog.text
-
-
-@pytest.mark.parametrize(
-        'list_command',
+        'category, list_command',
         [
-            '-li', '--list-items',
-            '-lu', '--list-users'
+            ('items', '-l'),
+            ('items', '--list'),
+            ('users', '-l'),
+            ('users', '--list')
         ]
 )
-def test_no_args_commands(monkeypatch, caplog, list_command):
+def test_no_args_commands(monkeypatch, caplog, category: str, list_command: str):
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', list_command])
+    monkeypatch.setattr('sys.argv', ['stock_manager', category, list_command])
     main()
-    assert 'Successfully Printed ' in caplog.text
+    assert 'Successfully Printed ' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
 
 
 @pytest.mark.parametrize(
-        'command, arg',
+        'command, arg, path',
         [
-            ('-e', 'csv'),
-            ('--export', 'csv'),
-            ('-qr', 'test'),
-            ('--create-qr', 'test')
+            ('export', 'csv', ''),
+            ('export', 'csv', './exports'),
+            ('qr', 'test', ''),
+            ('qr', 'test', './exports'),
         ]
 )
-def test_file_export_commands(monkeypatch, caplog, command: str, arg: str):
+def test_file_export_commands(monkeypatch, caplog, command: str, arg: str, path: str):
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', command, './exports', arg])
+    if not path:
+        monkeypatch.setattr('sys.argv', ['stock_manager', command, arg])
+    else:
+        monkeypatch.setattr('sys.argv', ['stock_manager', command, arg, path])
     main()
-    assert 'Successfully Exported' in caplog.text
+    assert 'Successfully Exported' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
 
 
 @pytest.mark.parametrize(
-        'command, arg',
+        'category, search_string',
         [
-            ('-si', 'BK9000'),
-            ('--search-items', 'BK9000'),
-            ('-su', 'username'),
-            ('--search-users', 'username')
+            ('items', 'BK9000'),
+            ('users', 'username')
         ]
 )
-def test_search_commands(monkeypatch, caplog, command: str, arg: str):
+def test_search_commands(monkeypatch, caplog, category: str, search_string: str):
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', command, arg])
+    monkeypatch.setattr('sys.argv', ['stock_manager', category, 'search', search_string])
     main()
-    assert 'Successfully Printed ' in caplog.text
+    assert 'Successfully Printed ' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
 
 
-@pytest.mark.parametrize(
-        'add_command, edit_command, remove_command', [
-            ('-ai', '-ei', '-ri'),
-            ('--add-item', '--edit', '--remove-item')
-        ]
-)
-def test_add_edit_remove_item(monkeypatch, caplog, add_command: str, edit_command: str, remove_command: str):
+def test_add_edit_remove_item(monkeypatch, caplog):
     caplog.set_level(logging.INFO)
     monkeypatch.setattr(
-            sys, 'argv',
+            'sys.argv',
             [
                 'stock_manager',
-                add_command,
+                'items',
+                'add',
                 'test', 'test', 'test',
                 0, 0, 0, 0, 0, 0,
                 'Out Of Stock'
             ]
     )
     main()
-    assert 'Successfully Added' in caplog.text
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', edit_command, 'test', 'total=999'])
+    assert 'Successfully Added' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
+    
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'items', 'edit', 'test', 'total=999'])
     main()
-    assert 'Successfully Updated' in caplog.text
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', remove_command, 'test'])
+    assert 'Successfully Updated' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
+    
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'items', 'remove', 'test'])
     main()
-    assert 'Successfully Removed' in caplog.text
+    assert 'Successfully Removed' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
 
 
-@pytest.mark.parametrize(
-        'add_command, remove_command', [
-            ('-au', '-ru'),
-            ('--add-user', '--remove-user')
-        ]
-)
-def test_add_remove_user(monkeypatch, caplog, add_command: str, remove_command: str):
+def test_add_remove_user(monkeypatch, caplog):
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', add_command, 'test_username'])
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'users', 'add', 'test_username'])
     main()
-    assert 'Successfully Added' in caplog.text
-    monkeypatch.setattr(sys, 'argv', ['stock_manager', remove_command, 'test_username'])
+    assert 'Successfully Added' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
+    
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'users', 'remove', 'test_username'])
     main()
-    assert 'Successfully Removed' in caplog.text
+    assert 'Successfully Removed' in caplog.text, \
+        f'Expected success message not found in logs: {caplog.text}'
