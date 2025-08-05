@@ -64,7 +64,7 @@ def build_commands() -> argparse.Namespace:
     export_parser.add_argument(
             'extension',
             type=str,
-            help=''
+            help='File extension/format to export as (e.g., csv, pdf, etc.)'
     )
     export_parser.add_argument(
             'path',

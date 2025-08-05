@@ -92,7 +92,8 @@ class Hutches(Enum):
     CXI = 'CXI (Coherent X-ray Imaging)',
     MEC = 'MEC (Matter in Extreme Conditions)',
     MFX = 'MFX (Macromolecular Femto-Second Crystallography)',
-    QRIXS = 'qRIXS',
+    QRIXS = 'qRIXS (Quantum Resonant Inelastic X-ray Scattering)',
+    CHEMRIXS = 'chemRIXS (Chemistry Resonant Inelastic X-ray Scattering)'
     TMO = 'TMO (Time-resolved AMO)',
     TXI = 'TXI (Tender X-ray Instrument)',
     XCS = 'XCS (X-ray Correlation Spectroscopy)',

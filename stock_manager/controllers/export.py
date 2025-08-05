@@ -66,7 +66,7 @@ class Export(AbstractExporter):
                     self.app.export_utils.pdf_export()
                 case ExportTypes.CSV.value | ExportTypes.TSV.value | ExportTypes.PSV.value as export_type:
                     self.app.export_utils.sv_export(export_type, self.path, self.app.all_items)
-                case 'Select':
+                case 'Select' | 'select':
                     QMessageBox.information(
                             self,
                             'Please Choose File Type',

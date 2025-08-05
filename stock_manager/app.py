@@ -30,7 +30,7 @@ class App(QMainWindow):
         :raises SystemExit: If the main UI fails to load
         """
         
-        from stock_manager import DBUtils, Logger, ExportUtils, Login, View, Add, Export, Edit, Remove, QRGenerate, \
+        from stock_manager import DBUtils, ExportUtils, Login, View, Add, Export, Edit, Remove, QRGenerate, \
             Finish, ItemScanner
         
         super().__init__()
@@ -103,7 +103,7 @@ class App(QMainWindow):
                 continue
             
             button.clicked.connect(controller.to_page)
-            button.setShortcut(str(enum.value.PAGE_INDEX))
+            button.setShortcut(str(enum.value.PAGE_INDEX + 1))
         
         self.screens.currentChanged.connect(self._on_page_changed)
         self.actionToggle_Maximize.triggered.connect(self.toggle_maximize)
