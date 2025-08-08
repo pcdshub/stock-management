@@ -106,7 +106,6 @@ class Edit(AbstractController):
             self.min_750_spinner.setValue(item.minimum if item.minimum is not None else 0)
             self.min_757_spinner.setValue(item.minimum_sallie if item.minimum_sallie is not None else 0)
         except Exception as e:
-            print(f'Failed To Populate Fields: {e}')
             self.logger.error(f'Failed To Populate Fields: {e}')
             QMessageBox.critical(
                     self,
@@ -135,7 +134,6 @@ class Edit(AbstractController):
             self.total_lbl.setText('Total: ' + str(self._total))
             self.excess_lbl.setText('Excess: ' + str(self._excess))
         except Exception as e:
-            print(f'Spinner Change Error: {e}')
             self.logger.error(f'Spinner Change Error: {e}')
             QMessageBox.critical(
                     self,
@@ -220,5 +218,24 @@ class Edit(AbstractController):
         
         self.logger.info(f'{self.app.user} Edited Database Item: {new_item.part_num}')
         self.app.update_tables()
-        self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
+        self.database.update_items_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
         self._clear_form()
+        
+        if new_item.stock_b750 + new_item.stock_b757 <= 0:
+            from datetime import datetime
+            msg = ('Hello,\n\n'
+                   
+                   'This is an automatic notification detailing that '
+                   'the following item has reached a total stock of 0:\n'
+                   f'\tItem: {new_item.part_num}\n'
+                   f'\tDescription: {new_item.description}\n'
+                   f'\tExcess Count: {new_item.excess} ({new_item.stock_status.value})\n'
+                   f'\tDate/Time: {datetime.now()}\n\n'
+                   
+                   'Please take any necessary action to reorder or restock.\n\n'
+                   
+                   'Best regards,\n'
+                   'Stock Management System')
+            
+            self.database.add_notification(new_item.part_num)
+            # stock_manager.send_email(msg, self)

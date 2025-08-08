@@ -53,17 +53,25 @@ class ItemScanner(AbstractScanner):
     
     @override
     @asyncSlot()
-    async def check_for_qr(self, frame: ndarray) -> None:
+    async def check_for_qr(self, frame: ndarray) -> bool:
         """
         Scans the current frame for an item QR code, adding it to an
         internal list to be used when submitting a form and updating the UI.
         
         :param frame: Current video frame as a numpy ndarray.
+        :return: True if the QR code scanned is successfully added to the
+        scanned items list or is already in the scanned items list, False
+        if no QR code is detected or if the scanned QR code is not recognized
+        in the database.
         """
         
         data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
-        if not data or data in [item.part_num for item in self._items]:
-            return
+        
+        if not data:
+            return False
+        
+        if data in [item.part_num for item in self._items]:
+            return True
         
         self.logger.info(f'{self.app.user} Scanned Item QR Code: {data}')
         
@@ -72,15 +80,15 @@ class ItemScanner(AbstractScanner):
                 self._items.append(item)
                 self.logger.info(f'{self.app.user} Added {data} To Items List')
                 self.items_list.append(f'<ul><li>{data}</li></ul>')
-                return
+                return True
         
-        print(f'Item QR Code Not Recognized: "{data}"')
-        self.logger.info(f'Item QR Code Not Recognized: "{data}"')
-        QMessageBox.information(
+        self.logger.warning(f'Item QR Code Not Recognized: "{data}"')
+        QMessageBox.warning(
                 self,
                 'Unknown QR Code',
                 'QR Code Not Recognized In Database'
         )
+        return False
     
     def _clear_form(self) -> None:
         """Clears all fields in the scanner UI form and resets the scanned item list."""
@@ -124,8 +132,8 @@ class ItemScanner(AbstractScanner):
                     elif self.b757_btn.isChecked():
                         item.stock_b757 -= 1
                     else:
-                        print('Neither Radio Button Is Selected')
-                        QMessageBox.information(
+                        self.logger.warning('Neither Radio Button Is Selected')
+                        QMessageBox.warning(
                                 self,
                                 'Radio Button Error',
                                 'Neither Radio Button Is Selected, '
@@ -134,15 +142,29 @@ class ItemScanner(AbstractScanner):
                         return
                     
                     item.update_stats()
-                    if item.excess <= 0:
-                        pass  # TODO: handle alert send for specified item
-                    
+                    if item.stock_b750 + item.stock_b757 <= 0:
+                        from datetime import datetime
+                        msg = ('Hello,\n\n'
+                               
+                               'This is an automatic notification detailing that '
+                               'the following item has reached a total stock of 0:\n'
+                               f'\tItem: {item.part_num}\n'
+                               f'\tDescription: {item.description}\n'
+                               f'\tExcess Count: {item.excess} ({item.stock_status.value})\n'
+                               f'\tDate/Time: {datetime.now()}\n\n'
+                               
+                               'Please take any necessary action to reorder or restock.\n\n'
+                               
+                               'Best regards,\n'
+                               'Stock Management System')
+                        
+                        self.database.add_notification(item.part_num)
+                        # stock_manager.send_email(msg, self)
                     break
             
             self.app.update_tables()
-            self.database.update_database(stock_manager.DatabaseUpdateType.EDIT, self._items)
+            self.database.update_items_database(stock_manager.DatabaseUpdateType.EDIT, self._items)
         except Exception as e:
-            print(f'Item(s) Could Not Be Subtracted From Database: {e}')
             self.logger.error(f'Item(s) Could Not Be Subtracted From Database: {e}')
             self.app.finish.set_text('An Error Occurred, Item(s) Could Not Be Subtracted From Database.')
         else:
@@ -174,7 +196,7 @@ class Login(AbstractScanner):
         page = stock_manager.Pages.LOGIN
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
-        self._users_list = self.database.get_all_users()
+        self._users_list = self.database.get_all_users_gs()
         self.handle_connections()
     
     @override
@@ -191,37 +213,39 @@ class Login(AbstractScanner):
         self.app.sideUI.hide()
         user = self.app.user
         if user:
-            print(f'User Logged Out As: {user}')
             self.logger.info(f'User Logged Out As: {user}')
             self.app.user = ''
         super().to_page()
     
     @override
     @asyncSlot()
-    async def check_for_qr(self, frame: ndarray) -> None:
+    async def check_for_qr(self, frame: ndarray) -> bool:
         """
         Scans the current frame for a user QR code, logging them in if valid.
         
         :param frame: Current video frame as a numpy ndarray.
+        :return: True if the QR code scanned is valid and the user can
+        be logged in, False if no QR code is detected or if the scanned
+        QR code is not recognized in the database.
         """
         
         data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
         if not data or self.app.user:
-            return
+            return False
         
         self.logger.info(f'QR Code Scanned: {data}')
         
         if data in self._users_list:
             self._finish_login(data)
-            return
+            return True
         
-        print(f'QR Code Not Recognized: "{data}"')
-        self.logger.info(f'QR Code Not Recognized: "{data}"')
-        QMessageBox.information(
+        self.logger.warning(f'QR Code Not Recognized: "{data}"')
+        QMessageBox.warning(
                 self,
                 'Unknown QR Code',
                 'QR Code Not Recognized In Database'
         )
+        return False
     
     def _login_clicked(self) -> None:
         """Checks if the user entered a valid username and logs them in if valid."""
@@ -240,9 +264,8 @@ class Login(AbstractScanner):
             self._finish_login(text)
             return
         
-        print(f'Username Not Recognized: "{text}"')
-        self.logger.info(f'Username Not Recognized: "{text}"')
-        QMessageBox.information(
+        self.logger.warning(f'Username Not Recognized: "{text}"')
+        QMessageBox.warning(
                 self,
                 'Unknown Username Entered',
                 'Entered Username Not Recognized In Database'
@@ -260,7 +283,6 @@ class Login(AbstractScanner):
         """
         
         self.app.user = username
-        print(f'User Logged In As: {username}')
         self.logger.info(f'User Logged In As: {username}')
         self.app.view.to_page()
         self.stop_video()

@@ -65,22 +65,21 @@ class Export(AbstractExporter):
                 case ExportTypes.PDF.value:
                     self.app.export_utils.pdf_export()
                 case ExportTypes.CSV.value | ExportTypes.TSV.value | ExportTypes.PSV.value as export_type:
-                    self.app.export_utils.sv_export(export_type, self.path)
-                case 'Select':
+                    self.app.export_utils.sv_export(export_type, self.path, self.app.all_items)
+                case 'Select' | 'select':
                     QMessageBox.information(
                             self,
                             'Please Choose File Type',
                             'Please Select A File Type Before Exporting'
                     )
                 case _ as unknown:
-                    print(f'Unknown Export Type: "{unknown}"')
+                    self.logger.warning(f'Unknown Export Type: "{unknown}"')
                     QMessageBox.warning(
                             self,
                             'Selection Error',
                             'Please Select A Valid File Type To Export'
                     )
         except Exception as e:
-            print(f'Export Failed: {e}')
             self.logger.error(f'Export Failed: {e}')
             response = QMessageBox.critical(
                     self,
@@ -140,7 +139,6 @@ class QRGenerate(AbstractExporter):
         try:
             self.app.export_utils.save_code(self._selected_qr, self.path)
         except Exception as e:
-            print(f'Failed To Save QR Code To File: {e}')
             self.logger.error(f'Failed To Save QR Code To File: {e}')
             QMessageBox.critical(
                     self,
@@ -161,8 +159,9 @@ class QRGenerate(AbstractExporter):
         
         try:
             self._selected_qr = self.app.export_utils.create_code(item.part_num)
+            if not self._selected_qr:
+                raise Exception('Error In App.export_utils()')
         except Exception as e:
-            print(f'Failed To Get Selected Item QR Code: {e}')
             self.logger.error(f'Failed To Get Selected Item QR Code: {e}')
             QMessageBox.critical(
                     self,
@@ -179,7 +178,6 @@ class QRGenerate(AbstractExporter):
             q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
             self.qr_lbl.setPixmap(QPixmap.fromImage(q_img))
         except Exception as e:
-            print(f'Failed To Update QR Label: {e}')
             self.logger.error(f'Failed To Update QR Label: {e}')
             QMessageBox.critical(
                     self,

@@ -132,6 +132,11 @@
         </item>
         <item>
          <widget class="QTextEdit" name="items_list">
+          <property name="font">
+           <font>
+            <pointsize>15</pointsize>
+           </font>
+          </property>
           <property name="styleSheet">
            <string notr="true">#items_list {
 background-color: transparent;

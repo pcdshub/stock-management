@@ -15,18 +15,24 @@ requirements:
     - setuptools
   run:
     - python >=3.9
-    - pyqt5
+    - pyqt
     - opencv
     - numpy
+    - gspread
+    - oauth2client
     - pathlib
     - typing
     - qasync
     - qrcode
     - qtawesome
+    - mysql-connector-python
+    - prettytable
 
 test:
   imports:
     - stock_manager
+    - pytest
+    - pytest-qt
 
 about:
   home: https://github.com/pcdshub/stock-management.git

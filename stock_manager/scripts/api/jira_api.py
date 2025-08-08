@@ -27,7 +27,7 @@ def main():
 
 def list_all_issues(client: JIRA):
     for issue in client.search_issues(f'project=KAN'):
-        print(f"Key: {issue.key}, Summary: {issue.fields.summary}, Desc: {issue.fields.description}")
+        print(f'Key: {issue.key}, Summary: {issue.fields.summary}, Desc: {issue.fields.description}')
 
 
 def create_issue(client: JIRA, summary: str, desc: str, type: str) -> Issue:

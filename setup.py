@@ -21,9 +21,8 @@ setup(
         long_description_content_type="text/markdown",
         install_requires=install_requires,
         entry_points={
-            'gui_scripts': [
-                'stock_manager=stock_manager.__main__:main'
-            ]
+            'gui_scripts': ['stock_manager=stock_manager.__main__:main'],
+            'console_scripts': ['stock_manager=stock_manager.__main__:main']
         },
         python_requires='>=3.10',
         classifiers=[

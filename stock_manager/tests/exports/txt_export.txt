@@ -1,0 +1,3 @@
+This file exists to test automatic filename incrementation logic for export operations.
+If txt_export.txt exists, the next export should be named txt_export2.txt, and so on.
+This file is not used for storing real test data-its presence is what matters.

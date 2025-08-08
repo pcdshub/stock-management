@@ -85,7 +85,6 @@ class Add(AbstractController):
             self.total_lbl.setText('Total: ' + str(self._total))
             self.excess_lbl.setText('Excess: ' + str(self._excess))
         except Exception as e:
-            print(f'Spinner Change Error: {e}')
             self.logger.error(f'Spinner Change Error: {e}')
             QMessageBox.critical(
                     self,
@@ -106,13 +105,16 @@ class Add(AbstractController):
         for spinner in self._spinners:
             spinner.setValue(0)
     
-    def _submit_form(self) -> None:
+    def _submit_form(self) -> bool:
         """
         Validate the form and submit a new stock item.
         
         Checks that all required text fields are filled and at least one
         spinner has a value. Adds the item to the database, updates tables,
         and clears the form.
+        
+        :return: `True` if form is chosen to be submitted or not submitted
+        successfully, `False` if any issues occur.
         """
         
         def empty_fields_check() -> bool:
@@ -145,7 +147,7 @@ class Add(AbstractController):
                     'Please Fill Out All Text Fields And '
                     'At Least One Spinner Before Submitting Form'
             )
-            return
+            return False
         
         new_item = stock_manager.Item(
                 self.part_num.text(),
@@ -166,7 +168,7 @@ class Add(AbstractController):
                     f'"{new_item.part_num}" Already Exists In The Database, '
                     'Please Make A New Item That Does Not Already Exist.'
             )
-            return
+            return False
         
         response = QMessageBox.information(
                 self,
@@ -178,13 +180,34 @@ class Add(AbstractController):
         )
         
         if response == QMessageBox.No:
-            return
+            return True
         
         self.app.all_items.append(new_item)
         self.logger.info(f'{self.app.user} Added Item To Database: {new_item.part_num}')
         self.app.update_tables()
-        self.database.update_database(stock_manager.DatabaseUpdateType.ADD, new_item)
+        self.database.update_items_database(stock_manager.DatabaseUpdateType.ADD, new_item)
         self._clear_form()
+        
+        if new_item.stock_b750 + new_item.stock_b757 <= 0:
+            from datetime import datetime
+            msg = ('Hello,\n\n'
+                   
+                   'This is an automatic notification detailing that '
+                   'the following item has been created with a total stock of 0:\n'
+                   f'\tItem: {new_item.part_num}\n'
+                   f'\tDescription: {new_item.description}\n'
+                   f'\tExcess Count: {new_item.excess} ({new_item.stock_status.value})\n'
+                   f'\tDate/Time: {datetime.now()}\n\n'
+                   
+                   'Please take any necessary action to order or restock.\n\n'
+                   
+                   'Best regards,\n'
+                   'Stock Management System')
+            
+            self.database.add_notification(new_item.part_num)
+            # stock_manager.send_email(msg, self)
         
         self.app.finish.set_text(f'Successfully Added {new_item.part_num} To The Database')
         self.app.finish.to_page()
+        
+        return True

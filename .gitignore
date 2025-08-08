@@ -12,6 +12,9 @@ __pycache__/
 *.pyc
 ui_*.py
 *Copy.ui
-app.log
+*.log
 TODO.txt
 thoughts.txt
+*_export*
+!/test/exports/test_image*
+!/test/exports/txt_export.txt
