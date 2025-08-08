@@ -26,7 +26,7 @@ class Item:
     :var minimum: Minimum required stock for B750.
     :var excess: The amount of stock above minimum levels.
     :var minimum_sallie: Minimum required stock for B757.
-    :var stock_status: The current state of the stock item represented as the value of a StockStatus enum.
+    :var stock_status: The current state of the stock item represented as a StockStatus enum.
     """
     
     part_num: str
@@ -88,9 +88,14 @@ class Item:
         :param idx: index at which to check value.
         :return: the field's value.
         """
-        return [value for value in self.__dict__.values()][idx]
+        return [
+            value
+            if not isinstance(value, Enum)
+            else value.value
+            for value in self.__dict__.values()
+        ][idx]
     
-    def __setitem__(self, idx: str, value: str | int | None) -> None:
+    def __setitem__(self, idx: str, value: str | int | Enum | None) -> None:
         """
         Allows the setting of `Item` objects as `obj[str] = val`.
         
@@ -109,7 +114,12 @@ class Item:
         
         :return: A `Generator` of `Item` values to iterate through.
         """
-        return (value for value in self.__dict__.values())
+        return (
+            value
+            if not isinstance(value, Enum)
+            else value.value
+            for value in self.__dict__.values()
+        )
     
     def update_stats(self) -> None:
         """Updates the `total`, `excess`, and `stock_status` fields based on current stock and minimums."""
