@@ -20,6 +20,8 @@ requirements:
     - numpy
     - gspread
     - oauth2client
+    - pathlib
+    - typing
     - qasync
     - qrcode
     - qtawesome
