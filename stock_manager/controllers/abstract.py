@@ -83,6 +83,8 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         object does not have a table, `False` if a failure occurs.
         """
         
+        from enum import Enum
+        
         if not hasattr(self, 'table'):
             QMessageBox.warning(
                     self,
@@ -99,7 +101,12 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         
         source_model.setHorizontalHeaderLabels(self.database.get_headers())
         for item in all_data:
-            items = [QStandardItem(str(value)) for value in item]
+            items = [
+                QStandardItem(str(value))
+                if not isinstance(value, Enum)
+                else QStandardItem(value.value)
+                for value in item
+            ]
             source_model.appendRow(items)
         
         try:

@@ -1,4 +1,4 @@
-# main requirements
+# Main requirements
 pyqt5
 cv2
 numpy
@@ -12,6 +12,6 @@ qtawesome
 mysql
 prettytable
 
-# testing requirements
+# Testing requirements
 pytest
 pytest-qt

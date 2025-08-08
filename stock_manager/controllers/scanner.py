@@ -150,7 +150,7 @@ class ItemScanner(AbstractScanner):
                                'the following item has reached a total stock of 0:\n'
                                f'\tItem: {item.part_num}\n'
                                f'\tDescription: {item.description}\n'
-                               f'\tExcess Count: {item.excess} ({item.stock_status})\n'
+                               f'\tExcess Count: {item.excess} ({item.stock_status.value})\n'
                                f'\tDate/Time: {datetime.now()}\n\n'
                                
                                'Please take any necessary action to reorder or restock.\n\n'

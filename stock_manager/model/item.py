@@ -5,7 +5,11 @@ Defines the Item dataclass, which tracks part numbers, quantities, and stock sta
 """
 
 from dataclasses import dataclass
-from typing import Generator, override
+from enum import Enum
+from typing import Generator, override, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from stock_manager import StockStatus
 
 
 @dataclass
@@ -25,7 +29,7 @@ class Item:
     :var stock_status: The current state of the stock item represented as the value of a StockStatus enum.
     """
     
-    part_num: str | None
+    part_num: str
     manufacturer: str | None
     description: str | None
     total: int | None
@@ -34,7 +38,7 @@ class Item:
     minimum: int | None
     excess: int | None
     minimum_sallie: int | None
-    stock_status: str = ''
+    stock_status: 'StockStatus' = None
     
     def __post_init__(self):
         self._calc_stock_status()
@@ -77,7 +81,7 @@ class Item:
         """
         return len(self.__dict__)
     
-    def __getitem__(self, idx: int) -> str | int | None:
+    def __getitem__(self, idx: int) -> str | int | Enum | None:
         """
         Allows indexed access to the item's field values.
         
@@ -99,7 +103,7 @@ class Item:
             return
         raise NameError(f'Unknown Field: {idx}')
     
-    def __iter__(self) -> Generator[str | int | None]:
+    def __iter__(self) -> Generator[str | int | Enum | None]:
         """
         Allows iteration access to the item's field values.
         
@@ -127,12 +131,12 @@ class Item:
         
         from stock_manager.utils import StockStatus
         
-        if not self.excess:
+        if self.excess is None or self.total is None:
             return
         
         if self.excess > 1:
-            self.stock_status = StockStatus.IN_STOCK.value
-        elif self.excess == 0:
-            self.stock_status = StockStatus.LOW_STOCK.value
-        else:
-            self.stock_status = StockStatus.OUT_OF_STOCK.value
+            self.stock_status = StockStatus.IN_STOCK
+        elif self.total <= 0:
+            self.stock_status = StockStatus.OUT_OF_STOCK
+        elif self.excess <= 1:
+            self.stock_status = StockStatus.LOW_STOCK

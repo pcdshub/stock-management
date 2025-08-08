@@ -13,15 +13,24 @@ requirements:
   build:
     - python >=3.9
     - setuptools
-    - pip
   run:
     - python >=3.9
-    - pip:
-        - -r requirements.txt
+    - pyqt
+    - opencv
+    - numpy
+    - gspread
+    - oauth2client
+    - qasync
+    - qrcode
+    - qtawesome
+    - mysql-connector-python
+    - prettytable
 
 test:
   imports:
     - stock_manager
+    - pytest
+    - pytest-qt
 
 about:
   home: https://github.com/pcdshub/stock-management.git

@@ -196,7 +196,7 @@ class Add(AbstractController):
                    'the following item has been created with a total stock of 0:\n'
                    f'\tItem: {new_item.part_num}\n'
                    f'\tDescription: {new_item.description}\n'
-                   f'\tExcess Count: {new_item.excess} ({new_item.stock_status})\n'
+                   f'\tExcess Count: {new_item.excess} ({new_item.stock_status.value})\n'
                    f'\tDate/Time: {datetime.now()}\n\n'
                    
                    'Please take any necessary action to order or restock.\n\n'
