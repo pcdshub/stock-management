@@ -18,7 +18,7 @@ from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils, Item, StockS
 logger = logging.getLogger()
 
 
-def build_commands() -> argparse.Namespace:
+def build_commands() -> argparse.Namespace | None:
     """
     Builds and parses command-line arguments for the CLI interface.
     
@@ -39,6 +39,11 @@ def build_commands() -> argparse.Namespace:
             action='version',
             version=stock_manager.__version__,
             help='Prints stock_manager\'s git version'
+    )
+    top_parser.add_argument(
+            '-t', '--tree',
+            action='store_true',
+            help='Prints stock_manager\'s commands, subcommands, and positional arguments in tree layout',
     )
     
     test_parser = sub_parsers.add_parser(
@@ -212,10 +217,34 @@ def build_commands() -> argparse.Namespace:
     remove_parser.set_defaults(func=_run_remove_user)
     # endregion
     
-    return top_parser.parse_args()
+    args = top_parser.parse_args()
+    
+    if args.tree:
+        print_command_tree(top_parser)
+        return
+    
+    return args
 
 
 # region Misc Argument Functions
+def print_command_tree(parser: argparse.ArgumentParser, indent=1):
+    for action in parser._actions:
+        if not isinstance(action, argparse.Action):
+            continue
+        
+        if not hasattr(action, '_choices_actions'):
+            print(f'{"│   " * (indent - 1)}├── {action.dest} - {action.help}')
+            continue
+        
+        for i, choice_action in enumerate(action._choices_actions):
+            subparser_name = choice_action.dest
+            help_text = choice_action.help
+            print(f'{"│   " * (indent - 1)}├── {subparser_name} - {help_text}')
+            
+            subparser = action.choices[subparser_name]
+            print_command_tree(subparser, indent + 1)
+
+
 def _run_tests(args) -> None:
     """
     Handler for the `test` command --- runs pytest on the `tests/` directory.

@@ -36,6 +36,9 @@ def main() -> None:
     
     args = build_commands()
     
+    if not args:
+        return
+    
     if hasattr(args, 'func'):
         args.func(args)
         return
