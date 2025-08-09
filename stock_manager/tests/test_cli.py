@@ -11,6 +11,13 @@ def test_help(monkeypatch):
         main()
 
 
+@pytest.mark.parametrize('tree_command', ['-t', '--tree'])
+def test_tree(monkeypatch, tree_command: str):
+    monkeypatch.setattr('sys.argv', ['stock_manager', tree_command])
+    with pytest.raises(SystemExit):
+        main()
+
+
 @pytest.mark.parametrize('version_command', ['-v', '--version'])
 def test_version(monkeypatch, capsys, version_command: str):
     import stock_manager

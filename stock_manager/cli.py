@@ -221,7 +221,7 @@ def build_commands() -> argparse.Namespace | None:
     
     if args.tree:
         print_command_tree(top_parser)
-        return
+        raise SystemExit(1)
     
     return args
 
