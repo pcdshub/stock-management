@@ -200,7 +200,7 @@ class Edit(AbstractController):
             )
             return
         
-        response = QMessageBox.warning(
+        response = QMessageBox.question(
                 self,
                 'Item Change Confirmation',
                 f'Are You Sure You Want To Update Item {new_item.part_num}?',

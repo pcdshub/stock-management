@@ -12,7 +12,7 @@ from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils
 
 
 class TestDatabase:
-    @pytest.fixture
+    @fixture
     def database(self) -> DBUtils:
         return DBUtils()
     
@@ -138,11 +138,11 @@ class TestLogger:
 
 
 class TestExports:
-    @pytest.fixture
+    @fixture
     def exports(self) -> ExportUtils:
         return ExportUtils()
     
-    @pytest.mark.parametrize(
+    @mark.parametrize(
             'file_type, expected_path',
             [
                 ('py', './exports/py_export.py'),
@@ -155,7 +155,7 @@ class TestExports:
     def test_pdf_export(self, exports):
         pass
     
-    @pytest.mark.parametrize('export_type', ['csv', 'tsv', 'psv'])
+    @mark.parametrize('export_type', ['csv', 'tsv', 'psv'])
     def test_sv_export(self, exports, export_type: Literal['csv', 'tsv', 'psv']):
         exports.sv_export(export_type, './exports', [MagicMock()])
         path = f'./exports/{export_type}_export.{export_type}'

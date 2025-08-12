@@ -9,23 +9,23 @@ from stock_manager.__main__ import main
 
 def test_help(monkeypatch):
     monkeypatch.setattr('sys.argv', ['stock_manager', '--help'])
-    with pytest.raises(SystemExit):
+    with raises(SystemExit):
         main()
 
 
-@pytest.mark.parametrize('tree_command', ['-t', '--tree'])
+@mark.parametrize('tree_command', ['-t', '--tree'])
 def test_tree(monkeypatch, tree_command: str):
     monkeypatch.setattr('sys.argv', ['stock_manager', tree_command])
-    with pytest.raises(SystemExit):
+    with raises(SystemExit):
         main()
 
 
-@pytest.mark.parametrize('version_command', ['-v', '--version'])
+@mark.parametrize('version_command', ['-v', '--version'])
 def test_version(monkeypatch, capsys, version_command: str):
     import stock_manager
     
     monkeypatch.setattr('sys.argv', ['stock_manager', version_command])
-    with pytest.raises(SystemExit):
+    with raises(SystemExit):
         main()
     
     captured = capsys.readouterr()
@@ -40,7 +40,7 @@ def test_sync(monkeypatch, caplog):
         f'Expected success message not found in logs: {caplog.text}'
 
 
-@pytest.mark.parametrize(
+@mark.parametrize(
         'category, list_command',
         [
             ('items', '-l'),
@@ -49,7 +49,7 @@ def test_sync(monkeypatch, caplog):
             ('users', '--list')
         ]
 )
-def test_no_args_commands(monkeypatch, caplog, category: str, list_command: str):
+def test_list_commands(monkeypatch, caplog, category: str, list_command: str):
     caplog.set_level(logging.INFO)
     monkeypatch.setattr('sys.argv', ['stock_manager', category, list_command])
     main()
@@ -57,7 +57,7 @@ def test_no_args_commands(monkeypatch, caplog, category: str, list_command: str)
         f'Expected success message not found in logs: {caplog.text}'
 
 
-@pytest.mark.parametrize(
+@mark.parametrize(
         'command, arg, path',
         [
             ('export', 'csv', ''),
@@ -82,7 +82,8 @@ def test_file_export_commands(monkeypatch, caplog, command: str, arg: str, path:
     
     os.remove(path)
 
-@pytest.mark.parametrize(
+
+@mark.parametrize(
         'category, search_string',
         [
             ('items', TEST_ITEM.part_num),

@@ -179,8 +179,8 @@ class App(QMainWindow):
     def _on_page_changed(self) -> None:
         """Update window title and manage QR scanner based on current screen."""
         
-        if self.scanner.camera_thread.running and \
-                self.screens.currentIndex() != stock_manager.Pages.SCAN.value.PAGE_INDEX:
+        if self.scanner.camera_thread.running \
+                and self.screens.currentIndex() != stock_manager.Pages.SCAN.value.PAGE_INDEX:
             try:
                 self.scanner.stop_video()
             except Exception as e:

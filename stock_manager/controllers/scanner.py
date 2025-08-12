@@ -66,7 +66,6 @@ class ItemScanner(AbstractScanner):
         """
         
         data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
-        
         if not data:
             return False
         

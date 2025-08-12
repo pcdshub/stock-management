@@ -71,7 +71,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         Each subclass must implement this to set up its own UI event handlers
         and internal logic connections.
         """
-        pass
+        ...
     
     async def update_table(self) -> bool:
         """
@@ -278,7 +278,7 @@ class AbstractScanner(AbstractController):
         
         :param frame: The video frame to analyze.
         """
-        pass
+        ...
     
     class _CameraThread(QThread):
         """
@@ -394,4 +394,4 @@ class AbstractExporter(AbstractController):
         data is exported, where it is sent, and the export
         format must be handled by the implementing subclass.
         """
-        pass
+        ...

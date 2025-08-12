@@ -56,7 +56,7 @@ class Remove(AbstractController):
         row = index.row()
         selected_item = self.app.all_items[row]
         
-        response = QMessageBox.warning(
+        response = QMessageBox.question(
                 self,
                 'Item Removal Confirmation',
                 f'Are You Sure You Want To Remove {selected_item.part_num} '

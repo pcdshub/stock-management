@@ -170,7 +170,7 @@ class Add(AbstractController):
             )
             return False
         
-        response = QMessageBox.information(
+        response = QMessageBox.question(
                 self,
                 'Item Creation Confirmation',
                 f'Are You Sure You Want To Add {new_item.part_num} '

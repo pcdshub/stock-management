@@ -29,7 +29,7 @@ def handle_table_click(qtbot: QtBot, table: QTableView):
 
 
 class TestControllers:
-    @pytest.fixture(
+    @fixture(
             params=[
                 Add, Edit, Export,
                 QRGenerate, Finish,
@@ -40,25 +40,25 @@ class TestControllers:
     def controller(self, request) -> AbstractController:
         return request.param(MagicMock())
     
-    @pytest.fixture(params=[Edit, QRGenerate, Remove, View])
+    @fixture(params=[Edit, QRGenerate, Remove, View])
     def table_controller(self, request) -> AbstractController:
         return request.param(MagicMock())
-    @pytest.mark.asyncio
     
+    @mark.asyncio
     async def test_update_table(self, qtbot: QtBot, table_controller):
         qtbot.addWidget(table_controller)
         assert await table_controller.update_table() and table_controller.table.model()
     
     def test_to_page(self, qtbot: QtBot, controller):
         if isinstance(controller, AbstractScanner):
-            pytest.skip('AbstractScanners Raise No Errors But Lots Of Warnings When Switching Pages')
+            skip('AbstractScanners Raise No Errors But Lots Of Warnings When Switching Pages')
         qtbot.addWidget(controller)
         controller.to_page()
 
 
-@pytest.mark.skip(reason='Raises Warnings But No Errors, Clutters All Useful Information')
+@mark.skip(reason='Raises Warnings But No Errors, Clutters All Useful Information')
 class TestScanners:
-    @pytest.fixture(params=[ItemScanner, Login])
+    @fixture(params=[ItemScanner, Login])
     def scanner(self, request) -> AbstractScanner:
         scanner_controller: AbstractScanner = request.param(MagicMock())
         scanner_controller.database = DBUtils()
@@ -66,6 +66,7 @@ class TestScanners:
     
     def test_video(self, qtbot: QtBot, scanner):
         qtbot.addWidget(scanner)
+        
         try:
             scanner.start_video()
         except TimeoutError:
@@ -79,7 +80,7 @@ class TestScanners:
         finally:
             scanner.stop_video()
     
-    @pytest.mark.parametrize('file_num', [1, 2])
+    @mark.parametrize('file_num', [1, 2])
     def test_qr_checking(self, qtbot: QtBot, scanner, file_num: str):
         qtbot.addWidget(scanner)
         image: ndarray = cv2.imread(f'./exports/test_image{file_num}.jpeg')
@@ -97,11 +98,11 @@ def test_exporter_directory(qtbot: QtBot, monkeypatch: MonkeyPatch, controller):
 
 
 class TestAdd:
-    @pytest.fixture
+    @fixture
     def controller(self) -> Add:
         return Add(MagicMock())
     
-    @pytest.mark.parametrize(
+    @mark.parametrize(
             'add_clicks, sub_clicks, expected_result',
             [
                 (3, 0, 3),
@@ -149,7 +150,7 @@ class TestAdd:
                 ]
         )
     
-    @pytest.mark.parametrize(
+    @mark.parametrize(
             'part_num, manufacturer, desc, b750_stock, expected_result',
             [
                 ('', '', '', 0, False),
