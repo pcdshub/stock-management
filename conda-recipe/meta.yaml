@@ -1,9 +1,9 @@
 package:
-  name: SLAC-LCLS-Stock-Management
-  version: { { load_setup_py_data().get('version') } }
+  name: stock_manager
+  version: {{ load_setup_py_data().get('version') }}
 
 source:
-  path: ..
+  path: ../
 
 build:
   number: 0
@@ -15,18 +15,9 @@ requirements:
     - setuptools
   run:
     - python >=3.9
-    - pyqt
-    - opencv
-    - numpy
-    - gspread
-    - oauth2client
-    - pathlib
-    - typing
-    - qasync
-    - qrcode
-    - qtawesome
-    - mysql-connector-python
-    - prettytable
+    {% for req in load_from_file('requirements.txt').splitlines() if req and not req.startswith('#') %}
+    - {{req.strip()}}
+    {% endfor %}
 
 test:
   imports:
