@@ -3,7 +3,7 @@ package:
   version: {{ load_setup_py_data().get('version') }}
 
 source:
-  path: ../
+  path: ..
 
 build:
   number: 0
@@ -16,7 +16,7 @@ requirements:
   run:
     - python >=3.9
     {% for req in load_from_file('requirements.txt').splitlines() if req and not req.startswith('#') %}
-    - {{req.strip()}}
+    - {{ req.strip() }}
     {% endfor %}
 
 test:
