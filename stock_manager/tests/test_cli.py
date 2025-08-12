@@ -1,7 +1,9 @@
 import logging
+import os
 
-import pytest
+from pytest import mark, raises
 
+from conftest import TEST_ITEM, TEST_USERNAME
 from stock_manager.__main__ import main
 
 
@@ -60,8 +62,8 @@ def test_no_args_commands(monkeypatch, caplog, category: str, list_command: str)
         [
             ('export', 'csv', ''),
             ('export', 'csv', './exports'),
-            ('qr', 'test', ''),
-            ('qr', 'test', './exports'),
+            ('qr', TEST_ITEM.part_num, ''),
+            ('qr', TEST_ITEM.part_num, './exports'),
         ]
 )
 def test_file_export_commands(monkeypatch, caplog, command: str, arg: str, path: str):
@@ -71,15 +73,20 @@ def test_file_export_commands(monkeypatch, caplog, command: str, arg: str, path:
     else:
         monkeypatch.setattr('sys.argv', ['stock_manager', command, arg, path])
     main()
+    
+    path = './exports/' + (f'{arg}_export.{arg}' if command == 'export' else 'png_export.png')
+    
     assert 'Successfully Exported' in caplog.text, \
-        f'Expected success message not found in logs: {caplog.text}'
-
+        f'Expected success message not found in logs: {caplog.text}' \
+        and os.path.exists(path)
+    
+    os.remove(path)
 
 @pytest.mark.parametrize(
         'category, search_string',
         [
-            ('items', 'BK9000'),
-            ('users', 'username')
+            ('items', TEST_ITEM.part_num),
+            ('users', TEST_USERNAME)
         ]
 )
 def test_search_commands(monkeypatch, caplog, category: str, search_string: str):
@@ -98,21 +105,19 @@ def test_add_edit_remove_item(monkeypatch, caplog):
                 'stock_manager',
                 'items',
                 'add',
-                'test', 'test', 'test',
-                0, 0, 0, 0, 0, 0,
-                'Out Of Stock'
+                *TEST_ITEM
             ]
     )
     main()
     assert 'Successfully Added' in caplog.text, \
         f'Expected success message not found in logs: {caplog.text}'
     
-    monkeypatch.setattr('sys.argv', ['stock_manager', 'items', 'edit', 'test', 'total=999'])
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'items', 'edit', TEST_ITEM.part_num, 'stock_b750=999'])
     main()
     assert 'Successfully Updated' in caplog.text, \
         f'Expected success message not found in logs: {caplog.text}'
     
-    monkeypatch.setattr('sys.argv', ['stock_manager', 'items', 'remove', 'test'])
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'items', 'remove', TEST_ITEM.part_num])
     main()
     assert 'Successfully Removed' in caplog.text, \
         f'Expected success message not found in logs: {caplog.text}'
@@ -120,12 +125,12 @@ def test_add_edit_remove_item(monkeypatch, caplog):
 
 def test_add_remove_user(monkeypatch, caplog):
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr('sys.argv', ['stock_manager', 'users', 'add', 'test_username'])
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'users', 'add', TEST_USERNAME])
     main()
     assert 'Successfully Added' in caplog.text, \
         f'Expected success message not found in logs: {caplog.text}'
     
-    monkeypatch.setattr('sys.argv', ['stock_manager', 'users', 'remove', 'test_username'])
+    monkeypatch.setattr('sys.argv', ['stock_manager', 'users', 'remove', TEST_USERNAME])
     main()
     assert 'Successfully Removed' in caplog.text, \
         f'Expected success message not found in logs: {caplog.text}'

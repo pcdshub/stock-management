@@ -57,7 +57,7 @@ class Export(AbstractExporter):
         handle_icons()
     
     @override
-    def export(self) -> None:
+    def export(self) -> bool:
         try:
             from stock_manager import ExportTypes
             
@@ -79,6 +79,7 @@ class Export(AbstractExporter):
                             'Selection Error',
                             'Please Select A Valid File Type To Export'
                     )
+            return True
         except Exception as e:
             self.logger.error(f'Export Failed: {e}')
             response = QMessageBox.critical(
@@ -89,8 +90,7 @@ class Export(AbstractExporter):
                     QMessageBox.Retry
             )
             
-            if response == QMessageBox.Retry:
-                self.export()
+            return self.export() if response == QMessageBox.Retry else False
 
 
 class QRGenerate(AbstractExporter):
@@ -127,14 +127,14 @@ class QRGenerate(AbstractExporter):
         self.save_btn.setIcon(qta.icon('fa5s.download'))
     
     @override
-    def export(self):
+    def export(self) -> bool:
         if not self._selected_qr:
             QMessageBox.warning(
                     self,
                     'Please Choose Item',
                     'Please Choose An Item From The Table Before Exporting QR Code.'
             )
-            return
+            return False
         
         try:
             self.app.export_utils.save_code(self._selected_qr, self.path)
@@ -145,6 +145,9 @@ class QRGenerate(AbstractExporter):
                     'QR Code Download Failure',
                     'Failed To Download QR Code'
             )
+            return False
+        else:
+            return True
     
     def _on_cell_clicked(self, index: QModelIndex) -> None:
         """

@@ -105,6 +105,7 @@ class Item:
         
         if hasattr(self, idx):
             setattr(self, idx, value)
+            self.update_stats()
             return
         raise NameError(f'Unknown Field: {idx}')
     

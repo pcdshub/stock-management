@@ -269,7 +269,7 @@ class AbstractScanner(AbstractController):
             )
     
     @abstractmethod
-    async def check_for_qr(self, frame: ndarray) -> None:
+    async def check_for_qr(self, frame: ndarray) -> bool:
         """
         Asynchronously check the given video frame for a QR code.
         

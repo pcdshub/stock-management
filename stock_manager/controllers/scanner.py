@@ -101,7 +101,7 @@ class ItemScanner(AbstractScanner):
         """Handles the completion of a scanning session and navigates to the finish screen."""
         
         if not self._items:
-            QMessageBox.critical(
+            QMessageBox.warning(
                     self,
                     'Item Required',
                     'Please Scan At Least One Item'
@@ -247,7 +247,7 @@ class Login(AbstractScanner):
         )
         return False
     
-    def _login_clicked(self) -> None:
+    def _login_clicked(self) -> bool:
         """Checks if the user entered a valid username and logs them in if valid."""
         
         text = self.username.text().strip()
@@ -258,11 +258,11 @@ class Login(AbstractScanner):
                     'Empty Field',
                     'Please Fill Out Login Field Before Submitting'
             )
-            return
+            return False
         
         if text in self._users_list:
             self._finish_login(text)
-            return
+            return True
         
         self.logger.warning(f'Username Not Recognized: "{text}"')
         QMessageBox.warning(
@@ -270,6 +270,7 @@ class Login(AbstractScanner):
                 'Unknown Username Entered',
                 'Entered Username Not Recognized In Database'
         )
+        return False
     
     def _finish_login(self, username) -> None:
         """

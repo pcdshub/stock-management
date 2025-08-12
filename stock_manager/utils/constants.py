@@ -15,7 +15,7 @@ def total_equation(b750_stock: int, b757_stock: int) -> int:
     :return: the sum of the two values
     """
     
-    return b750_stock + b757_stock
+    return int(b750_stock) + int(b757_stock)
 
 
 def excess_equation(total: int, b750_minimum: int, b757_minimum: int) -> int:

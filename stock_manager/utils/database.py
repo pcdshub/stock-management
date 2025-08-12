@@ -112,8 +112,7 @@ class DBUtils:
                         sql_part_dict['stock_b757'],
                         sql_part_dict['minimum'],
                         sql_part_dict['excess'],
-                        sql_part_dict['minimum_sallie'],
-                        sql_part_dict['stock_status'],
+                        sql_part_dict['minimum_sallie']
                 )
                 
                 if gs_part == sql_part:
