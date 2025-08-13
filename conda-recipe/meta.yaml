@@ -37,5 +37,5 @@ test:
 about:
   home: https://github.com/pcdshub/stock-management.git
   license: SLAC Open License
-  license_file: LICENSE
+  license_file: LICENSE.md
   summary: "SLAC LCLS stock management application with QR code support and simple UI."
