@@ -4,8 +4,13 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 def main():
-    scope: list[str] = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('../../../assets/gs_credentials.json')
+    scope: list[str] = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        '../../../assets/gs_credentials.json'
+    )
     client: Client = gspread.authorize(credentials)
     # client.del_spreadsheet('Stock Management Sheet')
     client: Spreadsheet = client.open('Common Stock')
@@ -18,15 +23,21 @@ def main():
 def update_sheet(sheet: Worksheet):
     # sheet.update_cell(1, 1, 'Another Updated Value')
     sheet.update(range_name='A2:D2', values=[[1, 2, 3, 4]])
-    
-    # sheet.update(range_name='B1:C2', values=[['New Value 1', 'New Value 2'], ['New Value 3', 'New Value 4']])
+
+    # sheet.update(range_name='B1:C2', values=[
+    #     ['New Value 1', 'New Value 2'],
+    #     ['New Value 3', 'New Value 4']
+    # ])
     # sheet.batch_update(
     #         [{
     #             'range': 'D1',
     #             'values': [['Batch Updated Value']]
     #         }, {
     #             'range': 'E1:F2',
-    #             'values': [['Batch', 'Update'], ['Example', 'Data']]
+    #             'values': [
+    #                 ['Batch', 'Update'],
+    #                 ['Example', 'Data']
+    #             ]
     #         }]
     # )
 

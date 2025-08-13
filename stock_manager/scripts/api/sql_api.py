@@ -1,11 +1,12 @@
 import mysql.connector
-from mysql.connector.abstracts import MySQLConnectionAbstract, MySQLCursorAbstract
+from mysql.connector.abstracts import (MySQLConnectionAbstract,
+                                       MySQLCursorAbstract)
 
 db: MySQLConnectionAbstract = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='password',
-        database='common_stock'
+    host='localhost',
+    user='root',
+    password='password',
+    database='common_stock'
 )
 
 cursor: MySQLCursorAbstract = db.cursor()
@@ -22,30 +23,31 @@ cursor: MySQLCursorAbstract = db.cursor()
 
 def init_items_database():
     def fetch_gs_rows() -> list[dict[str, int | float | str]]:
-        from oauth2client.service_account import ServiceAccountCredentials
-        from gspread import Client
         import gspread
-        from gspread import Spreadsheet
-        
-        credentials = ServiceAccountCredentials.from_json_keyfile_name('../../../assets/gs_credentials.json')
+        from gspread import Client, Spreadsheet
+        from oauth2client.service_account import ServiceAccountCredentials
+
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            '../../../assets/gs_credentials.json'
+        )
         client: Client = gspread.authorize(credentials)
         client: Spreadsheet = client.open('Common Stock')
         sheet = client.worksheet('Parts')
         records: list[dict[str, int | float | str]] = sheet.get_all_records()
         return records
-    
+
     sql = ('insert into inventory_items '
            '(part_num, manufacturer, description, '
            'total, stock_b750, stock_b757, minimum, '
            'excess, minimum_sallie, stock_status) '
            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);')
-    
+
     def parse_values() -> list[list[int | str | None]]:
         vals: list[list[int | float | str | None]] = [
             [value for value in record.values()]
             for record in fetch_gs_rows()
         ]
-        
+
         i: int
         items: list[int | float | str | None]
         for i, items in enumerate(vals):
@@ -60,25 +62,26 @@ def init_items_database():
                             vals[i][j] = 0
             print('Parsed:', items)
         return vals
-    
+
     cursor.executemany(sql, parse_values())
     db.commit()
 
 
 def init_users_database():
     def fetch_gs_rows() -> list[dict[str, str]]:
-        from oauth2client.service_account import ServiceAccountCredentials
-        from gspread import Client
         import gspread
-        from gspread import Spreadsheet
-        
-        credentials = ServiceAccountCredentials.from_json_keyfile_name('../../../assets/gs_credentials.json')
+        from gspread import Client, Spreadsheet
+        from oauth2client.service_account import ServiceAccountCredentials
+
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            '../../../assets/gs_credentials.json'
+        )
         client: Client = gspread.authorize(credentials)
         client: Spreadsheet = client.open('Common Stock')
         sheet = client.worksheet('Users')
         records: list[dict[str, str]] = sheet.get_all_records()
         return records
-    
+
     sql = 'insert into users (username) value (%s);'
     items: list[str] = []
     for row in fetch_gs_rows():

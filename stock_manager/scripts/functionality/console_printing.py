@@ -7,8 +7,10 @@ table.field_names = [
     'Stock Status'
 ]
 table.add_row(
-        ['BK9000', 'Beckhoff',
-            'Ethernet TCP/IP Bus Coupler for up to 64 Bus Terminals; Ethernet proto Beckhoff real-time Ethernet',
-            '0', '-1', '1', '1', '-4', '3', 'Out Of Stock']
+    [
+        'BK9000', 'Beckhoff',
+        'Ethernet TCP/IP Bus Coupler for up to 64 '
+        'Bus Terminals; Ethernet proto BeckHoff real-time Ethernet',
+        '0', '-1', '1', '1', '-4', '3', 'Out Of Stock']
 )
 print(table)

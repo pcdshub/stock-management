@@ -1,6 +1,6 @@
 """Controllers package for the Stock Management Application."""
 
-from .abstract import AbstractController, AbstractScanner, AbstractExporter
+from .abstract import AbstractController, AbstractExporter, AbstractScanner
 from .add import Add
 from .edit import Edit
 from .export import Export, QRGenerate

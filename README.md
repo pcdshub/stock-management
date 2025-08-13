@@ -10,43 +10,55 @@ cloud-based data storage.
 
 ## Features
 
-- **Dual Interface**  
+- **Dual Interface**
+  <br>
   Seamless GUI for ease-of-use and a powerful CLI for fast, scriptable control.
 
-- **Inventory Table View:**  
+- **Inventory Table View:**
+  <br>
   Browse, search, update, and remove inventory from a table view, resembling a Google Sheet.
 
-- **Restock Status Flags**  
+- **Restock Status Flags**
+  <br>
   Clearly indicates whether items are fully stocked, low, or pending replenishment.
 
-- **QR Code Scanning & Generation:**  
+- **QR Code Scanning & Generation:**
+  <br>
   Scan both item and user QR codes with your webcam or camera to quickly log users in, look up, and manage inventory
   items. Additionally, generate QR codes for new stock entries.
 
-- **Data Export & File Generation**  
+- **Data Export & File Generation**
+  <br>
   Export inventory data to multiple formats such as CSV or PDF for analysis and reporting.
 
-- **Redundant Dual Data Storage System**  
+- **Redundant Dual Data Storage System**
+  <br>
   Utilizes both SQL and Google Sheets to ensure consistent, recoverable record-keeping.
 
-- **Live Inventory Tracking**  
+- **Live Inventory Tracking**
+  <br>
   Real-time synchronization between physical stock, GUI, CLI, and both databases.
 
-- **Smart Restock Alerts**  
+- **Smart Restock Alerts**
+  <br>
   Automatically notifies inventory managers when items need restocking or reordering based on thresholds.
 
-- **Modular Architecture:**  
+- **Modular Architecture:**
+  <br>
   Components are cleanly separated into controllers, utilities, and UI for easy extension.
 
-- **Robust Logging:**  
+- **Robust Logging:**
+  <br>
   All application events and errors are logged thoroughly for troubleshooting and auditing.
 
-- **Asynchronous Programming:**  
+- **Asynchronous Programming:**
+  <br>
   The application uses asynchronous programming techniques to keep the user interface responsive during
   time-consuming operations like video capture, QR code scanning, and database access without freezing or lagging.
   This ensures a smooth and efficient user experience, even when multiple actions happen simultaneously.
 
-- **Portable & Scalable**  
+- **Portable & Scalable**
+  <br>
   Designed to scale with the division's needs and is adaptable for future hardware integrations.
 
 ---
@@ -99,13 +111,13 @@ cloud-based data storage.
 	- Place `gs_credentials.json` in the `assets/` directory.
 
 4. **Running the application:**
-	- **Run The GUI**  
+	- **Run The GUI**
 	  To launch the application in GUI mode, just use the -m flag:
 	   ```bash
 	   python -m stock_manager
 	   ```
 	  This opens the full graphical interface for managing inventory, scanning items, and generating reports.
-	- **Use Command-Line Options**  
+	- **Use Command-Line Options**
 	  You can also use CLI commands to perform specific tasks directly from the terminal. For example:
 	  ```bash
 	  python -m stock_manager --list-items
@@ -120,33 +132,33 @@ cloud-based data storage.
 ## Usage
 
 - **View & Manage Inventory**
-  The main screen displays a live-synced table with your Google Sheet database. Changes made in the app or CLI are 
+  The main screen displays a live-synced table with your Google Sheet database. Changes made in the app or CLI are
   reflected automatically—no need to worry about syncing one database over another.
 
 - **QR Code Scanning for Items & Login**
-  On the QR Scanner and Login pages, users can scan item QR codes to look up inventory or scan their personal QR 
+  On the QR Scanner and Login pages, users can scan item QR codes to look up inventory or scan their personal QR
   code to log in. Scanned events are timestamped and logged.
 
 - **Generate QR Codes**
-  Use the "Generate QR" page to create QR codes for items or users. Choose the target item, destination folder, and 
+  Use the "Generate QR" page to create QR codes for items or users. Choose the target item, destination folder, and
   click **Download** to export a QR image file.
 
 - **Command Line Interface (CLI)**
-  Run `python -m stock_manager` to launch the GUI or pass additional CLI flags for command-line tasks (e.g., 
+  Run `python -m stock_manager` to launch the GUI or pass additional CLI flags for command-line tasks (e.g.,
   exporting data, printing inventory, or syncing databases). Run `--help` for a full list of options.
 
 - **Export Data**
   Export inventory data to various file formats (e.g., `.csv`, `.pdf`, etc.) through the GUI or CLI.
 
 - **Database Synchronization**
-  The local MySQL database is automatically synchronized to the state of the Google Sheet. You’ll 
+  The local MySQL database is automatically synchronized to the state of the Google Sheet. You’ll
   never have to worry about one database being out of date.
 
 - **Logging**
   All significant events (logins, scans, syncs, errors) are logged to `app.log` for auditing and debugging.
 
 - **Navigation**
-  Use the sidebar to switch between pages (Inventory, Scanner, QR Generator, etc.) or to log out and exit the 
+  Use the sidebar to switch between pages (Inventory, Scanner, QR Generator, etc.) or to log out and exit the
   application.
 
 ---
@@ -231,16 +243,16 @@ stock-management/
 
 ## Customization
 
-- **To use a different Google Sheet:**  
+- **To use a different Google Sheet:**
   Change the file or sheets names in `database.py`.
 
-- **To modify the UI:**  
+- **To modify the UI:**
   Edit the `.ui` files in the `ui/` directory using [Qt Designer](https://build-system.fman.io/qt-designer-download).
 
-- **To add new features/screens:**  
+- **To add new features/screens:**
   Extend the `controllers/` or `utils/` package as needed.
 
-- **To add new commands:**  
+- **To add new commands:**
   Add commands in `cli.py` and try running them using `python -m stock_manager --your-command`.
 
 - **To test features:**

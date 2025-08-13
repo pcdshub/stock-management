@@ -17,6 +17,6 @@ class ItemMaintenance:
     days_since_incident: int
     priority: int
     git_hash: str
-    
+
     def formula(self):
         pass  # TODO: get formula from Amir
