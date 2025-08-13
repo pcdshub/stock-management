@@ -9,7 +9,7 @@ with open("requirements.txt", "rt") as fp:
     ]
 
 setup(
-        name="slac-stock-manager",
+        name="stock_manager",
         version=versioneer.get_version(),
         cmdclass=versioneer.get_cmdclass(),
         license="BSD",
