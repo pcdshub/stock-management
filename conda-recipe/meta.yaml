@@ -15,9 +15,18 @@ requirements:
     - setuptools
   run:
     - python >=3.9
-    {% for req in load_from_file('requirements.txt').splitlines() if req and not req.startswith('#') %}
-    - {{ req.strip() }}
-    {% endfor %}
+    - pyqt
+    - opencv
+    - numpy
+    - gspread
+    - oauth2client
+    - pathlib
+    - typing
+    - qasync
+    - qrcode
+    - qtawesome
+    - mysql-connector-python
+    - prettytable
 
 test:
   imports:
