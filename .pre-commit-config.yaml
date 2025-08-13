@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: |
   (?x)^(
-    stock_manager/_version.py|
+    versioneer.py|stock_manager/_version.py|stock_manager/scripts/.*
   )$
 
 repos:
@@ -23,7 +23,6 @@ repos:
     rev: 7.2.0
     hooks:
       - id: flake8
-        exclude: 'scripts/.*|versioneer.py|_version.py'
 
   - repo: https://github.com/timothycrosley/isort
     rev: 6.0.1
