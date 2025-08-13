@@ -33,7 +33,7 @@ test:
     - stock_manager
   requires:
     - pytest
-    - pytestqt
+    - pytest-qt
 
 about:
   home: https://github.com/pcdshub/stock-management.git
