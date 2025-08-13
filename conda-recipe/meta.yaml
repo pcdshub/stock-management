@@ -32,7 +32,7 @@ test:
   imports:
     - stock_manager
     - pytest
-    - pytest-qt
+    - pytestqt
 
 about:
   home: https://github.com/pcdshub/stock-management.git
