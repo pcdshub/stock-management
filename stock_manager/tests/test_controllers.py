@@ -9,9 +9,12 @@ from PyQt5.QtWidgets import QFileDialog, QLineEdit, QMessageBox, QTableView, QTe
 from pytest import fixture, mark, skip
 
 import stock_manager
-from conftest import TEST_ITEM, TEST_USERNAME
-from stock_manager import AbstractController, AbstractScanner, Add, App, DBUtils, Edit, Export, ExportUtils, Finish, \
-    Item, ItemScanner, Login, QRGenerate, Remove, View
+from .conftest import TEST_ITEM, TEST_USERNAME
+from stock_manager import App
+from stock_manager.controllers import AbstractController, AbstractScanner, Add, Edit, Export, Finish, \
+    ItemScanner, Login, QRGenerate, Remove, View
+from stock_manager.model import Item
+from stock_manager.utils import DBUtils, ExportUtils
 
 
 def handle_alert(monkeypatch: MonkeyPatch, alert_type: str = 'information', select: int = QMessageBox.Ok):
@@ -122,8 +125,8 @@ class TestAdd:
         controller.b750_spinner.setValue(add_clicks)
         controller.min_750_spinner.setValue(sub_clicks)
         
-        total = stock_manager.total_equation(add_clicks, 0)
-        excess = stock_manager.excess_equation(total, sub_clicks, 0)
+        total = stock_manager.utils.total_equation(add_clicks, 0)
+        excess = stock_manager.utils.excess_equation(total, sub_clicks, 0)
         
         assert controller._total == total and controller._excess == excess == expected_result
     
@@ -270,9 +273,6 @@ class TestEdit:
         controller._submit_form()
         
         await self.test_clicked_item(qtbot, controller)
-        
-        handle_alert(monkeypatch)
-        controller._submit_form()
         
         controller.b750_spinner.setValue(1)
         handle_alert(monkeypatch, 'question', QMessageBox.No)

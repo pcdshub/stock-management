@@ -13,7 +13,8 @@ import pytest
 from prettytable import PrettyTable
 
 import stock_manager
-from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils, Item, StockStatus
+from stock_manager.utils import DatabaseUpdateType, DBUtils, ExportUtils, StockStatus
+from stock_manager.model import Item
 
 logger = logging.getLogger()
 
@@ -323,7 +324,7 @@ def _run_sync_databases(args) -> bool:
     """
     
     logger.info('Syncing Databases...')
-    if not stock_manager.DBUtils().sync_databases():
+    if not stock_manager.utils.DBUtils().sync_databases():
         return False
     logger.info('Successfully Synchronized Databases')
     return True

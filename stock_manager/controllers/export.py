@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QMessageBox
 from qrcode.image.base import BaseImage
 
 import stock_manager
-from .abstract import AbstractExporter
+from stock_manager.controllers import AbstractExporter
 
 if TYPE_CHECKING:
     from stock_manager import App
@@ -30,7 +30,7 @@ class Export(AbstractExporter):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.EXPORT
+        page = stock_manager.utils.Pages.EXPORT
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self.location_btn.setText('.../' + self.path.split('\\')[-1])
@@ -59,7 +59,7 @@ class Export(AbstractExporter):
     @override
     def export(self) -> bool:
         try:
-            from stock_manager import ExportTypes
+            from stock_manager.utils import ExportTypes
             
             match self.export_combo.currentText().lower():
                 case ExportTypes.PDF.value:
@@ -107,7 +107,7 @@ class QRGenerate(AbstractExporter):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.GENERATE
+        page = stock_manager.utils.Pages.GENERATE
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self._selected_qr: BaseImage | None = None

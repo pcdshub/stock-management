@@ -11,8 +11,8 @@ from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 import stock_manager
-from stock_manager.model.item import Item
-from .abstract import AbstractController
+from stock_manager.model import Item
+from stock_manager.controllers import AbstractController
 
 if TYPE_CHECKING:
     from stock_manager import App
@@ -33,7 +33,7 @@ class Edit(AbstractController):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.EDIT
+        page = stock_manager.utils.Pages.EDIT
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         
@@ -121,11 +121,11 @@ class Edit(AbstractController):
         """
         
         try:
-            self._total = stock_manager.total_equation(
+            self._total = stock_manager.utils.total_equation(
                     self.b750_spinner.value(),
                     self.b757_spinner.value()
             )
-            self._excess = stock_manager.excess_equation(
+            self._excess = stock_manager.utils.excess_equation(
                     self._total,
                     self.min_750_spinner.value(),
                     self.min_757_spinner.value()
@@ -218,7 +218,7 @@ class Edit(AbstractController):
         
         self.logger.info(f'{self.app.user} Edited Database Item: {new_item.part_num}')
         self.app.update_tables()
-        self.database.update_items_database(stock_manager.DatabaseUpdateType.EDIT, new_item)
+        self.database.update_items_database(stock_manager.utils.DatabaseUpdateType.EDIT, new_item)
         self._clear_form()
         
         if new_item.stock_b750 + new_item.stock_b757 <= 0:

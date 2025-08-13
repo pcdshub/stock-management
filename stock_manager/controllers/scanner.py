@@ -36,7 +36,7 @@ class ItemScanner(AbstractScanner):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.SCAN
+        page = stock_manager.utils.Pages.SCAN
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self._items: list[Item] = []
@@ -192,7 +192,7 @@ class Login(AbstractScanner):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.LOGIN
+        page = stock_manager.utils.Pages.LOGIN
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self._users_list = self.database.get_all_users_gs()

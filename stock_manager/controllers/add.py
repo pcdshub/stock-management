@@ -10,7 +10,7 @@ from typing import override, TYPE_CHECKING
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
 import stock_manager
-from .abstract import AbstractController
+from stock_manager.controllers import AbstractController
 
 if TYPE_CHECKING:
     from stock_manager import App
@@ -31,7 +31,7 @@ class Add(AbstractController):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.ADD
+        page = stock_manager.utils.Pages.ADD
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self._total = self._excess = 0
@@ -72,11 +72,11 @@ class Add(AbstractController):
         """
         
         try:
-            self._total = stock_manager.total_equation(
+            self._total = stock_manager.utils.total_equation(
                     self.b750_spinner.value(),
                     self.b757_spinner.value()
             )
-            self._excess = stock_manager.excess_equation(
+            self._excess = stock_manager.utils.excess_equation(
                     self._total,
                     self.min_750_spinner.value(),
                     self.min_757_spinner.value()
@@ -149,7 +149,7 @@ class Add(AbstractController):
             )
             return False
         
-        new_item = stock_manager.Item(
+        new_item = stock_manager.model.Item(
                 self.part_num.text(),
                 self.manufacturer.text(),
                 self.desc.toPlainText(),
@@ -185,7 +185,7 @@ class Add(AbstractController):
         self.app.all_items.append(new_item)
         self.logger.info(f'{self.app.user} Added Item To Database: {new_item.part_num}')
         self.app.update_tables()
-        self.database.update_items_database(stock_manager.DatabaseUpdateType.ADD, new_item)
+        self.database.update_items_database(stock_manager.utils.DatabaseUpdateType.ADD, new_item)
         self._clear_form()
         
         if new_item.stock_b750 + new_item.stock_b757 <= 0:

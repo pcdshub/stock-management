@@ -3,7 +3,7 @@ import os
 
 from pytest import mark, raises
 
-from conftest import TEST_ITEM, TEST_USERNAME
+from .conftest import TEST_ITEM, TEST_USERNAME
 from stock_manager.__main__ import main
 
 

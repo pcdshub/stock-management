@@ -9,7 +9,7 @@ Manages the UI and logic for displaying the completion screen and returning the 
 from typing import override, TYPE_CHECKING
 
 import stock_manager
-from .abstract import AbstractController
+from stock_manager.controllers import AbstractController
 
 if TYPE_CHECKING:
     from stock_manager import App
@@ -29,7 +29,7 @@ class Finish(AbstractController):
         :param app: The main application instance.
         """
         
-        page = stock_manager.Pages.FINISHED
+        page = stock_manager.utils.Pages.FINISHED
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self.handle_connections()

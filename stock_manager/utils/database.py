@@ -19,7 +19,8 @@ from PyQt5.QtWidgets import QMessageBox
 import stock_manager
 
 if TYPE_CHECKING:
-    from stock_manager import Item, DatabaseUpdateType
+    from stock_manager.model import Item
+    from stock_manager.utils import DatabaseUpdateType
 
 
 class DBUtils:
@@ -49,7 +50,7 @@ class DBUtils:
                     str(credentials_path),
                     scope
             )
-            self._client: Spreadsheet = gspread.authorize(credentials).open(stock_manager.GS_FILE_NAME)
+            self._client: Spreadsheet = gspread.authorize(credentials).open(stock_manager.utils.GS_FILE_NAME)
             
             self._db: MySQLConnectionAbstract = mysql.connector.connect(
                     host='localhost',
@@ -81,7 +82,8 @@ class DBUtils:
         :return: `True` if databases are synchronized successfully, `False` otherwise.
         """
         
-        from stock_manager import Item, DatabaseUpdateType
+        from stock_manager.model import Item
+        from stock_manager.utils import DatabaseUpdateType
         
         all_parts_gs = self.get_all_data_gs()
         all_users_gs = self.get_all_users_gs()
@@ -183,7 +185,7 @@ class DBUtils:
         :return: a list of `Item` objects
         """
         
-        from stock_manager import Item
+        from stock_manager.model import Item
         
         obj_items: list[Item] = []
         for item in gs_items:
@@ -328,7 +330,7 @@ class DBUtils:
         :return: `True` if process completed successfully, `False` otherwise
         """
         
-        from stock_manager import DatabaseUpdateType
+        from stock_manager.utils import DatabaseUpdateType
         
         if not isinstance(changelist, list):
             changelist = [changelist]
@@ -360,7 +362,7 @@ class DBUtils:
         :return: `True` if the operation was successful, `False` otherwise.
         """
         
-        from stock_manager import DatabaseUpdateType
+        from stock_manager.utils import DatabaseUpdateType
         
         vals: list[str | int | None] = [value if not value == '' else None for value in item]
         sql = ''
@@ -406,7 +408,7 @@ class DBUtils:
         :return: `True` if the operation was successful, `False` otherwise.
         """
         
-        from stock_manager import DatabaseUpdateType
+        from stock_manager.utils import DatabaseUpdateType
         
         sheet: Worksheet = self._client.worksheet('Parts')
         try:
@@ -445,7 +447,7 @@ class DBUtils:
         :return: `True` if the operation was successful, `False` otherwise.
         """
         
-        from stock_manager import DatabaseUpdateType
+        from stock_manager.utils import DatabaseUpdateType
         
         if update_type not in [DatabaseUpdateType.ADD, DatabaseUpdateType.REMOVE]:
             self._log.error(f'Unknown Users Database Update Type: {update_type}')
@@ -470,7 +472,7 @@ class DBUtils:
         :return: `True` if the operation was successful, `False` otherwise.
         """
         
-        from stock_manager import DatabaseUpdateType
+        from stock_manager.utils import DatabaseUpdateType
         
         sql = ''
         if update_type == DatabaseUpdateType.ADD:
@@ -500,7 +502,7 @@ class DBUtils:
         :return: `True` if the operation was successful, `False` otherwise.
         """
         
-        from stock_manager import DatabaseUpdateType
+        from stock_manager.utils import DatabaseUpdateType
         
         sheet: Worksheet = self._client.worksheet('Users')
         try:
@@ -556,5 +558,5 @@ class DBUtils:
         
         for item in self.get_all_data_gs():
             if item['Part #'] == part_num:
-                return stock_manager.Item(*item.values())
+                return stock_manager.model.Item(*item.values())
         return None

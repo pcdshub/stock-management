@@ -32,7 +32,7 @@ def main() -> None:
     :raise SystemExit: If a fatal error occurs during GUI startup.
     """
     
-    stock_manager.Logger()
+    stock_manager.utils.Logger()
     
     args = build_commands()
     
@@ -54,8 +54,6 @@ def main() -> None:
         with loop:
             loop.run_forever()
     except Exception as e:
-        from stock_manager.utils.logger import Logger
-        
         logging.getLogger().error(f'Fatal Error In Main(): {e}')
         QMessageBox.critical(
                 None,

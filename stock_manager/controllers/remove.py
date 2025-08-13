@@ -11,7 +11,7 @@ from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QMessageBox
 
 import stock_manager
-from .abstract import AbstractController
+from stock_manager.controllers import AbstractController
 
 if TYPE_CHECKING:
     from stock_manager import App
@@ -32,7 +32,7 @@ class Remove(AbstractController):
         :param app: Reference to the main application instance.
         """
         
-        page = stock_manager.Pages.REMOVE
+        page = stock_manager.utils.Pages.REMOVE
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
         self.handle_connections()
@@ -69,4 +69,4 @@ class Remove(AbstractController):
             self.app.all_items.remove(selected_item)
             self.logger.info(f'{self.app.user} Removed Item From Database: {selected_item.part_num}')
             self.app.update_tables()
-            self.database.update_items_database(stock_manager.DatabaseUpdateType.REMOVE, selected_item)
+            self.database.update_items_database(stock_manager.utils.DatabaseUpdateType.REMOVE, selected_item)

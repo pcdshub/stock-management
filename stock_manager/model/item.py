@@ -125,7 +125,7 @@ class Item:
     def update_stats(self) -> None:
         """Updates the `total`, `excess`, and `stock_status` fields based on current stock and minimums."""
         
-        from stock_manager import excess_equation, total_equation
+        from stock_manager.utils import excess_equation, total_equation
         
         total = total_equation(self.stock_b750, self.stock_b757)
         self.total = 0 if total <= 0 else total

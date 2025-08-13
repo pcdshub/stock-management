@@ -50,7 +50,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         self.app = app
         self.logger = logging.getLogger()
         self.database = app.db
-        self.PAGE_NAME: stock_manager.Pages | None = None
+        self.PAGE_NAME: stock_manager.utils.Pages | None = None
         
         try:
             ui_path = Path(__file__).resolve().parent.parent.parent / 'ui' / f'{file_name}.ui'

@@ -11,7 +11,6 @@ from PyQt5.uic import loadUi
 from qasync import asyncSlot
 
 import stock_manager
-from stock_manager.model import Item
 
 
 class App(QMainWindow):
@@ -30,8 +29,8 @@ class App(QMainWindow):
         :raises SystemExit: If the main UI fails to load
         """
         
-        from stock_manager import DBUtils, ExportUtils, Login, View, Add, Export, Edit, Remove, QRGenerate, \
-            Finish, ItemScanner
+        from stock_manager.controllers import Login, View, Add, Export, Edit, Remove, QRGenerate, Finish, ItemScanner
+        from stock_manager.utils import DBUtils, ExportUtils
         
         super().__init__()
         
@@ -49,7 +48,7 @@ class App(QMainWindow):
         self.export = Export(self)
         self.finish = Finish(self)
         
-        self.controllers: list[stock_manager.AbstractController] = [
+        self.controllers: list[stock_manager.controllers.AbstractController] = [
             self.view, self.scanner,
             self.add, self.edit, self.remove,
             self.generate, self.login,
@@ -57,9 +56,9 @@ class App(QMainWindow):
         ]
         
         self.user = ''
-        self.all_items: list[Item] = []
+        self.all_items: list[stock_manager.model.Item] = []
         self.screens: QStackedWidget | None = None
-        self.current_page: stock_manager.Pages | None = None
+        self.current_page: stock_manager.utils.Pages | None = None
         
         try:
             ui_path: Path = Path(__file__).resolve().parent.parent / 'ui' / 'main.ui'
@@ -96,9 +95,9 @@ class App(QMainWindow):
         """
         
         button: QPushButton
-        controller: stock_manager.AbstractController
-        enum: stock_manager.Pages
-        for button, controller, enum in zip(self.buttons, self.controllers, stock_manager.Pages):
+        controller: stock_manager.controllers.AbstractController
+        enum: stock_manager.utils.Pages
+        for button, controller, enum in zip(self.buttons, self.controllers, stock_manager.utils.Pages):
             if not isinstance(button, QPushButton):
                 continue
             
@@ -180,7 +179,7 @@ class App(QMainWindow):
         """Update window title and manage QR scanner based on current screen."""
         
         if self.scanner.camera_thread.running \
-                and self.screens.currentIndex() != stock_manager.Pages.SCAN.value.PAGE_INDEX:
+                and self.screens.currentIndex() != stock_manager.utils.Pages.SCAN.value.PAGE_INDEX:
             try:
                 self.scanner.stop_video()
             except Exception as e:
@@ -194,7 +193,7 @@ class App(QMainWindow):
         def bold_current_screen_button() -> None:
             """Update sidebar buttons' font to indicate the currently active screen."""
             
-            from stock_manager import SIDEBAR_BUTTON_SIZE
+            from stock_manager.utils import SIDEBAR_BUTTON_SIZE
             
             idx = self.screens.currentIndex()
             
@@ -230,7 +229,8 @@ class App(QMainWindow):
                 *(
                     controller.update_table()
                     for controller in self.controllers
-                    if isinstance(controller, stock_manager.AbstractController) and hasattr(controller, 'table')
+                    if isinstance(controller, stock_manager.controllers.AbstractController)
+                    and hasattr(controller, 'table')
                 )
         )
     

@@ -7,8 +7,8 @@ from gspread import Cell, Worksheet
 from pytest import fixture, mark
 
 import stock_manager
-from conftest import TEST_ITEM, TEST_NOTIFICATION, TEST_USERNAME
-from stock_manager import DatabaseUpdateType, DBUtils, ExportUtils
+from .conftest import TEST_ITEM, TEST_NOTIFICATION, TEST_USERNAME
+from stock_manager.utils import DatabaseUpdateType, DBUtils, ExportUtils
 
 
 class TestDatabase:
@@ -175,4 +175,4 @@ class TestExports:
 
 
 def test_email_sending():
-    assert stock_manager.send_email('Test Email')
+    assert stock_manager.utils.send_email('Test Email')
