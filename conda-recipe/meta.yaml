@@ -37,7 +37,7 @@ test:
     - pytest
     - pytest-qt
   source_files:
-    - tests
+    - stock_manager/tests/**
   commands:
     - pytest -q
 
