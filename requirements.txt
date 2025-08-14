@@ -14,4 +14,4 @@ prettytable
 
 # Testing requirements
 pytest
-# pytest-qt
+pytest-qt

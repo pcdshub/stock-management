@@ -8,6 +8,7 @@ from PyQt5.QtCore import QAbstractItemModel, QModelIndex, QRect, Qt
 from PyQt5.QtWidgets import (QFileDialog, QLineEdit, QMessageBox, QTableView,
                              QTextEdit)
 from pytest import fixture, mark, skip
+from pytestqt.qtbot import QtBot
 
 import stock_manager
 from stock_manager.app import App
@@ -30,7 +31,7 @@ def handle_alert(
     )
 
 
-def handle_table_click(qtbot, table: QTableView):
+def handle_table_click(qtbot: QtBot, table: QTableView):
     model: QAbstractItemModel = table.model()
     item_to_click: QModelIndex = model.index(0, 0)
     assert item_to_click.isValid()
@@ -56,12 +57,12 @@ class TestControllers:
         return request.param(MagicMock())
 
     @mark.asyncio
-    async def test_update_table(self, qtbot, table_controller):
+    async def test_update_table(self, qtbot: QtBot, table_controller):
         qtbot.addWidget(table_controller)
         assert await table_controller.update_table() \
                and table_controller.table.model()
 
-    def test_to_page(self, qtbot, controller):
+    def test_to_page(self, qtbot: QtBot, controller):
         if isinstance(controller, AbstractScanner):
             skip(
                 'AbstractScanners Raise No Errors '
@@ -81,7 +82,7 @@ class TestScanners:
         scanner_controller.database = DBUtils()
         return scanner_controller
 
-    def test_video(self, qtbot, scanner):
+    def test_video(self, qtbot: QtBot, scanner):
         qtbot.addWidget(scanner)
 
         try:
@@ -98,14 +99,18 @@ class TestScanners:
             scanner.stop_video()
 
     @mark.parametrize('file_num', [1, 2])
-    def test_qr_checking(self, qtbot, scanner, file_num: str):
+    def test_qr_checking(self, qtbot: QtBot, scanner, file_num: str):
         qtbot.addWidget(scanner)
         image: ndarray = cv2.imread(f'./exports/test_image{file_num}.jpeg')
         assert image.any() and scanner.check_for_qr(image)
 
 
 @mark.parametrize('controller', [Export, QRGenerate])
-def test_exporter_directory(qtbot, monkeypatch: MonkeyPatch, controller):
+def test_exporter_directory(
+    qtbot: QtBot,
+    monkeypatch: MonkeyPatch,
+    controller
+):
     controller = controller(MagicMock())
     qtbot.addWidget(controller)
 
@@ -132,7 +137,7 @@ class TestAdd:
     )
     def test_spinner_change(
         self,
-        qtbot,
+        qtbot: QtBot,
         controller,
         add_clicks: int,
         sub_clicks: int,
@@ -149,7 +154,7 @@ class TestAdd:
         assert controller._total == total \
                and controller._excess == excess == expected_result
 
-    def test_clear_form(self, qtbot, controller):
+    def test_clear_form(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
 
         for field in controller._text_fields:
@@ -182,7 +187,7 @@ class TestAdd:
     )
     def test_submit_form(
         self,
-        qtbot,
+        qtbot: QtBot,
         monkeypatch: MonkeyPatch,
         controller,
         part_num: str,
@@ -231,7 +236,7 @@ class TestEdit:
     )
     def test_parse_field(
         self,
-        qtbot,
+        qtbot: QtBot,
         controller,
         text: str,
         expected: int | str | None
@@ -240,7 +245,7 @@ class TestEdit:
         assert controller._parse_field(text) == expected
 
     @mark.asyncio
-    async def test_clicked_item(self, qtbot, controller):
+    async def test_clicked_item(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
 
         assert await controller.update_table()
@@ -261,7 +266,7 @@ class TestEdit:
             ]
         )
 
-    def test_spinner_change(self, qtbot, controller):
+    def test_spinner_change(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
 
         for i, spinner in enumerate(controller._spinners):
@@ -270,7 +275,7 @@ class TestEdit:
         assert '3' in controller.total_lbl.text() \
                and '4' in controller.excess_lbl.text()
 
-    def test_clear_form(self, qtbot, controller):
+    def test_clear_form(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
 
         for field in controller._text_fields:
@@ -296,7 +301,7 @@ class TestEdit:
     @mark.asyncio
     async def test_submit_form(
         self,
-        qtbot,
+        qtbot: QtBot,
         monkeypatch: MonkeyPatch,
         controller
     ):
@@ -317,7 +322,7 @@ class TestEdit:
 
 
 @mark.parametrize('idx', [2, 3, 4])
-def test_export(qtbot, idx: int):
+def test_export(qtbot: QtBot, idx: int):
     controller = Export(MagicMock())
     controller.app.export_utils = ExportUtils()
     qtbot.addWidget(controller)
@@ -341,14 +346,19 @@ class TestQRGenerate:
         return controller
 
     @mark.asyncio
-    async def test_clicked_item(self, qtbot, controller):
+    async def test_clicked_item(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
         assert await controller.update_table()
         handle_table_click(qtbot, controller.table)
         assert controller._selected_qr and not controller.qr_lbl.text()
 
     @mark.asyncio
-    async def test_export(self, qtbot, monkeypatch: MonkeyPatch, controller):
+    async def test_export(
+        self,
+        qtbot: QtBot,
+        monkeypatch: MonkeyPatch,
+        controller
+    ):
         qtbot.addWidget(controller)
 
         handle_alert(monkeypatch, 'warning')
@@ -362,7 +372,7 @@ class TestQRGenerate:
         os.remove(path)
 
 
-def test_finish(qtbot):
+def test_finish(qtbot: QtBot):
     controller = Finish(MagicMock())
     qtbot.addWidget(controller)
 
@@ -373,7 +383,7 @@ def test_finish(qtbot):
 
 
 @mark.asyncio
-async def test_remove(qtbot, monkeypatch: MonkeyPatch):
+async def test_remove(qtbot: QtBot, monkeypatch: MonkeyPatch):
     controller = Remove(MagicMock())
     controller.app.all_items = [TEST_ITEM]
     qtbot.addWidget(controller)
@@ -393,7 +403,7 @@ class TestItemScanner:
     def controller(self) -> ItemScanner:
         return ItemScanner(MagicMock())
 
-    def test_clear_form(self, qtbot, controller):
+    def test_clear_form(self, qtbot: QtBot, controller):
         qtbot.addWidget(controller)
 
         controller._items = [TEST_ITEM, TEST_ITEM, TEST_ITEM]
@@ -405,7 +415,11 @@ class TestItemScanner:
         assert not controller._items \
                and not controller.items_list.toPlainText()
 
-    def test_submit_form(self, qtbot, monkeypatch: MonkeyPatch, controller):
+    def test_submit_form(
+        self, qtbot: QtBot,
+        monkeypatch: MonkeyPatch,
+        controller
+    ):
         qtbot.addWidget(controller)
 
         handle_alert(monkeypatch, 'warning')
@@ -423,7 +437,7 @@ class TestItemScanner:
         assert not controller.app.all_items[0].total
 
 
-def test_login(qtbot, monkeypatch: MonkeyPatch):
+def test_login(qtbot: QtBot, monkeypatch: MonkeyPatch):
     controller = Login(App())
     qtbot.addWidget(controller)
 
