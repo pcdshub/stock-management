@@ -97,6 +97,8 @@ class DBUtils:
         successfully, `False` otherwise.
         """
 
+        return True
+
         from stock_manager.model import Item
         from stock_manager.utils import DatabaseUpdateType
 
@@ -408,9 +410,11 @@ class DBUtils:
         item: Item
         for item in changelist:
             update_gs: bool = self._update_items_gs(update_type, item)
-            update_sql: bool = self._update_items_sql(update_type, item)
+            # update_sql: bool = self._update_items_sql(update_type, item)
 
-            if not all([update_gs, update_sql]):
+            # if not all([update_gs, update_sql]):
+            #     return False
+            if not update_gs:
                 return False
         return True
 
@@ -547,9 +551,10 @@ class DBUtils:
             return False
 
         update_gs: bool = self._update_users_gs(update_type, username)
-        update_sql: bool = self._update_users_sql(update_type, username)
+        # update_sql: bool = self._update_users_sql(update_type, username)
 
-        return all([update_gs, update_sql])
+        # return all([update_gs, update_sql])
+        return update_gs
 
     def _update_users_sql(
         self,
