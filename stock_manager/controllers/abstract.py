@@ -10,7 +10,7 @@ functionality, or reusable connection logic for concrete page controllers.
 import logging
 from abc import ABC, ABCMeta, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from numpy import ndarray
 from PyQt5.QtCore import QSortFilterProxyModel, Qt, QThread, pyqtSignal
@@ -52,7 +52,7 @@ class AbstractController(ABC, QWidget, metaclass=CombinedMeta):
         self.app = app
         self.logger = logging.getLogger()
         self.database = app.db
-        self.PAGE_NAME: stock_manager.utils.Pages | None = None
+        self.PAGE_NAME: Union[stock_manager.utils.Pages, None] = None
 
         try:
             ui_path = Path(

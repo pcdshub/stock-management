@@ -8,7 +8,7 @@ item details, validating user input, and saving changes
 to the database.
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
@@ -40,7 +40,7 @@ class Edit(AbstractController):
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
 
-        self._selected_item: Item | None = None
+        self._selected_item: Union[Item, None] = None
         self._total = self._excess = 0
         self._spinners: list[QSpinBox] = [
             self.b750_spinner,
@@ -48,7 +48,7 @@ class Edit(AbstractController):
             self.min_750_spinner,
             self.min_757_spinner
         ]
-        self._text_fields: list[QLineEdit | QTextEdit] = [
+        self._text_fields: list[Union[QLineEdit, QTextEdit]] = [
             self.manufacturer,
             self.desc
         ]
@@ -73,7 +73,7 @@ class Edit(AbstractController):
         self.submit_btn.setIcon(qta.icon('fa5s.plus-square'))
 
     @staticmethod
-    def _parse_field(text: str) -> int | str | None:
+    def _parse_field(text: str) -> Union[int, str, None]:
         """
         Convert text from a table cell into the
         appropriate type (int, str, or None).
@@ -171,7 +171,7 @@ class Edit(AbstractController):
 
         self.part_num.setText('Part Number...')
 
-        text_field: QLineEdit | QTextEdit
+        text_field: Union[QLineEdit, QTextEdit]
         for text_field in self._text_fields:
             text_field.clear()
         for spinner in self._spinners:
@@ -194,7 +194,7 @@ class Edit(AbstractController):
             )
             return
 
-        field_vals: list[str | int] = [
+        field_vals: list[Union[str, int]] = [
             self.part_num.text(),
             self.manufacturer.text(),
             self.desc.toPlainText(),
@@ -207,7 +207,7 @@ class Edit(AbstractController):
         ]
 
         i: int
-        field_val: str | int
+        field_val: Union[str, int]
         for i, field_val in enumerate(field_vals):
             if isinstance(field_val, str):
                 field_vals[i] = self._parse_field(field_val)

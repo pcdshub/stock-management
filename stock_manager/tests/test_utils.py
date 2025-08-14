@@ -1,6 +1,6 @@
 import logging
 import os.path
-from typing import Literal
+from typing import Literal, Union
 from unittest.mock import MagicMock
 
 from gspread import Cell, Worksheet
@@ -98,7 +98,7 @@ class TestDatabase:
         database.add_notification(TEST_NOTIFICATION)
 
         sheet: Worksheet = database._client.worksheet('Notifications')
-        cell: Cell | None = sheet.find(TEST_NOTIFICATION)
+        cell: Union[Cell, None] = sheet.find(TEST_NOTIFICATION)
         assert cell
 
         sheet.delete_rows(cell.row)
@@ -107,7 +107,7 @@ class TestDatabase:
         database.add_notification(TEST_NOTIFICATION)
 
         sheet: Worksheet = database._client.worksheet('Notifications')
-        cell: Cell | None = sheet.find(TEST_NOTIFICATION)
+        cell: Union[Cell, None] = sheet.find(TEST_NOTIFICATION)
         assert cell
 
         caplog.set_level(logging.INFO)

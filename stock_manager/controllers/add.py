@@ -6,7 +6,7 @@ Provides logic for the user to add new stock items, including form validation,
 computation of totals and excess, and updating the database.
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
@@ -42,7 +42,7 @@ class Add(AbstractController):
             self.min_750_spinner,
             self.min_757_spinner
         }
-        self._text_fields: set[QLineEdit | QTextEdit] = {
+        self._text_fields: set[Union[QLineEdit, QTextEdit]] = {
             self.part_num,
             self.manufacturer,
             self.desc
@@ -99,7 +99,7 @@ class Add(AbstractController):
         Resets the form to its initial state for new input.
         """
 
-        text_field: QLineEdit | QTextEdit
+        text_field: Union[QLineEdit, QTextEdit]
         for text_field in self._text_fields:
             text_field.clear()
         for spinner in self._spinners:

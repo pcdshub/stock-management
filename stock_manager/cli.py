@@ -10,6 +10,7 @@ import argparse
 import logging
 import os
 import sys
+from typing import Union
 
 import pytest
 from prettytable import PrettyTable
@@ -22,7 +23,7 @@ from stock_manager.utils import (DatabaseUpdateType, DBUtils, ExportUtils,
 logger = logging.getLogger()
 
 
-def build_commands() -> argparse.Namespace | None:
+def build_commands() -> Union[argparse.Namespace, None]:
     """
     Builds and parses command-line arguments for the CLI interface.
 
@@ -399,7 +400,7 @@ def _run_add_item(args) -> bool:
     logger.info(f'Adding "{args.values[0]}" To Databases...')
 
     try:
-        vals: list[str | int] = [
+        vals: list[Union[str, int]] = [
             value if i not in [3, 4, 5, 6, 7, 8]
             else int(value)
             for i, value in enumerate(args.values)
@@ -580,7 +581,7 @@ def _list_items(search_value='') -> None:
         else f'Searching For Items With "{search_value}"...'
     )
 
-    all_data: list[dict[str, int | str | None]] = DBUtils().get_all_data_gs()
+    all_data: list[dict[str, Union[int, str, None]]] = DBUtils().get_all_data_gs()
     headers = [
         '#', 'Name', 'Manufacturer', 'Total',
         'B750 Stock', 'B757 Stock', 'B750 Min',
@@ -593,7 +594,7 @@ def _list_items(search_value='') -> None:
     print('\n[+] Stock Items Report')
 
     i: int
-    data: dict[str, int | str | None]
+    data: dict[str, Union[int, str, None]]
     out_of_stock = low_stock = in_stock = other = total = 0
     for i, data in enumerate(all_data):
         if search_value:

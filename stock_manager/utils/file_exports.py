@@ -7,7 +7,7 @@ data exportation for various application features.
 
 import logging
 import os
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Union
 
 import qrcode
 from PyQt5.QtWidgets import QMessageBox
@@ -107,7 +107,7 @@ class ExportUtils:
             )
             return False
 
-    def create_code(self, part_num: str) -> BaseImage | None:
+    def create_code(self, part_num: str) -> Union[BaseImage, None]:
         """
         This method creates a QR code using the input `part_num`
         string and returns it as a `BaseImage` object.

@@ -6,6 +6,7 @@ the SLAC Inventory Management application.
 import asyncio
 import logging
 from pathlib import Path
+from typing import Union
 
 from PyQt5.QtGui import QCloseEvent, QFont
 from PyQt5.QtWidgets import (QMainWindow, QMessageBox, QPushButton,
@@ -64,8 +65,8 @@ class App(QMainWindow):
 
         self.user = ''
         self.all_items: list[stock_manager.model.Item] = []
-        self.screens: QStackedWidget | None = None
-        self.current_page: stock_manager.utils.Pages | None = None
+        self.screens: Union[QStackedWidget, None] = None
+        self.current_page: Union[stock_manager.utils.Pages, None] = None
 
         try:
             ui_path: Path = Path(

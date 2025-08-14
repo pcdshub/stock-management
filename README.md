@@ -95,9 +95,10 @@ cloud-based data storage.
 	- qasync
 	- qrcode
 	- qtawesome
+	- mysql
+    - prettytable
 	- pytest
 	- pytest-qt
-	- mysql
 
 3. **Configure Your Google Sheet:**
 	- Create or open a Google Sheets document that will act as your stock database.
@@ -272,3 +273,4 @@ This project is licensed under the SLAC National Accelerator Laboratory License.
 - [PyQt5](https://www.riverbankcomputing.com/static/Docs/PyQt5/introduction.html)
 - [OpenCV](https://opencv.org/)
 - [gspread](https://gspread.readthedocs.io/)
+- [PyTest](https://docs.pytest.org/en/stable/)

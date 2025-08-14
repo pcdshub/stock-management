@@ -1,3 +1,5 @@
+from typing import Union
+
 import mysql.connector
 from mysql.connector.abstracts import (MySQLConnectionAbstract,
                                        MySQLCursorAbstract)
@@ -22,7 +24,7 @@ cursor: MySQLCursorAbstract = db.cursor()
 
 
 def init_items_database():
-    def fetch_gs_rows() -> list[dict[str, int | float | str]]:
+    def fetch_gs_rows() -> list[dict[str, Union[int, float, str]]]:
         import gspread
         from gspread import Client, Spreadsheet
         from oauth2client.service_account import ServiceAccountCredentials
@@ -33,7 +35,7 @@ def init_items_database():
         client: Client = gspread.authorize(credentials)
         client: Spreadsheet = client.open('Common Stock')
         sheet = client.worksheet('Parts')
-        records: list[dict[str, int | float | str]] = sheet.get_all_records()
+        records: list[dict[str, Union[int, float, str]]] = sheet.get_all_records()
         return records
 
     sql = ('insert into inventory_items '
@@ -42,17 +44,17 @@ def init_items_database():
            'excess, minimum_sallie, stock_status) '
            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);')
 
-    def parse_values() -> list[list[int | str | None]]:
-        vals: list[list[int | float | str | None]] = [
+    def parse_values() -> list[list[Union[int, str, None]]]:
+        vals: list[list[Union[int, float, str, None]]] = [
             [value for value in record.values()]
             for record in fetch_gs_rows()
         ]
 
         i: int
-        items: list[int | float | str | None]
+        items: list[Union[int, float, str, None]]
         for i, items in enumerate(vals):
             j: int
-            val: int | float | str | None
+            val: Union[int, float, str, None]
             for j, val in enumerate(items):
                 if not val or val == '':
                     match j:

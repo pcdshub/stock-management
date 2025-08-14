@@ -1,7 +1,7 @@
 """Export page controller for exporting inventory data
 in the Stock Management Application."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy
 from PyQt5.QtCore import QModelIndex
@@ -74,7 +74,7 @@ class Export(AbstractExporter):
                         self.path,
                         self.app.all_items
                     )
-                case 'Select' | 'select':
+                case 'select':
                     QMessageBox.information(
                         self,
                         'Please Choose File Type',
@@ -118,7 +118,7 @@ class QRGenerate(AbstractExporter):
         page = stock_manager.utils.Pages.GENERATE
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
-        self._selected_qr: BaseImage | None = None
+        self._selected_qr: Union[BaseImage, None] = None
         self.location_btn.setText('.../' + self.path.split('\\')[-1])
         self.handle_connections()
 

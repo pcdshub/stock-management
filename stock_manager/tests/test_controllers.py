@@ -1,4 +1,5 @@
 import os.path
+from typing import Union
 from unittest.mock import MagicMock
 
 import cv2
@@ -198,7 +199,7 @@ class TestAdd:
     ):
         qtbot.addWidget(controller)
 
-        field: QLineEdit | QTextEdit
+        field: Union[QLineEdit, QTextEdit]
         value: str
         for field, value in zip(
                 controller._text_fields, [part_num, manufacturer, desc]
@@ -239,7 +240,7 @@ class TestEdit:
         qtbot: QtBot,
         controller,
         text: str,
-        expected: int | str | None
+        expected: Union[int, str, None]
     ):
         qtbot.addWidget(controller)
         assert controller._parse_field(text) == expected

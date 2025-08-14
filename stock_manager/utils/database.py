@@ -8,7 +8,7 @@ data from/to Google Sheets and a MySQL Database.
 import logging
 import os.path
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING, Iterable, Union
 
 import gspread
 import mysql.connector
@@ -207,7 +207,7 @@ class DBUtils:
 
     @staticmethod
     def create_all_items(
-        gs_items: list[dict[str, int | str | None]]
+        gs_items: list[dict[str, Union[int, str, None]]]
     ) -> list['Item']:
         """
         Convert a list dictionaries (Google Sheet
@@ -221,7 +221,7 @@ class DBUtils:
 
         obj_items: list[Item] = []
         for item in gs_items:
-            vals: list[int | str | None] = [
+            vals: list[Union[int, str, None]] = [
                 None if val is None or val == ''
                 else val
                 for val in list(item.values())
@@ -235,6 +235,7 @@ class DBUtils:
         'Stock Management Sheet'.
 
         :return: A list of strings containing the headers of the worksheet
+    def get_all_data_gs(self) -> list[dict[str, Union[int, str, None]]]:
         """
 
         try:
@@ -252,7 +253,6 @@ class DBUtils:
                 f'{gs_file_name}.'
             )
 
-    def get_all_data_gs(self) -> list[dict[str, int | str | None]]:
         """
         Retrieves all records from the `'Parts'` worksheet of
         the `'Stock Management Sheet'`.
@@ -267,13 +267,13 @@ class DBUtils:
         except Exception as e:
             gs_file_name = stock_manager.utils.GS_FILE_NAME
             self._log.error(
-                'Failed To Fetch All Data From'
+                'Failed To Fetch All Data From '
                 f'{gs_file_name} Database: {e}'
             )
             response = QMessageBox.critical(
                 None,
                 'Data Fetching Error',
-                'Failed To Fetch All Data From'
+                'Failed To Fetch All Data From '
                 f'{gs_file_name}.\n\n'
                 'Continue To Application?',
                 QMessageBox.Yes,
@@ -283,7 +283,7 @@ class DBUtils:
             if response == QMessageBox.Close:
                 raise SystemExit(1)
 
-    def get_all_data_sql(self) -> list[dict[str, int | str | None]]:
+    def get_all_data_sql(self) -> list[dict[str, Union[int, str, None]]]:
         """
         Retrieves all part data from the SQL database.
 
@@ -374,7 +374,7 @@ class DBUtils:
     def update_items_database(
         self,
         update_type: 'DatabaseUpdateType',
-        changelist: Iterable['Item'] | 'Item'
+        changelist: Union[Iterable['Item'], 'Item']
     ) -> bool:
         """
         Update both the Google Sheet and SQL database with
@@ -434,7 +434,7 @@ class DBUtils:
 
         from stock_manager.utils import DatabaseUpdateType
 
-        vals: list[str | int | None] = [
+        vals: list[Union[str, int, None]] = [
             value
             if not value == ''
             else None for
@@ -496,16 +496,16 @@ class DBUtils:
                 case DatabaseUpdateType.ADD:
                     sheet.append_row([value for value in item])
                 case DatabaseUpdateType.EDIT:
-                    cell: Cell | None = sheet.find(item.part_num)
+                    cell: Union[Cell, None] = sheet.find(item.part_num)
                     if not cell:
                         return False
 
                     i: int
-                    value: str | int | None
+                    value: Union[str, int, None]
                     for i, value in enumerate(item):
                         sheet.update_cell(cell.row, i + 1, value)
                 case DatabaseUpdateType.REMOVE:
-                    cell: Cell | None = sheet.find(item.part_num)
+                    cell: Union[Cell, None] = sheet.find(item.part_num)
                     if cell:
                         sheet.delete_rows(cell.row)
             return True
@@ -610,7 +610,7 @@ class DBUtils:
             if update_type == DatabaseUpdateType.ADD:
                 sheet.append_row([username])
             elif update_type == DatabaseUpdateType.REMOVE:
-                cell: Cell | None = sheet.find(username)
+                cell: Union[Cell, None] = sheet.find(username)
                 if cell:
                     sheet.delete_rows(cell.row)
             return True
@@ -639,7 +639,7 @@ class DBUtils:
 
         try:
             sheet: Worksheet = self._client.worksheet('Notifications')
-            cell: Cell | None = sheet.find(part_num)
+            cell: Union[Cell, None] = sheet.find(part_num)
             if cell:
                 self._log.warning(
                     f'{part_num} Already In Notifications Database'

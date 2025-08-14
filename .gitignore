@@ -9,12 +9,9 @@ __pycache__/
 # Custom ignored files
 *credentials.json
 .idea
+.pytest_cache
 *.pyc
-ui_*.py
-*Copy.ui
 *.log
-TODO.txt
-thoughts.txt
 *_export*
 !/test/exports/test_image*
 !/test/exports/txt_export.txt
