@@ -6,7 +6,6 @@ the SLAC Inventory Management application.
 import asyncio
 import logging
 from pathlib import Path
-from typing import override
 
 from PyQt5.QtGui import QCloseEvent, QFont
 from PyQt5.QtWidgets import (QMainWindow, QMessageBox, QPushButton,
@@ -237,7 +236,6 @@ class App(QMainWindow):
 
         bold_current_screen_button()
 
-    @override
     def closeEvent(self, event: QCloseEvent) -> None:
         """Handle the application close event and log exit."""
 

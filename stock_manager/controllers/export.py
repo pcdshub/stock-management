@@ -1,7 +1,7 @@
 """Export page controller for exporting inventory data
 in the Stock Management Application."""
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 import numpy
 from PyQt5.QtCore import QModelIndex
@@ -37,7 +37,6 @@ class Export(AbstractExporter):
         self.location_btn.setText('.../' + self.path.split('\\')[-1])
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         self.back_btn.clicked.connect(
             lambda: self.app.view.to_page()
@@ -61,7 +60,6 @@ class Export(AbstractExporter):
 
         handle_icons()
 
-    @override
     def export(self) -> bool:
         try:
             from stock_manager.utils import ExportTypes
@@ -124,7 +122,6 @@ class QRGenerate(AbstractExporter):
         self.location_btn.setText('.../' + self.path.split('\\')[-1])
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         import qtawesome as qta
 
@@ -138,7 +135,6 @@ class QRGenerate(AbstractExporter):
         self.location_btn.setIcon(qta.icon('fa6s.folder-tree'))
         self.save_btn.setIcon(qta.icon('fa5s.download'))
 
-    @override
     def export(self) -> bool:
         if not self._selected_qr:
             QMessageBox.warning(

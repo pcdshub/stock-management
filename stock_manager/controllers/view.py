@@ -5,7 +5,7 @@ in the Stock Management Application.
 Handles the main table display and navigation to the export page.
 """
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 import stock_manager
 from stock_manager.controllers import AbstractController
@@ -35,7 +35,6 @@ class View(AbstractController):
         self.PAGE_NAME = page
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         import qtawesome as qta
 

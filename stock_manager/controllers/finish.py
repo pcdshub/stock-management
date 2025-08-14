@@ -7,7 +7,7 @@ Manages the UI and logic for displaying the completion screen and
 returning the user to the main menu.
 """
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 import stock_manager
 from stock_manager.controllers import AbstractController
@@ -37,7 +37,6 @@ class Finish(AbstractController):
         self.PAGE_NAME = page
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         import qtawesome as qta
 

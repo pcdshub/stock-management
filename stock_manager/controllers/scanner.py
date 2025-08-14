@@ -7,7 +7,7 @@ camera input, processing frames, and integrating QR scanning into different
 parts of the application.
 """
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 import cv2
 import qtawesome as qta
@@ -44,7 +44,6 @@ class ItemScanner(AbstractScanner):
         self._items: list[Item] = []
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         self.clear_btn.clicked.connect(self._clear_form)
         self.done_btn.clicked.connect(self._finish_form)
@@ -53,7 +52,6 @@ class ItemScanner(AbstractScanner):
         self.clear_btn.setIcon(qta.icon('fa5s.backspace'))
         self.done_btn.setIcon(qta.icon('fa5s.check-square'))
 
-    @override
     @asyncSlot()
     async def check_for_qr(self, frame: ndarray) -> bool:
         """
@@ -221,7 +219,6 @@ class Login(AbstractScanner):
         self._users_list = self.database.get_all_users_gs()
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         self.login_btn.clicked.connect(self._login_clicked)
         self.username.returnPressed.connect(self._login_clicked)
@@ -230,7 +227,6 @@ class Login(AbstractScanner):
             qta.icon('fa6s.right-to-bracket', color='white')
         )
 
-    @override
     def to_page(self) -> None:
         """Navigate to this login page, logging out, and hiding sidebar."""
 
@@ -241,7 +237,6 @@ class Login(AbstractScanner):
             self.app.user = ''
         super().to_page()
 
-    @override
     @asyncSlot()
     async def check_for_qr(self, frame: ndarray) -> bool:
         """

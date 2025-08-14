@@ -8,7 +8,7 @@ part numbers, quantities, and stock statistics.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Generator, override
+from typing import TYPE_CHECKING, Generator
 
 if TYPE_CHECKING:
     from stock_manager.utils import StockStatus
@@ -46,7 +46,6 @@ class Item:
     def __post_init__(self):
         self._calc_stock_status()
 
-    @override
     def __hash__(self) -> int:
         """
         Allows hashing of an Item object, and
@@ -56,7 +55,6 @@ class Item:
         """
         return hash((value for value in self))
 
-    @override
     def __eq__(self, other: object) -> bool:
         """
         Allows comparing of two objects by checking

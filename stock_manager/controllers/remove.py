@@ -6,7 +6,7 @@ Provides functionality for removing stock items from the database.
 Includes search filtering and confirmation dialogs for safe item removal.
 """
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QMessageBox
@@ -38,7 +38,6 @@ class Remove(AbstractController):
         self.PAGE_NAME = page
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         import qtawesome as qta
 

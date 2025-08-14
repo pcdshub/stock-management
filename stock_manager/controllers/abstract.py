@@ -10,7 +10,7 @@ functionality, or reusable connection logic for concrete page controllers.
 import logging
 from abc import ABC, ABCMeta, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 from numpy import ndarray
 from PyQt5.QtCore import QSortFilterProxyModel, Qt, QThread, pyqtSignal
@@ -176,7 +176,6 @@ class AbstractScanner(AbstractController):
         super().__init__(file_name, app)
         self.camera_thread = self._CameraThread()
 
-    @override
     def to_page(self) -> None:
         """Navigate to this scanner page and start the video feed."""
 
@@ -314,7 +313,6 @@ class AbstractScanner(AbstractController):
             self.running = False
             self._logger = logging.getLogger()
 
-        @override
         def run(self) -> None:
             """
             Start the video capture loop.

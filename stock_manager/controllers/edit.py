@@ -8,7 +8,7 @@ item details, validating user input, and saving changes
 to the database.
 """
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
@@ -55,7 +55,6 @@ class Edit(AbstractController):
 
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         import qtawesome as qta
 

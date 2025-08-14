@@ -6,7 +6,7 @@ Provides logic for the user to add new stock items, including form validation,
 computation of totals and excess, and updating the database.
 """
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QLineEdit, QMessageBox, QSpinBox, QTextEdit
 
@@ -50,7 +50,6 @@ class Add(AbstractController):
 
         self.handle_connections()
 
-    @override
     def handle_connections(self) -> None:
         import qtawesome as qta
 
