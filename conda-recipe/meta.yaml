@@ -39,7 +39,7 @@ test:
   source_files:
     - stock_manager/tests/**
   commands:
-    - pytest -q
+    - python -m stock_manager test
 
 about:
   home: https://github.com/pcdshub/stock-management.git

@@ -1,8 +1,11 @@
+import os
+
 from setuptools import find_packages, setup
 
 import versioneer
 
-with open("requirements.txt", "rt") as fp:
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, "requirements.txt"), "rt") as fp:
     install_requires = [
         line for line in fp.read().splitlines()
         if line and not line.startswith("#")
@@ -28,5 +31,5 @@ setup(
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: BSD License",
-        ],
+        ]
 )

@@ -8,7 +8,7 @@ part numbers, quantities, and stock statistics.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, Iterator, Optional
 
 if TYPE_CHECKING:
     from stock_manager.utils import StockStatus
@@ -33,15 +33,15 @@ class Item:
     """
 
     part_num: str
-    manufacturer: str | None
-    description: str | None
-    total: int | None
-    stock_b750: int | None
-    stock_b757: int | None
-    minimum: int | None
-    excess: int | None
-    minimum_sallie: int | None
-    stock_status: 'StockStatus' = None
+    manufacturer: Optional[str]
+    description: Optional[str]
+    total: Optional[int]
+    stock_b750: Optional[int]
+    stock_b757: Optional[int]
+    minimum: Optional[int]
+    excess: Optional[int]
+    minimum_sallie: Optional[int]
+    stock_status: Optional['StockStatus'] = None
 
     def __post_init__(self):
         self._calc_stock_status()
