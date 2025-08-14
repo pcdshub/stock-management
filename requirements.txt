@@ -1,6 +1,6 @@
 # Main requirements
 pyqt5
-cv2
+opencv-python
 numpy
 gspread
 oauth2client

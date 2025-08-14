@@ -8,7 +8,7 @@ part numbers, quantities, and stock statistics.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Iterator, Optional
+from typing import TYPE_CHECKING, Iterator, Optional, Union
 
 if TYPE_CHECKING:
     from stock_manager.utils import StockStatus
@@ -85,7 +85,7 @@ class Item:
         """
         return len(self.__dict__)
 
-    def __getitem__(self, idx: int) -> str | int | Enum | None:
+    def __getitem__(self, idx: int) -> Union[str | int | Enum | None]:
         """
         Allows indexed access to the item's field values.
 
@@ -99,7 +99,11 @@ class Item:
             for value in self.__dict__.values()
         ][idx]
 
-    def __setitem__(self, idx: str, value: str | int | Enum | None) -> None:
+    def __setitem__(
+        self,
+        idx: str,
+        value: Union[str | int | Enum | None]
+    ) -> None:
         """
         Allows the setting of `Item` objects as `obj[str] = val`.
 
