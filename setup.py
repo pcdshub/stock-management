@@ -24,7 +24,7 @@ setup(
             'gui_scripts': ['stock_manager=stock_manager.__main__:main'],
             'console_scripts': ['stock_manager=stock_manager.__main__:main']
         },
-        python_requires='>=3.10',
+        python_requires='>=3.9',
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: BSD License",

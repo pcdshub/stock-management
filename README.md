@@ -67,7 +67,7 @@ cloud-based data storage.
 
 ### Prerequisites
 
-- Python 3.10 or newer
+- Python 3.9 or newer
 - [pip](https://pip.pypa.io/en/stable/) (Python package manager)
 - Google Cloud service account with access
   to [Google Sheets API](https://developers.google.com/sheets/api/quickstart/python)
