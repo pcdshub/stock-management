@@ -85,7 +85,7 @@ class Item:
         """
         return len(self.__dict__)
 
-    def __getitem__(self, idx: int) -> Union[str | int | Enum | None]:
+    def __getitem__(self, idx: int) -> Union[str, int, Enum, None]:
         """
         Allows indexed access to the item's field values.
 
@@ -102,7 +102,7 @@ class Item:
     def __setitem__(
         self,
         idx: str,
-        value: Union[str | int | Enum | None]
+        value: Union[str, int, Enum, None]
     ) -> None:
         """
         Allows the setting of `Item` objects as `obj[str] = val`.
