@@ -8,7 +8,7 @@ part numbers, quantities, and stock statistics.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Iterator
 
 if TYPE_CHECKING:
     from stock_manager.utils import StockStatus
@@ -113,11 +113,11 @@ class Item:
             return
         raise NameError(f'Unknown Field: {idx}')
 
-    def __iter__(self) -> Generator[str | int | Enum | None]:
+    def __iter__(self) -> Iterator[str | int | Enum | None]:
         """
         Allows iteration access to the item's field values.
 
-        :return: A `Generator` of `Item` values to iterate through.
+        :return: A `Iterator` of `Item` values to iterate through.
         """
         return (
             value
