@@ -8,13 +8,15 @@ source:
 build:
   number: 0
   noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
 
 requirements:
   build:
-    - python >=3.9
+    - python >=3.10
+    - pip
     - setuptools
   run:
-    - python >=3.9
+    - python >=3.10
     - pyqt
     - opencv
     - numpy
@@ -34,6 +36,10 @@ test:
   requires:
     - pytest
     - pytest-qt
+  source_files:
+    - tests
+  commands:
+    - pytest -q
 
 about:
   home: https://github.com/pcdshub/stock-management.git
