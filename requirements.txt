@@ -9,7 +9,7 @@ typing
 qasync
 qrcode
 qtawesome
-mysql
+mysql-connector-python
 prettytable
 
 # Testing requirements

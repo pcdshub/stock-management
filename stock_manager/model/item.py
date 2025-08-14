@@ -117,7 +117,7 @@ class Item:
             return
         raise NameError(f'Unknown Field: {idx}')
 
-    def __iter__(self) -> Iterator[str | int | Enum | None]:
+    def __iter__(self) -> Iterator[Union[str, int, Enum, None]]:
         """
         Allows iteration access to the item's field values.
 
