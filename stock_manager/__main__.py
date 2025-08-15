@@ -34,6 +34,7 @@ def main() -> None:
     """
 
     stock_manager.utils.Logger()
+    logging.getLogger('mysql.connector').setLevel(logging.WARNING)
 
     args = build_commands()
 

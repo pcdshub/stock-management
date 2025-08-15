@@ -336,7 +336,7 @@ class DBUtils:
         try:
             return {
                 str(user)
-                for user in self._client.worksheet('Users').col_values(1)
+                for user in self._client.worksheet('Users').col_values(1)[1:]
             }
         except Exception as e:
             gs_file_name = stock_manager.utils.GS_FILE_NAME

@@ -176,7 +176,7 @@ class App(QMainWindow):
         """
 
         try:
-            if not self.db.sync_databases():
+            if self.db.sql_database and not self.db.sync_databases():
                 raise Exception('Database Synchronization Error')
             self.all_items = self.db.create_all_items(
                 self.db.get_all_data_gs()
@@ -237,7 +237,7 @@ class App(QMainWindow):
 
         bold_current_screen_button()
 
-    def closeEvent(self, event: QCloseEvent) -> None:
+    def closeEvent(self, event: QCloseEvent, _=None) -> None:
         """Handle the application close event and log exit."""
 
         self.logger.info('App Exited\n')

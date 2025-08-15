@@ -587,7 +587,8 @@ def _list_items(search_value='') -> None:
         else f'Searching For Items With "{search_value}"...'
     )
 
-    all_data: list[dict[str, Union[int, str, None]]] = DBUtils().get_all_data_gs()
+    all_data: list[dict[str, Union[int, str, None]]] = \
+        DBUtils().get_all_data_gs()
     headers = [
         '#', 'Name', 'Manufacturer', 'Total',
         'B750 Stock', 'B757 Stock', 'B750 Min',
