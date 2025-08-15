@@ -148,27 +148,6 @@ class ItemScanner(AbstractScanner):
                         return
 
                     item.update_stats()
-                    if item.stock_b750 + item.stock_b757 <= 0:
-                        from datetime import datetime
-                        msg = ('Hello,\n\n'
-
-                               'This is an automatic notification '
-                               'detailing that the following item '
-                               'has reached a total stock of 0:\n'
-                               f'\tItem: {item.part_num}\n'
-                               f'\tDescription: {item.description}\n'
-                               f'\tExcess Count: {item.excess} ('
-                               f'{item.stock_status.value})\n'
-                               f'\tDate/Time: {datetime.now()}\n\n'
-
-                               'Please take any necessary action '
-                               'to reorder or restock.\n\n'
-
-                               'Best regards,\n'
-                               'Stock Management System')
-
-                        self.database.add_notification(item.part_num)
-                        stock_manager.utils.send_email(msg)
                     break
 
             self.app.update_tables()

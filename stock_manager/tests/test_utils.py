@@ -1,15 +1,13 @@
 import logging
 import os.path
-from typing import Literal, Union
+from typing import Literal
 from unittest.mock import MagicMock
 
-from gspread import Cell, Worksheet
 from pytest import fixture, mark
 
-import stock_manager
 from stock_manager.utils import DatabaseUpdateType, DBUtils, ExportUtils
 
-from .conftest import TEST_ITEM, TEST_NOTIFICATION, TEST_USERNAME
+from .conftest import TEST_ITEM, TEST_USERNAME
 
 
 class TestDatabase:
@@ -91,28 +89,6 @@ class TestDatabase:
         database.update_items_database(DatabaseUpdateType.REMOVE, TEST_ITEM)
         assert not database.find_item(TEST_ITEM.part_num)
 
-    def test_database_notification(self, database):
-        database.add_notification(TEST_NOTIFICATION)
-
-        sheet: Worksheet = database._client.worksheet('Notifications')
-        cell: Union[Cell, None] = sheet.find(TEST_NOTIFICATION)
-        assert cell
-
-        sheet.delete_rows(cell.row)
-
-    def test_existing_notif(self, database, caplog):
-        database.add_notification(TEST_NOTIFICATION)
-
-        sheet: Worksheet = database._client.worksheet('Notifications')
-        cell: Union[Cell, None] = sheet.find(TEST_NOTIFICATION)
-        assert cell
-
-        caplog.set_level(logging.INFO)
-        database.add_notification(TEST_NOTIFICATION)
-        assert 'Already In Notifications Database' in caplog.text
-
-        sheet.delete_rows(cell.row)
-
     def test_create_items(self, database):
         assert database.create_all_items(database.get_all_data_gs())
 
@@ -176,7 +152,3 @@ class TestExports:
         assert os.path.exists(path)
 
         os.remove(path)
-
-
-def test_email_sending():
-    assert stock_manager.utils.send_email('Test Email')
