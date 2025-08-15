@@ -68,9 +68,6 @@ class TestDatabase:
         update_gs(DatabaseUpdateType.REMOVE)
         assert database_unaltered
 
-    def test_fetch_headers(self, database):
-        assert database.get_headers()
-
     def test_fetch_data_gs(self, database):
         assert database.get_all_data_gs()
 

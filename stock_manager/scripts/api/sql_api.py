@@ -33,8 +33,8 @@ def init_items_database():
             '../../../assets/gs_credentials.json'
         )
         client: Client = gspread.authorize(credentials)
-        client: Spreadsheet = client.open('Common Stock')
-        sheet = client.worksheet('Parts')
+        client: Spreadsheet = client.open('ECS Common Stock Inventory')
+        sheet = client.worksheet('Master Part List')
         records: list[dict[str, Union[int, float, str]]] = sheet.get_all_records()
         return records
 
@@ -79,7 +79,7 @@ def init_users_database():
             '../../../assets/gs_credentials.json'
         )
         client: Client = gspread.authorize(credentials)
-        client: Spreadsheet = client.open('Common Stock')
+        client: Spreadsheet = client.open('ECS Common Stock Inventory')
         sheet = client.worksheet('Users')
         records: list[dict[str, str]] = sheet.get_all_records()
         return records

@@ -33,4 +33,16 @@ def excess_equation(total: int, b750_minimum: int, b757_minimum: int) -> int:
 
 
 SIDEBAR_BUTTON_SIZE = 14
-GS_FILE_NAME = 'Common Stock'
+GS_FILE_NAME = 'ECS Common Stock Inventory'
+KEEP_HEADERS = [
+    'Part #',
+    'Manufacturer',
+    'Description',
+    'Total',
+    'B750',
+    'B757',
+    'Minimum',
+    'Excess',
+    'Min Sallies',
+    'Stock Status'
+]

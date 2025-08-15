@@ -343,7 +343,13 @@ def _run_sync_databases(args) -> bool:
     """
 
     logger.info('Syncing Databases...')
-    if not stock_manager.utils.DBUtils().sync_databases():
+    utils = DBUtils()
+    if not utils.sql_database:
+        logger.info('No MySQL Database Present, '
+                    'No Need For Database Synchronization')
+        return True
+
+    if not utils.sync_databases():
         return False
     logger.info('Successfully Synchronized Databases')
     return True
@@ -615,7 +621,7 @@ def _list_items(search_value='') -> None:
             data['B750'],
             data['B757'],
             data['Minimum'],
-            data['B750 Minimum'],
+            data['Min Sallies'],
             data['Excess'],
             data['Stock Status'],
             data['Description']

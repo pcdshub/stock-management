@@ -16,7 +16,7 @@ from gspread import Cell, Spreadsheet, Worksheet
 from mysql.connector.abstracts import (MySQLConnectionAbstract,
                                        MySQLCursorAbstract)
 from oauth2client.service_account import ServiceAccountCredentials
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 import stock_manager
 
@@ -59,7 +59,20 @@ class DBUtils:
             self._client: Spreadsheet = gspread.authorize(credentials).open(
                 stock_manager.utils.GS_FILE_NAME
             )
+        except Exception as e:
+            self._log.error(f'Failed To Connect To Google Sheet Database: {e}')
+            QMessageBox.critical(
+                None,
+                'Google Sheet Connection Failure',
+                'Failed To Connect To Google Sheet Database, '
+                'Make Sure You Have An Internet Connection '
+                'And Google Sheet Data Is Correct'
+            )
+            raise SystemExit(1)
 
+        self.sql_database = False
+
+        try:
             self._db: MySQLConnectionAbstract = mysql.connector.connect(
                 host='localhost',
                 user='root',
@@ -69,15 +82,24 @@ class DBUtils:
             self._cursor: MySQLCursorAbstract = self._db.cursor(
                 dictionary=True
             )
+            self.sql_database = True
         except Exception as e:
-            self._log.error(f'Failed To Connect To Database: {e}')
-            QMessageBox.critical(
+            self._log.error(f'Failed To Connect To MySQL Database: {e}')
+
+            if not QApplication.instance():
+                return
+
+            response = QMessageBox.question(
                 None,
-                'Database Connection Failure',
-                'Failed To Connect To Database, '
-                'Make Sure You Have An Internet Connection'
+                'MySQL Connection Failure',
+                'Failed To Connect To MySQL Database, '
+                'Continue To Application?',
+                QMessageBox.Yes,
+                QMessageBox.No
             )
-            raise SystemExit(1)
+
+            if response == QMessageBox.No:
+                raise SystemExit(1)
 
     def sync_databases(self) -> bool:
         """
@@ -96,8 +118,6 @@ class DBUtils:
         :return: `True` if databases are synchronized
         successfully, `False` otherwise.
         """
-
-        return True
 
         from stock_manager.model import Item
         from stock_manager.utils import DatabaseUpdateType
@@ -229,32 +249,9 @@ class DBUtils:
             obj_items.append(Item(*vals))
         return obj_items
 
-    def get_headers(self) -> list[str]:
-        """
-        Retrieves the headers of the 'Parts' worksheet of the
-        'Stock Management Sheet'.
-
-        :return: A list of strings containing the headers of the worksheet
     def get_all_data_gs(self) -> list[dict[str, Union[int, str, None]]]:
         """
-
-        try:
-            return self._client.worksheet('Parts').row_values(1)
-        except Exception as e:
-            gs_file_name = stock_manager.utils.GS_FILE_NAME
-            self._log.error(
-                'Failed To Fetch Sheet Headers From '
-                f'{gs_file_name} Database: {e}'
-            )
-            QMessageBox.critical(
-                None,
-                'Header Fetching Error',
-                'Failed To Fetch Sheet Headers From '
-                f'{gs_file_name}.'
-            )
-
-        """
-        Retrieves all records from the `'Parts'` worksheet of
+        Retrieves all records from the `'Master Part List'` worksheet of
         the `'Stock Management Sheet'`.
 
         :return: List of dictionaries, each representing a row from the sheet.
@@ -263,7 +260,17 @@ class DBUtils:
         """
 
         try:
-            return self._client.worksheet('Parts').get_all_records()
+            all_values = \
+                self._client.worksheet('Master Part List').get_all_records()
+            filtered_dict = [
+                {
+                    key: value[key]
+                    for key in value
+                    if key in stock_manager.utils.KEEP_HEADERS
+                }
+                for value in all_values
+            ]
+            return filtered_dict
         except Exception as e:
             gs_file_name = stock_manager.utils.GS_FILE_NAME
             self._log.error(
@@ -410,11 +417,12 @@ class DBUtils:
         item: Item
         for item in changelist:
             update_gs: bool = self._update_items_gs(update_type, item)
-            # update_sql: bool = self._update_items_sql(update_type, item)
 
-            # if not all([update_gs, update_sql]):
-            #     return False
-            if not update_gs:
+            if self.sql_database:
+                update_sql: bool = self._update_items_sql(update_type, item)
+                if not all([update_gs, update_sql]):
+                    return False
+            elif not update_gs:
                 return False
         return True
 
@@ -490,7 +498,7 @@ class DBUtils:
 
         from stock_manager.utils import DatabaseUpdateType
 
-        sheet: Worksheet = self._client.worksheet('Parts')
+        sheet: Worksheet = self._client.worksheet('Master Part List')
         try:
             match update_type:
                 case DatabaseUpdateType.ADD:
@@ -551,9 +559,10 @@ class DBUtils:
             return False
 
         update_gs: bool = self._update_users_gs(update_type, username)
-        # update_sql: bool = self._update_users_sql(update_type, username)
 
-        # return all([update_gs, update_sql])
+        if self.sql_database:
+            update_sql: bool = self._update_users_sql(update_type, username)
+            return all([update_gs, update_sql])
         return update_gs
 
     def _update_users_sql(
