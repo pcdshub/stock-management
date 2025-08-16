@@ -1,6 +1,6 @@
 """Controllers package for the Stock Management Application."""
 
-from .abstract import AbstractController, AbstractScanner
+from .abstract import AbstractController, AbstractExporter, AbstractScanner
 from .add import Add
 from .edit import Edit
 from .export import Export, QRGenerate
@@ -12,6 +12,7 @@ from .view import View
 __all__ = [
     'AbstractController',
     'AbstractScanner',
+    'AbstractExporter',
     'Login',
     'View',
     'ItemScanner',

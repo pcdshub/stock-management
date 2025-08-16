@@ -1,5 +1,6 @@
-PyQt5
-cv2
+# Main requirements
+pyqt5
+opencv-python
 numpy
 gspread
 oauth2client
@@ -8,3 +9,9 @@ typing
 qasync
 qrcode
 qtawesome
+mysql-connector-python
+prettytable
+
+# Testing requirements
+pytest
+pytest-qt

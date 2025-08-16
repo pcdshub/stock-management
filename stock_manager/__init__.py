@@ -6,16 +6,8 @@ for the SLAC Inventory Management system, including versioning and
 the main application window.
 """
 
+from . import controllers, model, utils
 from ._version import get_versions
-from .app import App
-from .controllers import *
-from .model import *
-from .utils import *
 
 __version__ = get_versions()['version']
-__all__ = [
-    'App',
-    controllers.__all__,
-    model.__all__,
-    utils.__all__
-]
+__all__ = ['App'] + controllers.__all__ + model.__all__ + utils.__all__

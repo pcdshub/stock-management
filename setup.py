@@ -1,15 +1,18 @@
+import os
+
 from setuptools import find_packages, setup
 
 import versioneer
 
-with open("requirements.txt", "rt") as fp:
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, "requirements.txt"), "rt") as fp:
     install_requires = [
         line for line in fp.read().splitlines()
         if line and not line.startswith("#")
     ]
 
 setup(
-        name="slac-stock-manager",
+        name="stock_manager",
         version=versioneer.get_version(),
         cmdclass=versioneer.get_cmdclass(),
         license="BSD",
@@ -21,13 +24,12 @@ setup(
         long_description_content_type="text/markdown",
         install_requires=install_requires,
         entry_points={
-            'gui_scripts': [
-                'stock_manager=stock_manager.__main__:main'
-            ]
+            'gui_scripts': ['stock_manager=stock_manager.__main__:main'],
+            'console_scripts': ['stock_manager=stock_manager.__main__:main']
         },
-        python_requires='>=3.10',
+        python_requires='>=3.9',
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: BSD License",
-        ],
+        ]
 )
