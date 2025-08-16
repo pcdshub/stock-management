@@ -39,10 +39,6 @@ cloud-based data storage.
   <br>
   Real-time synchronization between physical stock, GUI, CLI, and both databases.
 
-- **Smart Restock Alerts**
-  <br>
-  Automatically notifies inventory managers when items need restocking or reordering based on thresholds.
-
 - **Modular Architecture:**
   <br>
   Components are cleanly separated into controllers, utilities, and UI for easy extension.
@@ -96,37 +92,80 @@ cloud-based data storage.
 	- qrcode
 	- qtawesome
 	- mysql
-    - prettytable
+	- prettytable
 	- pytest
 	- pytest-qt
 
-3. **Configure Your Google Sheet:**
+3. **Configure your Google Sheet:**
 	- Create or open a Google Sheets document that will act as your stock database.
 	- Name the file and change `contants.py` -> `GS_FILE_NAME` to match the file name.
 	- Make sure your sheet includes two separate tabs (worksheets):
-		- One named "Parts" — this should store all inventory items, quantities, and related details.
+	    - One named "Master Part List" — this should store all inventory items, quantities, and related details.
+          - This sheet should have specific columns which are listed in `constants.py` as `KEEP_HEADERS`.
 		- One named "Users" — this should store usernames for access control, logging, or tracking who checks out stock.
+          - All usernames should be placed in the first column.
 	- Follow [these instructions](https://gspread.readthedocs.io/en/latest/oauth2.html) to create a Google Cloud service
-	  account and download the `gs_credentials.json` key.
-	- Share your Google Sheet (e.g., "Stock Management Sheet") with the service account email in your credentials file.
+	  account and rename the `.json` file as `gs_credentials.json`.
+	- Share your Google Sheet with the service account.
 	- Place `gs_credentials.json` in the `assets/` directory.
 
-4. **Running the application:**
+4. **(Optional) Configure your MySQL database:**
+	- **Install MySQL:** Download and install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/).
+    - **Start the MySQL Server:** On most systems this happens automatically after installation, but you can start
+      it manually with:
+      ```bash
+      net start MySQL
+      ```
+    - **Log into MySQL as root:**
+      ```bash
+      mysql -u root -p
+      ```
+    - **Create, use, and source the database with MySQL:**
+      ```sql
+      CREATE DATABASE common_stock
+      USE common_stock
+      SOURCE /path/to/dump/file.sql
+      ```
+
+5. **Running the application:**
 	- **Run The GUI**
-	  To launch the application in GUI mode, just use the -m flag:
+	  To launch the application in GUI mode, just use the --run or -r flag:
 	   ```bash
-	   python -m stock_manager
+	   python -m stock_manager --run
 	   ```
 	  This opens the full graphical interface for managing inventory, scanning items, and generating reports.
 	- **Use Command-Line Options**
 	  You can also use CLI commands to perform specific tasks directly from the terminal. For example:
 	  ```bash
-	  python -m stock_manager --list-items
+	  python -m stock_manager users --list
+	  python -m stock_manager items remove part_num
+	  python -m stock_manager sync
+	  python -m stock_manager qr part_num ./exports
+	  python -m stock_manager --version
+	  python -m stock_manager -r
 	  ```
-	  Use `--help` to see all available CLI options:
+	  Use `--help` to see all available CLI options for any command:
 	  ```bash
       python -m stock_manager --help
+      python -m stock_manager items --help
+      python -m stock_manager users --help
+      python -m stock_manager qr --help
+      python -m stock_manager export --help
 	  ```
+      Use `--tree` to see all commands in a tree layout:
+      ```bash
+      python -m stock_manager --tree
+      ```
+      ```
+      ├── help - ...
+      ├── test - ...
+      ├── sync - ...
+      ├── export - ...
+      │   ├── help - ...
+      │   ├── extension - ...
+      │   └── path - ...
+      └── ...
+      ```
 
 ---
 
@@ -177,24 +216,23 @@ stock-management/
 │   │
 │   ├── controllers/
 │   │   ├── abstract.py
-│   │   ├── view.py
-│   │   ├── scanner.py
 │   │   ├── add.py
 │   │   ├── edit.py
-│   │   ├── remove.py
 │   │   ├── export.py
-│   │   └── finish.py
+│   │   ├── finish.py
+│   │   ├── remove.py
+│   │   ├── scanner.py
+│   │   └── view.py
 │   │
 │   ├── model/
 │   │   └── item.py
 │   │
 │   ├── utils/
 │   │   ├── constants.py
-│   │   ├── logger.py
+│   │   ├── database.py
 │   │   ├── enums.py
 │   │   ├── file_exports.py
-│   │   ├── qr_generator.py
-│   │   └── database.py
+│   │   └── logger.py
 │   │
 │   └── ...
 │
@@ -205,9 +243,6 @@ stock-management/
 ├── assets/
 │   ├── gs_credentials.json # Google Sheets credentials
 │   ├── resources.qrc
-│   │
-│   ├── icons/              # Icons used throughout application
-│   │   └── ...
 │   │
 │   ├── images/             # Images used throughout application
 │   │   └── ...
@@ -254,10 +289,13 @@ stock-management/
   Extend the `controllers/` or `utils/` package as needed.
 
 - **To add new commands:**
-  Add commands in `cli.py` and try running them using `python -m stock_manager --your-command`.
+  Add commands in `cli.py` accordingly.
 
-- **To test features:**
+- **To run tests:**
   Add test modules to `tests/` as needed.
+
+- **To Develop New Features:**
+  Add WIP modules to `scripts/` before implementing into project.
 
 ---
 
