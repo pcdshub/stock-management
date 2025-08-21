@@ -8,6 +8,7 @@ pathlib
 typing
 qasync
 qrcode
+pillow
 qtawesome
 mysql-connector-python
 prettytable
