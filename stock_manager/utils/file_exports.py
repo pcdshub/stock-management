@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Literal, Union
 
 import qrcode
 from PyQt5.QtWidgets import QMessageBox
-from qrcode.image.base import BaseImage
+from qrcode.image.pil import PilImage
 
 if TYPE_CHECKING:
     from stock_manager.model import Item
@@ -107,10 +107,10 @@ class ExportUtils:
             )
             return False
 
-    def create_code(self, part_num: str) -> Union[BaseImage, None]:
+    def create_code(self, part_num: str) -> Union[PilImage, None]:
         """
         This method creates a QR code using the input `part_num`
-        string and returns it as a `BaseImage` object.
+        string and returns it as a `PilImage` object.
 
         :param part_num: The string to encode in the QR code.
         :return: The generated QR code image.
@@ -120,7 +120,7 @@ class ExportUtils:
             qr = qrcode.QRCode()
             qr.add_data(part_num)
             qr.make()
-            image = qr.make_image()
+            image = qr.make_image(image_factory=PilImage)
             self._logger.info(
                 f'Successfully Generated QR Code For: {part_num}'
             )
@@ -136,7 +136,7 @@ class ExportUtils:
             )
             return None
 
-    def save_code(self, qr_code: BaseImage, path: str) -> bool:
+    def save_code(self, qr_code: PilImage, path: str) -> bool:
         """
         Save a QR code image to a specified file path in `.png` format.
 

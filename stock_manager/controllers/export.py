@@ -7,7 +7,7 @@ import numpy
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qrcode.image.base import BaseImage
+from qrcode.image.pil import PilImage
 
 import stock_manager
 from stock_manager.controllers import AbstractExporter
@@ -118,7 +118,7 @@ class QRGenerate(AbstractExporter):
         page = stock_manager.utils.Pages.GENERATE
         super().__init__(page.value.FILE_NAME, app)
         self.PAGE_NAME = page
-        self._selected_qr: Union[BaseImage, None] = None
+        self._selected_qr: Union[PilImage, None] = None
         self.location_btn.setText('.../' + self.path.split('\\')[-1])
         self.handle_connections()
 
